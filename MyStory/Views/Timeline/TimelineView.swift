@@ -1,109 +1,182 @@
 import SwiftUI
 import PhotosUI
 
+// MARK: - Main View
 struct TimelineView: View {
+    // MARK: - Environment
     @Environment(\.managedObjectContext) private var context
     @EnvironmentObject private var coreData: CoreDataStack
-
-    @State private var mediaService = MediaStorageService()
-    @State private var locationService = LocationService()
-
+    
+    // MARK: - State
     @StateObject private var vm = TimelineViewModel()
     @State private var selectedStory: StoryEntity?
     @State private var showFullScreen = false
     @State private var showEditor = false
-
+    
+    // MARK: - Services
+    @State private var mediaService = MediaStorageService()
+    
+    // MARK: - Body
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 20) {
-                    ForEach(Array(vm.stories.enumerated()), id: \.element.objectID) { index, story in
-                        let media = story.medias?.first
-                        let imgName = media?.thumbnailFileName ?? media?.fileName
-                        // 加载封面图：视频用封面，图片用缩略图或原图
-                        let img = imgName.flatMap { mediaService.loadImage(fileName: $0) }
-                        
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack(spacing: 8) {
-                                Circle()
-                                    .stroke(Color.red, lineWidth: 2)
-                                    .frame(width: 16, height: 16)
-                                Text(Self.formatDate(story.timestamp))
-                                    .font(.subheadline)
-                                    .foregroundColor(.red)
-                            }
-                            
-                            Button {
-                                // 点击进入全屏预览
-                                navigateToFullScreen(story: story)
-                            } label: {
-                                StoryCardView(story: story, firstImage: img)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .contextMenu {
-                                Button {
-                                    editStory(story)
-                                } label: {
-                                    Label("编辑", systemImage: "pencil")
-                                }
-                                Button(role: .destructive) {
-                                    delete(story)
-                                } label: {
-                                    Label("删除", systemImage: "trash")
-                                }
-                            }
-                        }
-                        .onAppear {
-                            if index >= vm.stories.count - 3 { vm.loadNextPage() }
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                storyListView
             }
             .navigationTitle("时间轴")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        selectedStory = nil
-                        showEditor = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
+                toolbarContent
             }
             .sheet(isPresented: $showEditor) {
-                if let story = selectedStory {
-                    StoryEditorView(existingStory: story) {
-                        reloadStories()
-                    }
-                } else {
-                    StoryEditorView { reloadStories() }
-                }
+                editorSheet
             }
             .fullScreenCover(isPresented: $showFullScreen) {
-                if let story = selectedStory, let index = vm.stories.firstIndex(where: { $0.objectID == story.objectID }) {
-                    FullScreenStoryView(stories: vm.stories, initialIndex: index)
-                } else {
-                    EmptyView()
-                }
+                fullScreenView
             }
             .onAppear {
-                vm.setContext(context)
-                if vm.stories.isEmpty { vm.loadFirstPage() }
+                setupViewModel()
             }
         }
     }
-
-    private func delete(_ story: StoryEntity) {
-        context.delete(story)
-        vm.stories.removeAll { $0.objectID == story.objectID }
-        coreData.save()
+    
+    // MARK: - View Components
+    private var storyListView: some View {
+        LazyVStack(alignment: .leading, spacing: 20) {
+            ForEach(Array(vm.stories.enumerated()), id: \.element.objectID) { index, story in
+                storyItemView(story: story, index: index)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+    }
+    
+    private func storyItemView(story: StoryEntity, index: Int) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            dateHeaderView(for: story)
+            storyCardButton(for: story)
+        }
+        .onAppear {
+            handleItemAppear(index: index)
+        }
+    }
+    
+    private func dateHeaderView(for story: StoryEntity) -> some View {
+        HStack(spacing: 8) {
+            Circle()
+                .stroke(Color.red, lineWidth: 2)
+                .frame(width: 16, height: 16)
+            Text(Self.formatDate(story.timestamp))
+                .font(.subheadline)
+                .foregroundColor(.red)
+        }
+    }
+    
+    private func storyCardButton(for story: StoryEntity) -> some View {
+        Button {
+            navigateToFullScreen(story: story)
+        } label: {
+            StoryCardView(story: story, firstImage: loadCoverImage(for: story))
+        }
+        .buttonStyle(PlainButtonStyle())
+        .contextMenu {
+            contextMenuItems(for: story)
+        }
+    }
+    
+    @ViewBuilder
+    private func contextMenuItems(for story: StoryEntity) -> some View {
+        Button {
+            editStory(story)
+        } label: {
+            Label("编辑", systemImage: "pencil")
+        }
+        
+        Button(role: .destructive) {
+            deleteStory(story)
+        } label: {
+            Label("删除", systemImage: "trash")
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            Button {
+                createNewStory()
+            } label: {
+                Image(systemName: "plus")
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var editorSheet: some View {
+        if let story = selectedStory {
+            StoryEditorView(existingStory: story) {
+                reloadStories()
+            }
+        } else {
+            StoryEditorView { 
+                reloadStories() 
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var fullScreenView: some View {
+        if let story = selectedStory, 
+           let index = vm.stories.firstIndex(where: { $0.objectID == story.objectID }) {
+            FullScreenStoryView(stories: vm.stories, initialIndex: index)
+        } else {
+            EmptyView()
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private func setupViewModel() {
+        vm.setContext(context)
+        if vm.stories.isEmpty { 
+            vm.loadFirstPage() 
+        }
+    }
+    
+    private func handleItemAppear(index: Int) {
+        if index >= vm.stories.count - 3 { 
+            vm.loadNextPage() 
+        }
+    }
+    
+    private func loadCoverImage(for story: StoryEntity) -> UIImage? {
+        guard let media = story.medias?.first else { return nil }
+        
+        // 根据媒体类型选择正确的加载方法
+        if media.type == "video" {
+            // 视频封面：优先使用thumbnailFileName
+            if let thumbFileName = media.thumbnailFileName {
+                return mediaService.loadVideoThumbnail(fileName: thumbFileName)
+            }
+            return nil
+        } else {
+            // 图片：优先使用缩略图，其次使用原图
+            let fileName = media.thumbnailFileName ?? media.fileName
+            return mediaService.loadImage(fileName: fileName)
+        }
+    }
+    
+    // MARK: - Actions
+    private func createNewStory() {
+        selectedStory = nil
+        showEditor = true
     }
     
     private func editStory(_ story: StoryEntity) {
         selectedStory = story
         showEditor = true
+    }
+    
+    private func deleteStory(_ story: StoryEntity) {
+        context.delete(story)
+        vm.stories.removeAll { $0.objectID == story.objectID }
+        coreData.save()
     }
     
     private func navigateToFullScreen(story: StoryEntity) {
@@ -115,9 +188,10 @@ struct TimelineView: View {
         vm.loadFirstPage()
     }
     
+    // MARK: - Date Formatting
     private static func formatDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy年MM月dd日"
-        return f.string(from: date)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy年MM月dd日"
+        return formatter.string(from: date)
     }
 }
