@@ -71,16 +71,6 @@ struct TimelineView: View {
                         Image(systemName: "plus")
                     }
                 }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        if let first = vm.stories.first {
-                            selectedStory = first
-                            showFullScreen = true
-                        }
-                    } label: {
-                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                    }
-                }
             }
             .sheet(isPresented: $showEditor) {
                 if let story = selectedStory {
@@ -94,6 +84,8 @@ struct TimelineView: View {
             .fullScreenCover(isPresented: $showFullScreen) {
                 if let story = selectedStory, let index = vm.stories.firstIndex(where: { $0.objectID == story.objectID }) {
                     FullScreenStoryView(stories: vm.stories, initialIndex: index)
+                } else {
+                    EmptyView()
                 }
             }
             .onAppear {

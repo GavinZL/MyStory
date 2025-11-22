@@ -2,7 +2,7 @@ import SwiftUI
 import AVKit
 
 struct VideoPlayerView: View {
-    let videoURL: URL
+    let videoURL: URL?
     @State private var player: AVPlayer?
     @Environment(\.dismiss) private var dismiss
     
@@ -36,8 +36,12 @@ struct VideoPlayerView: View {
             }
         }
         .onAppear {
-            player = AVPlayer(url: videoURL)
-            player?.play()
+            if let url = videoURL {
+                player = AVPlayer(url: url)
+                player?.play()
+            }else{
+                print("url is null")
+            }
         }
         .onDisappear {
             player?.pause()

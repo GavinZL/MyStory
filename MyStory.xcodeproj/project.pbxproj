@@ -21,6 +21,7 @@
 		E10000000C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E20000000C /* Assets.xcassets */; };
 		E10000000E /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000E /* VideoPlayerView.swift */; };
 		E10000000F /* VideoTransferable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000F /* VideoTransferable.swift */; };
+		E100000010 /* LoadingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000010 /* LoadingIndicator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		E20000000D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E20000000E /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
 		E20000000F /* VideoTransferable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoTransferable.swift; sourceTree = "<group>"; };
+		E200000010 /* LoadingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingIndicator.swift; sourceTree = "<group>"; };
 		E2000000FF /* MyStory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = MyStory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -144,6 +146,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		E600000008 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				E20000000F /* VideoTransferable.swift */,
+				E200000010 /* LoadingIndicator.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		E700000002 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
@@ -177,14 +188,6 @@
 				E200000008 /* StoryEditorView.swift */,
 			);
 			path = Editor;
-			sourceTree = "<group>";
-		};
-		E600000008 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				E20000000F /* VideoTransferable.swift */,
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -268,6 +271,7 @@
 				E10000000B /* MediaEntity.swift in Sources */,
 				E10000000E /* VideoPlayerView.swift in Sources */,
 				E10000000F /* VideoTransferable.swift in Sources */,
+				E100000010 /* LoadingIndicator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,6 +316,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -322,6 +327,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

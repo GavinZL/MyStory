@@ -72,6 +72,14 @@ final class MediaStorageService: ObservableObject {
         return UIImage(data: dec)
     }
     
+    func loadVideoThumbnail(fileName: String) -> UIImage? {
+        guard let url = url(for: fileName, type: .video) else { return nil }
+        guard let enc = try? Data(contentsOf: url) else { return nil }
+        let keyId = (fileName as NSString).deletingPathExtension
+        guard let dec = try? decrypt(data: enc, keyId: keyId) else { return nil }
+        return UIImage(data: dec)
+    }
+    
     func saveVideo(from sourceURL: URL) throws -> (fileName: String, thumbFileName: String) {
         let fileId = UUID().uuidString
         let fileName = fileId + ".mov"
@@ -140,7 +148,12 @@ final class MediaStorageService: ObservableObject {
         let asset = AVAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
-        let time = CMTime(seconds: 1, preferredTimescale: 60)
+        // 优化：设置最大尺寸以加快生成速度
+        generator.maximumSize = CGSize(width: 800, height: 800)
+        // 优化：使用快速模式，降低精度换取速度
+        generator.requestedTimeToleranceBefore = CMTime(seconds: 1, preferredTimescale: 60)
+        generator.requestedTimeToleranceAfter = CMTime(seconds: 1, preferredTimescale: 60)
+        let time = CMTime(seconds: 0.1, preferredTimescale: 60)  // 使用更早的帧
         let cgImage = try generator.copyCGImage(at: time, actualTime: nil)
         return UIImage(cgImage: cgImage)
     }
