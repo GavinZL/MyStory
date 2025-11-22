@@ -1,0 +1,353 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E100000001 /* MyStoryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000001 /* MyStoryApp.swift */; };
+		E100000002 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000002 /* CoreDataStack.swift */; };
+		E100000003 /* MediaStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000003 /* MediaStorageService.swift */; };
+		E100000004 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000004 /* LocationService.swift */; };
+		E100000005 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000005 /* TimelineView.swift */; };
+		E100000006 /* TimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000006 /* TimelineViewModel.swift */; };
+		E100000007 /* FullScreenStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000007 /* FullScreenStoryView.swift */; };
+		E100000008 /* StoryEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000008 /* StoryEditorView.swift */; };
+		E100000009 /* StoryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000009 /* StoryCardView.swift */; };
+		E10000000A /* StoryEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000A /* StoryEntity.swift */; };
+		E10000000B /* MediaEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000B /* MediaEntity.swift */; };
+		E10000000C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E20000000C /* Assets.xcassets */; };
+		E10000000E /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000E /* VideoPlayerView.swift */; };
+		E10000000F /* VideoTransferable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000F /* VideoTransferable.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		E200000001 /* MyStoryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStoryApp.swift; sourceTree = "<group>"; };
+		E200000002 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		E200000003 /* MediaStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaStorageService.swift; sourceTree = "<group>"; };
+		E200000004 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		E200000005 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		E200000006 /* TimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModel.swift; sourceTree = "<group>"; };
+		E200000007 /* FullScreenStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenStoryView.swift; sourceTree = "<group>"; };
+		E200000008 /* StoryEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryEditorView.swift; sourceTree = "<group>"; };
+		E200000009 /* StoryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCardView.swift; sourceTree = "<group>"; };
+		E20000000A /* StoryEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryEntity.swift; sourceTree = "<group>"; };
+		E20000000B /* MediaEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaEntity.swift; sourceTree = "<group>"; };
+		E20000000C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E20000000D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E20000000E /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
+		E20000000F /* VideoTransferable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoTransferable.swift; sourceTree = "<group>"; };
+		E2000000FF /* MyStory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = MyStory.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E300000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E400000000 = {
+			isa = PBXGroup;
+			children = (
+				E500000001 /* MyStory */,
+				E5000000FF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E500000001 /* MyStory */ = {
+			isa = PBXGroup;
+			children = (
+				E600000001 /* App */,
+				E600000002 /* Core */,
+				E600000003 /* Models */,
+				E600000004 /* Services */,
+				E600000005 /* Views */,
+				E600000006 /* Components */,
+				E600000008 /* Utils */,
+				E600000007 /* Resources */,
+				E20000000D /* Info.plist */,
+			);
+			path = MyStory;
+			sourceTree = "<group>";
+		};
+		E5000000FF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E2000000FF /* MyStory.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E600000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				E200000001 /* MyStoryApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E600000002 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				E700000002 /* Storage */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		E600000003 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E700000003 /* Entities */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E600000004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E200000003 /* MediaStorageService.swift */,
+				E200000004 /* LocationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E600000005 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E700000005 /* Timeline */,
+				E700000006 /* Editor */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E600000006 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				E200000009 /* StoryCardView.swift */,
+				E20000000E /* VideoPlayerView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		E600000007 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E20000000C /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		E700000002 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				E200000002 /* CoreDataStack.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		E700000003 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				E20000000A /* StoryEntity.swift */,
+				E20000000B /* MediaEntity.swift */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		E700000005 /* Timeline */ = {
+			isa = PBXGroup;
+			children = (
+				E200000005 /* TimelineView.swift */,
+				E200000006 /* TimelineViewModel.swift */,
+				E200000007 /* FullScreenStoryView.swift */,
+			);
+			path = Timeline;
+			sourceTree = "<group>";
+		};
+		E700000006 /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				E200000008 /* StoryEditorView.swift */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		E600000008 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				E20000000F /* VideoTransferable.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E800000001 /* MyStory */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E900000001 /* Build configuration list for PBXNativeTarget "MyStory" */;
+			buildPhases = (
+				EA00000001 /* Sources */,
+				E300000001 /* Frameworks */,
+				EA00000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MyStory;
+			productName = MyStory;
+			productReference = E2000000FF /* MyStory.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EB00000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1500;
+				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					E800000001 = {
+						CreatedOnToolsVersion = 15.0;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = E900000002 /* Build configuration list for PBXProject "MyStory" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E400000000;
+			productRefGroup = E5000000FF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E800000001 /* MyStory */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EA00000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E10000000C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EA00000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E100000001 /* MyStoryApp.swift in Sources */,
+				E100000002 /* CoreDataStack.swift in Sources */,
+				E100000003 /* MediaStorageService.swift in Sources */,
+				E100000004 /* LocationService.swift in Sources */,
+				E100000005 /* TimelineView.swift in Sources */,
+				E100000006 /* TimelineViewModel.swift in Sources */,
+				E100000007 /* FullScreenStoryView.swift in Sources */,
+				E100000008 /* StoryEditorView.swift in Sources */,
+				E100000009 /* StoryCardView.swift in Sources */,
+				E10000000A /* StoryEntity.swift in Sources */,
+				E10000000B /* MediaEntity.swift in Sources */,
+				E10000000E /* VideoPlayerView.swift in Sources */,
+				E10000000F /* VideoTransferable.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		EC00000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 893973NXS8;
+				INFOPLIST_FILE = MyStory/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gogo.MyStory;
+				PRODUCT_NAME = MyStory;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EC00000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 893973NXS8;
+				INFOPLIST_FILE = MyStory/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gogo.MyStory;
+				PRODUCT_NAME = MyStory;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		EC00000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		EC00000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E900000001 /* Build configuration list for PBXNativeTarget "MyStory" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC00000001 /* Debug */,
+				EC00000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E900000002 /* Build configuration list for PBXProject "MyStory" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC00000011 /* Debug */,
+				EC00000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EB00000001 /* Project object */;
+}
