@@ -33,7 +33,9 @@ private struct FullScreenPager: UIViewControllerRepresentable {
         let pvc = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .vertical, options: nil)
         pvc.dataSource = context.coordinator
         pvc.delegate = context.coordinator
-        let controllers = pageControllers()
+        
+        // 使用 Coordinator 中的 controllers
+        let controllers = context.coordinator.controllers
         if initialIndex < controllers.count {
             pvc.setViewControllers([controllers[initialIndex]], direction: .forward, animated: false)
         } else if let first = controllers.first {
@@ -44,22 +46,16 @@ private struct FullScreenPager: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIPageViewController, context: Context) {}
 
-    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
-
-    private func pageControllers() -> [UIViewController] {
-        stories.map { story in
-            let vc = UIHostingController(rootView: StoryDetailView(story: story))
-            return vc
-        }
-    }
+    func makeCoordinator() -> Coordinator { Coordinator(stories: stories) }
 
     final class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        let parent: FullScreenPager
-        private var controllers: [UIViewController]
+        let controllers: [UIViewController]
 
-        init(parent: FullScreenPager) {
-            self.parent = parent
-            self.controllers = parent.pageControllers()
+        init(stories: [StoryEntity]) {
+            self.controllers = stories.map { story in
+                UIHostingController(rootView: StoryDetailView(story: story))
+            }
+            super.init()
         }
 
         func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
@@ -96,38 +92,47 @@ struct StoryDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // 媒体展示区域
-                if !mediaList.isEmpty {
-                    mediaDisplaySection
-                }
-
-                // 标题
-                Text(story.title ?? "无标题")
-                    .font(.title)
-                    .bold()
-                    .padding(.horizontal)
-
-                // 正文内容
-                if let content = story.content, !content.isEmpty {
-                    Text(content)
-                        .font(.body)
-                        .padding(.horizontal)
-                }
-
-                // 位置信息
-                if let city = story.locationCity, !city.isEmpty {
-                    HStack(spacing: 8) {
-                        Image(systemName: "mappin.circle.fill").foregroundColor(.blue)
-                        Text(city)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // 媒体展示区域
+                    if !mediaList.isEmpty {
+                        mediaDisplaySection
                     }
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal)
+
+                    // 标题
+                    Text(story.title ?? "无标题")
+                        .font(.title)
+                        .bold()
+                        .padding(.horizontal)
+
+                    // 正文内容
+                    if let content = story.content, !content.isEmpty {
+                        ScrollView {
+                            Text(content)
+                                .font(.body)
+                                .padding(.horizontal)
+                        }
+                        .frame(maxHeight: geometry.size.height * 0.3)
+                    }
+
+                    // 位置信息
+                    if let city = story.locationCity, !city.isEmpty {
+                        HStack(spacing: 8) {
+                            Image(systemName: "mappin.circle.fill").foregroundColor(.blue)
+                            Text(city)
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                    }
+                    
+                    Spacer()
                 }
+                .padding(.vertical)
+                .frame(minHeight: geometry.size.height)
             }
-            .padding(.vertical)
+            .scrollDisabled(true)
         }
         .fullScreenCover(isPresented: $showImageViewer) {
             ImageGalleryViewer(
@@ -209,22 +214,10 @@ struct StoryDetailView: View {
     private func videoPlayerView(media: MediaEntity, index: Int) -> some View {
         if playingVideoIndex == index, let player = videoPlayers[index] {
             // 正在播放状态
-            ZStack(alignment: .topTrailing) {
-                VideoPlayer(player: player)
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(8)
-                
-                Button {
-                    stopVideo(at: index)
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundColor(.white)
-                        .shadow(radius: 4)
-                }
-                .padding(8)
-            }
+            VideoPlayer(player: player)
+                .frame(maxWidth: .infinity)
+                .aspectRatio(contentMode: .fit)
+                .cornerRadius(8)
         } else {
             // 未播放状态 - 显示缩略图
             videoThumbnailView(media: media, index: index)
