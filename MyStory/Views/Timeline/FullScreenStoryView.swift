@@ -1,18 +1,6 @@
 import SwiftUI
 import UIKit
-
-// MARK: - Video Player Wrapper for StoryDetail
-struct StoryVideoPlayerWrapper: View {
-    @Binding var videoURL: URL?
-    
-    var body: some View {
-        if let url = videoURL {
-            VideoPlayerView(videoURL: url)
-        } else {
-            EmptyView()
-        }
-    }
-}
+import AVKit
 
 struct FullScreenStoryView: View {
     let stories: [StoryEntity]
@@ -88,76 +76,333 @@ private struct FullScreenPager: UIViewControllerRepresentable {
 
 struct StoryDetailView: View {
     let story: StoryEntity
-    @State private var showVideoPlayer = false
-    @State private var videoURL: URL?
+    @State private var showImageViewer = false
+    @State private var selectedImageIndex = 0
+    @State private var playingVideoIndex: Int?
+    @State private var videoPlayers: [Int: AVPlayer] = [:]
     private let mediaService = MediaStorageService()
+
+    private var mediaList: [MediaEntity] {
+        guard let medias = story.medias as? Set<MediaEntity> else { return [] }
+        return medias.sorted { ($0.createdAt ?? Date()) < ($1.createdAt ?? Date()) }
+    }
+    
+    private var imageMediaList: [MediaEntity] {
+        mediaList.filter { $0.type == "image" }
+    }
+    
+    private var videoMediaList: [MediaEntity] {
+        mediaList.filter { $0.type == "video" }
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                if let first = story.medias?.first {
-                    if first.type == "video" {
-                        // 视频封面，点击播放
-                        if let img = mediaService.loadImage(fileName: first.thumbnailFileName ?? first.fileName) {
-                            Button {
-                                loadAndPlayVideo(fileName: first.fileName)
-                            } label: {
-                                ZStack(alignment: .center) {
-                                    Image(uiImage: img)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(maxWidth: .infinity)
-                                    
-                                    Circle()
-                                        .fill(Color.black.opacity(0.6))
-                                        .frame(width: 80, height: 80)
-                                    Image(systemName: "play.fill")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(.white)
-                                }
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                        }
-                    } else {
-                        // 图片直接展示
-                        if let img = mediaService.loadImage(fileName: first.fileName) {
-                            Image(uiImage: img)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
+                // 媒体展示区域
+                if !mediaList.isEmpty {
+                    mediaDisplaySection
                 }
 
-                Text(story.title)
+                // 标题
+                Text(story.title ?? "无标题")
                     .font(.title)
                     .bold()
+                    .padding(.horizontal)
 
-                if let content = story.content {
+                // 正文内容
+                if let content = story.content, !content.isEmpty {
                     Text(content)
                         .font(.body)
+                        .padding(.horizontal)
                 }
 
-                if let city = story.locationCity {
+                // 位置信息
+                if let city = story.locationCity, !city.isEmpty {
                     HStack(spacing: 8) {
                         Image(systemName: "mappin.circle.fill").foregroundColor(.blue)
                         Text(city)
                     }
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+                    .padding(.horizontal)
                 }
             }
-            .padding()
+            .padding(.vertical)
         }
-        .fullScreenCover(isPresented: $showVideoPlayer) {
-            StoryVideoPlayerWrapper(videoURL: $videoURL)
+        .fullScreenCover(isPresented: $showImageViewer) {
+            ImageGalleryViewer(
+                images: loadAllImages(),
+                initialIndex: selectedImageIndex,
+                isPresented: $showImageViewer
+            )
+        }
+        .onDisappear {
+            // 清理所有视频播放器
+            stopAllVideos()
         }
     }
     
-    private func loadAndPlayVideo(fileName: String) {
+    // MARK: - Media Display Section
+    @ViewBuilder
+    private var mediaDisplaySection: some View {
+        VStack(spacing: 0) {
+            // 图片区域
+            if !imageMediaList.isEmpty {
+                imageGallerySection
+            }
+            
+            // 视频区域
+            if !videoMediaList.isEmpty {
+                videoSection
+                    .padding(.top, imageMediaList.isEmpty ? 0 : 16)
+            }
+        }.frame(height: UIScreen.main.bounds.height / 2)
+    }
+    
+    // MARK: - Image Gallery Section
+    @ViewBuilder
+    private var imageGallerySection: some View {
+        if imageMediaList.count == 1 {
+            // 单张图片
+            singleImageView(media: imageMediaList[0], index: 0)
+        } else {
+            // 多张图片 - 横向滑动
+            TabView {
+                ForEach(Array(imageMediaList.enumerated()), id: \.element.id) { index, media in
+                    singleImageView(media: media, index: index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .always))
+            .frame(height: UIScreen.main.bounds.height * 0.5)
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
+        }
+    }
+    
+    @ViewBuilder
+    private func singleImageView(media: MediaEntity, index: Int) -> some View {
+        if let img = mediaService.loadImage(fileName: media.fileName ?? "") {
+            Button {
+                selectedImageIndex = index
+                showImageViewer = true
+            } label: {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+    
+    // MARK: - Video Section
+    @ViewBuilder
+    private var videoSection: some View {
+        VStack(spacing: 12) {
+            ForEach(Array(videoMediaList.enumerated()), id: \.element.id) { index, media in
+                videoPlayerView(media: media, index: index)
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    private func videoPlayerView(media: MediaEntity, index: Int) -> some View {
+        if playingVideoIndex == index, let player = videoPlayers[index] {
+            // 正在播放状态
+            ZStack(alignment: .topTrailing) {
+                VideoPlayer(player: player)
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(contentMode: .fit)
+                    .cornerRadius(8)
+                
+                Button {
+                    stopVideo(at: index)
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 28))
+                        .foregroundColor(.white)
+                        .shadow(radius: 4)
+                }
+                .padding(8)
+            }
+        } else {
+            // 未播放状态 - 显示缩略图
+            videoThumbnailView(media: media, index: index)
+        }
+    }
+    
+    @ViewBuilder
+    private func videoThumbnailView(media: MediaEntity, index: Int) -> some View {
+        if let thumbFileName = media.thumbnailFileName,
+           let img = mediaService.loadVideoThumbnail(fileName: thumbFileName) {
+            Button {
+                playVideo(fileName: media.fileName ?? "", at: index)
+            } label: {
+                ZStack(alignment: .center) {
+                    Image(uiImage: img)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity)
+                        .cornerRadius(8)
+                    
+                    Circle()
+                        .fill(Color.black.opacity(0.6))
+                        .frame(width: 80, height: 80)
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private func loadAllImages() -> [UIImage] {
+        imageMediaList.compactMap { media in
+            mediaService.loadImage(fileName: media.fileName ?? "")
+        }
+    }
+    
+    private func playVideo(fileName: String, at index: Int) {
+        // 停止其他正在播放的视频
+        stopAllVideos()
+        
+        // 加载并播放新视频
         if let url = mediaService.loadVideoURL(fileName: fileName) {
-            videoURL = url
-            showVideoPlayer = true
+            let player = AVPlayer(url: url)
+            videoPlayers[index] = player
+            playingVideoIndex = index
+            player.play()
+        }
+    }
+    
+    private func stopVideo(at index: Int) {
+        videoPlayers[index]?.pause()
+        videoPlayers[index] = nil
+        playingVideoIndex = nil
+    }
+    
+    private func stopAllVideos() {
+        for (_, player) in videoPlayers {
+            player.pause()
+        }
+        videoPlayers.removeAll()
+        playingVideoIndex = nil
+    }
+}
+
+// MARK: - Image Gallery Viewer
+struct ImageGalleryViewer: View {
+    let images: [UIImage]
+    let initialIndex: Int
+    @Binding var isPresented: Bool
+    @State private var currentIndex: Int
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+    
+    init(images: [UIImage], initialIndex: Int, isPresented: Binding<Bool>) {
+        self.images = images
+        self.initialIndex = initialIndex
+        self._isPresented = isPresented
+        self._currentIndex = State(initialValue: initialIndex)
+    }
+    
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            TabView(selection: $currentIndex) {
+                ForEach(Array(images.enumerated()), id: \.offset) { index, image in
+                    zoomableImageView(image: image)
+                        .tag(index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .ignoresSafeArea()
+            
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        isPresented = false
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundColor(.white)
+                            .shadow(radius: 4)
+                    }
+                    .padding()
+                }
+                Spacer()
+                
+                if images.count > 1 {
+                    Text("\(currentIndex + 1) / \(images.count)")
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.black.opacity(0.6))
+                        .cornerRadius(16)
+                        .padding(.bottom, 20)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func zoomableImageView(image: UIImage) -> some View {
+        GeometryReader { geometry in
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .scaleEffect(scale)
+                .offset(offset)
+                .gesture(
+                    MagnificationGesture()
+                        .onChanged { value in
+                            let delta = value / lastScale
+                            lastScale = value
+                            scale = min(max(scale * delta, 1.0), 5.0)
+                        }
+                        .onEnded { _ in
+                            lastScale = 1.0
+                            if scale < 1.0 {
+                                withAnimation {
+                                    scale = 1.0
+                                    offset = .zero
+                                }
+                            }
+                        }
+                )
+                .simultaneousGesture(
+                    DragGesture()
+                        .onChanged { value in
+                            if scale > 1.0 {
+                                offset = CGSize(
+                                    width: lastOffset.width + value.translation.width,
+                                    height: lastOffset.height + value.translation.height
+                                )
+                            }
+                        }
+                        .onEnded { _ in
+                            lastOffset = offset
+                        }
+                )
+                .onTapGesture(count: 2) {
+                    withAnimation {
+                        if scale > 1.0 {
+                            scale = 1.0
+                            offset = .zero
+                            lastOffset = .zero
+                        } else {
+                            scale = 2.0
+                        }
+                    }
+                }
         }
     }
 }

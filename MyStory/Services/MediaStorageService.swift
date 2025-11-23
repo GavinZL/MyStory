@@ -148,8 +148,35 @@ final class MediaStorageService: ObservableObject {
         let asset = AVAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
-        // 优化：设置最大尺寸以加快生成速度
-        generator.maximumSize = CGSize(width: 800, height: 800)
+        
+        // 获取视频分辨率
+        if let track = asset.tracks(withMediaType: .video).first {
+            let size = track.naturalSize
+            let transform = track.preferredTransform
+            
+            // 处理视频旋转，获取真实显示尺寸
+            var videoSize = size
+            if transform.a == 0 && transform.b == 1.0 && transform.c == -1.0 && transform.d == 0 {
+                // 90度旋转
+                videoSize = CGSize(width: size.height, height: size.width)
+            } else if transform.a == 0 && transform.b == -1.0 && transform.c == 1.0 && transform.d == 0 {
+                // 270度旋转
+                videoSize = CGSize(width: size.height, height: size.width)
+            }
+            
+            // 计算保持宽高比的缩略图尺寸，最大边不超过800
+            let maxEdge: CGFloat = 800
+            let scale = min(maxEdge / videoSize.width, maxEdge / videoSize.height)
+            if scale < 1.0 {
+                let thumbnailSize = CGSize(
+                    width: videoSize.width * scale,
+                    height: videoSize.height * scale
+                )
+                generator.maximumSize = thumbnailSize
+            }
+            // 如果视频本身就小于800，不设置maximumSize，保持原始分辨率
+        }
+        
         // 优化：使用快速模式，降低精度换取速度
         generator.requestedTimeToleranceBefore = CMTime(seconds: 1, preferredTimescale: 60)
         generator.requestedTimeToleranceAfter = CMTime(seconds: 1, preferredTimescale: 60)
