@@ -26,9 +26,9 @@ class PersistenceController: ObservableObject {
             story.timestamp = Date().addingTimeInterval(TimeInterval(-i * 86400))
             story.createdAt = Date()
             story.updatedAt = Date()
-            story.plainTextContent = story.content
-            story.syncStatus = 0
-            story.isDeleted = false
+//            story.plainTextContent = story.content
+//            story.syncStatus = 0
+//            story.isDeleted = false
         }
         
         do {

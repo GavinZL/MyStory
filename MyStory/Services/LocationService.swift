@@ -51,11 +51,3 @@ extension LocationService: CLLocationManagerDelegate {
     }
 }
 
-struct LocationInfo {
-    let latitude: Double
-    let longitude: Double
-    let name: String?
-    let address: String?
-    let city: String?
-    let country: String?
-}

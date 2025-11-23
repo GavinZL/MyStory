@@ -18,9 +18,9 @@ struct CategoryListView: View {
         NavigationStack {
             VStack {
                 // 搜索栏
-                if isSearching {
-                    SearchBar(text: $searchText, isSearching: $isSearching)
-                }
+//                if isSearching {
+//                    SearchBar(text: $searchText, isSearching: $isSearching)
+//                }
                 
                 // 分类内容（占位）
                 Text("分类页面")

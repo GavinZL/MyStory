@@ -7,9 +7,10 @@ struct MyStoryApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootTabView()
+            RootView()
                 .environment(\.managedObjectContext, coreDataStack.viewContext)
                 .environmentObject(coreDataStack)
+                .environmentObject(AppRouter())
         }
     }
 }
