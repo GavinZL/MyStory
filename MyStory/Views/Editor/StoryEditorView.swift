@@ -2,6 +2,19 @@ import SwiftUI
 import PhotosUI
 import AVFoundation
 
+// MARK: - Video Player Wrapper
+struct VideoPlayerWrapper: View {
+    @Binding var videoURL: URL?
+    
+    var body: some View {
+        if let url = videoURL {
+            VideoPlayerView(videoURL: url)
+        } else {
+            EmptyView()
+        }
+    }
+}
+
 // MARK: - Main View
 struct StoryEditorView: View {
     // MARK: - Properties
@@ -115,7 +128,7 @@ struct StoryEditorView: View {
                 toolbarContent
             }
             .fullScreenCover(isPresented: $showVideoPlayer) {
-                videoPlayerView
+                VideoPlayerWrapper(videoURL: $selectedVideoURL)
             }
             .withLoadingIndicator()
         }
@@ -177,15 +190,7 @@ struct StoryEditorView: View {
         }
     }
     
-    @ViewBuilder
-    private var videoPlayerView: some View {
-        if let url = selectedVideoURL {
-            VideoPlayerView(videoURL: url)
-        } else {
-            EmptyView()
-        }
-    }
-    
+
     // MARK: - Media Picker
     private var mediaPickerButton: some View {
         PhotosPicker(

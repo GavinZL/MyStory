@@ -1,6 +1,19 @@
 import SwiftUI
 import UIKit
 
+// MARK: - Video Player Wrapper for StoryDetail
+struct StoryVideoPlayerWrapper: View {
+    @Binding var videoURL: URL?
+    
+    var body: some View {
+        if let url = videoURL {
+            VideoPlayerView(videoURL: url)
+        } else {
+            EmptyView()
+        }
+    }
+}
+
 struct FullScreenStoryView: View {
     let stories: [StoryEntity]
     let initialIndex: Int
@@ -137,9 +150,7 @@ struct StoryDetailView: View {
             .padding()
         }
         .fullScreenCover(isPresented: $showVideoPlayer) {
-            if let url = videoURL {
-                VideoPlayerView(videoURL: url)
-            }
+            StoryVideoPlayerWrapper(videoURL: $videoURL)
         }
     }
     

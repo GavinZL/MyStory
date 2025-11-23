@@ -1,5 +1,20 @@
 import SwiftUI
+import CoreData
 import PhotosUI
+
+// MARK: - Wrapper View
+struct FullScreenStoryViewWrapper: View {
+    let stories: [StoryEntity]
+    @Binding var selectedIndex: Int?
+    
+    var body: some View {
+        if let index = selectedIndex, index < stories.count {
+            FullScreenStoryView(stories: stories, initialIndex: index)
+        } else {
+            EmptyView()
+        }
+    }
+}
 
 // MARK: - Main View
 struct TimelineView: View {
@@ -10,6 +25,7 @@ struct TimelineView: View {
     // MARK: - State
     @StateObject private var vm = TimelineViewModel()
     @State private var selectedStory: StoryEntity?
+    @State private var fullScreenStoryIndex: Int?
     @State private var showFullScreen = false
     @State private var showEditor = false
     
@@ -30,7 +46,10 @@ struct TimelineView: View {
                 editorSheet
             }
             .fullScreenCover(isPresented: $showFullScreen) {
-                fullScreenView
+                FullScreenStoryViewWrapper(
+                    stories: vm.stories,
+                    selectedIndex: $fullScreenStoryIndex
+                )
             }
             .onAppear {
                 setupViewModel()
@@ -70,6 +89,7 @@ struct TimelineView: View {
         }
     }
     
+    @ViewBuilder
     private func storyCardButton(for story: StoryEntity) -> some View {
         Button {
             navigateToFullScreen(story: story)
@@ -121,16 +141,7 @@ struct TimelineView: View {
         }
     }
     
-    @ViewBuilder
-    private var fullScreenView: some View {
-        if let story = selectedStory, 
-           let index = vm.stories.firstIndex(where: { $0.objectID == story.objectID }) {
-            FullScreenStoryView(stories: vm.stories, initialIndex: index)
-        } else {
-            EmptyView()
-        }
-    }
-    
+
     // MARK: - Helper Methods
     private func setupViewModel() {
         vm.setContext(context)
@@ -180,8 +191,10 @@ struct TimelineView: View {
     }
     
     private func navigateToFullScreen(story: StoryEntity) {
-        selectedStory = story
-        showFullScreen = true
+        if let index = vm.stories.firstIndex(where: { $0.objectID == story.objectID }) {
+            fullScreenStoryIndex = index
+            showFullScreen = true
+        }
     }
     
     private func reloadStories() {
@@ -191,7 +204,7 @@ struct TimelineView: View {
     // MARK: - Date Formatting
     private static func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日"
+        formatter.dateFormat = "yyyy年MM月dd日 HH:MM"
         return formatter.string(from: date)
     }
 }
