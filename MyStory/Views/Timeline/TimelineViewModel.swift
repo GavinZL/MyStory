@@ -3,12 +3,12 @@ import CoreData
 
 final class TimelineViewModel: ObservableObject {
     @Published var stories: [StoryEntity] = []
+    @Published var hasMore: Bool = true
 
     private var context: NSManagedObjectContext?
     private(set) var pageSize: Int = 20
     private(set) var currentPage: Int = 0
     private(set) var isLoading: Bool = false
-    private(set) var hasMore: Bool = true
 
     func setContext(_ context: NSManagedObjectContext) {
         if self.context == nil { self.context = context }

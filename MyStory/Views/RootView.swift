@@ -25,7 +25,7 @@ struct RootView: View {
                 }
             
             // 设置页面
-            SettingsPlaceholderView()
+            SettingsView()
                 .tabItem {
                     Label("设置", systemImage: "gearshape.fill")
                 }

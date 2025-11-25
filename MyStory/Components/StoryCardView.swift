@@ -13,7 +13,7 @@ struct StoryCardView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 24) {
             if let uiImg = firstImage {
                 ZStack(alignment: .center) {
                     Image(uiImage: uiImg)

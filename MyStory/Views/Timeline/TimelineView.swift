@@ -2,20 +2,6 @@ import SwiftUI
 import CoreData
 import PhotosUI
 
-// MARK: - Wrapper View
-struct FullScreenStoryViewWrapper: View {
-    let stories: [StoryEntity]
-    @Binding var selectedIndex: Int?
-    
-    var body: some View {
-        if let index = selectedIndex, index < stories.count {
-            FullScreenStoryView(stories: stories, initialIndex: index)
-        } else {
-            EmptyView()
-        }
-    }
-}
-
 // MARK: - Main View
 struct TimelineView: View {
     // MARK: - Environment
@@ -25,8 +11,6 @@ struct TimelineView: View {
     // MARK: - State
     @StateObject private var vm = TimelineViewModel()
     @State private var selectedStory: StoryEntity?
-    @State private var fullScreenStoryIndex: Int?
-    @State private var showFullScreen = false
     @State private var showEditor = false
     
     // MARK: - Services
@@ -45,12 +29,6 @@ struct TimelineView: View {
             .sheet(isPresented: $showEditor) {
                 editorSheet
             }
-            .fullScreenCover(isPresented: $showFullScreen) {
-                FullScreenStoryViewWrapper(
-                    stories: vm.stories,
-                    selectedIndex: $fullScreenStoryIndex
-                )
-            }
             .onAppear {
                 setupViewModel()
             }
@@ -64,14 +42,16 @@ struct TimelineView: View {
                 storyItemView(story: story, index: index)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 8)
         .padding(.vertical, 12)
     }
     
     private func storyItemView(story: StoryEntity, index: Int) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             dateHeaderView(for: story)
-            storyCardButton(for: story)
+            HStack(spacing: 2) {
+                storyCardButton(for: story)
+            }.padding(.horizontal, 16)
         }
         .onAppear {
             handleItemAppear(index: index)
@@ -84,16 +64,14 @@ struct TimelineView: View {
                 .stroke(Color.red, lineWidth: 2)
                 .frame(width: 16, height: 16)
             Text(Self.formatDate(story.timestamp))
-                .font(.subheadline)
-                .foregroundColor(.red)
+                .font(.headline)
+                .foregroundColor(.black)
         }
     }
     
     @ViewBuilder
     private func storyCardButton(for story: StoryEntity) -> some View {
-        Button {
-            navigateToFullScreen(story: story)
-        } label: {
+        NavigationLink(destination: fullScreenDestination(for: story)) {
             StoryCardView(story: story, firstImage: loadCoverImage(for: story))
         }
         .buttonStyle(PlainButtonStyle())
@@ -138,6 +116,20 @@ struct TimelineView: View {
             StoryEditorView { 
                 reloadStories() 
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func fullScreenDestination(for story: StoryEntity) -> some View {
+        if let index = vm.stories.firstIndex(where: { $0.objectID == story.objectID }) {
+            FullScreenStoryView(
+                stories: vm.stories,
+                initialIndex: index,
+                onLoadMore: {
+                    vm.loadNextPage()
+                },
+                hasMoreData: vm.hasMore
+            )
         }
     }
     
@@ -188,13 +180,6 @@ struct TimelineView: View {
         context.delete(story)
         vm.stories.removeAll { $0.objectID == story.objectID }
         coreData.save()
-    }
-    
-    private func navigateToFullScreen(story: StoryEntity) {
-        if let index = vm.stories.firstIndex(where: { $0.objectID == story.objectID }) {
-            fullScreenStoryIndex = index
-            showFullScreen = true
-        }
     }
     
     private func reloadStories() {

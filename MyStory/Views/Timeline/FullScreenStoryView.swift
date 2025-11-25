@@ -2,82 +2,266 @@ import SwiftUI
 import UIKit
 import AVKit
 
+// MARK: - Main View
 struct FullScreenStoryView: View {
+    // MARK: - Properties
     let stories: [StoryEntity]
     let initialIndex: Int
-    @Environment(\.dismiss) private var dismiss
-
+    let onLoadMore: (() -> Void)?
+    let hasMoreData: Bool
+    
+    // MARK: - State
+    @State private var currentIndex: Int
+    @StateObject private var coordinator: PageCoordinator
+    @State private var showTopToast = false
+    @State private var showBottomToast = false
+    @State private var topToastMessage = ""
+    @State private var bottomToastMessage = ""
+    
+    // MARK: - Initializer
+    init(stories: [StoryEntity], initialIndex: Int, onLoadMore: (() -> Void)? = nil, hasMoreData: Bool = true) {
+        self.stories = stories
+        self.initialIndex = initialIndex
+        self.onLoadMore = onLoadMore
+        self.hasMoreData = hasMoreData
+        self._currentIndex = State(initialValue: initialIndex)
+        self._coordinator = StateObject(wrappedValue: PageCoordinator(stories: stories, initialIndex: initialIndex))
+    }
+    
+    // MARK: - Body
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            FullScreenPager(stories: stories, initialIndex: initialIndex)
-                .ignoresSafeArea()
+        ZStack {
+            pageViewController
+                .navigationTitle(navigationTitle)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(.hidden, for: .tabBar)
             
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundColor(.white)
-                    .shadow(radius: 4)
+            // 顶部提示
+            if showTopToast {
+                topToastView
             }
-            .padding()
+            
+            // 底部提示
+            if showBottomToast {
+                bottomToastView
+            }
         }
     }
-}
-
-private struct FullScreenPager: UIViewControllerRepresentable {
-    let stories: [StoryEntity]
-    let initialIndex: Int
-
-    func makeUIViewController(context: Context) -> UIPageViewController {
-        let pvc = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .vertical, options: nil)
-        pvc.dataSource = context.coordinator
-        pvc.delegate = context.coordinator
+    
+    // MARK: - View Components
+    private var pageViewController: some View {
+        PageViewControllerWrapper(
+            coordinator: coordinator,
+            currentIndex: $currentIndex,
+            onReachBoundary: handleBoundaryReached
+        )
+        .ignoresSafeArea(edges: .bottom)
+    }
+    
+    private var navigationTitle: String {
+        if currentIndex < stories.count {
+            return stories[currentIndex].title
+        }
+        return "故事详情"
+    }
+    
+    private var topToastView: some View {
+        VStack {
+            Text(topToastMessage)
+                .font(.subheadline)
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.7))
+                )
+                .padding(.top, 10)
+            Spacer()
+        }
+        .transition(.move(edge: .top).combined(with: .opacity))
+        .animation(.easeInOut(duration: 0.3), value: showTopToast)
+    }
+    
+    private var bottomToastView: some View {
+        VStack {
+            Spacer()
+            Text(bottomToastMessage)
+                .font(.subheadline)
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.7))
+                )
+                .padding(.bottom, 50)
+        }
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .animation(.easeInOut(duration: 0.3), value: showBottomToast)
+    }
+    
+    // MARK: - Helper Methods
+    private func handleBoundaryReached(_ boundaryType: PageCoordinator.BoundaryType) {
+        switch boundaryType {
+        case .top:
+            // 第一个往上滑，加载更早的数据
+            handleLoadEarlierData()
+        case .bottom:
+            // 最后一个往下滑，加载更新的数据
+            handleLoadNewerData()
+        }
+    }
+    
+    private func handleLoadEarlierData() {
+        if hasMoreData {
+            onLoadMore?()
+            showTopToast("正在加载更早的故事...")
+        } else {
+            showTopToast("已无更新的故事")
+        }
+    }
+    
+    private func handleLoadNewerData() {
+        if hasMoreData {
+            onLoadMore?()
+            showBottomToast("正在加载更新的故事...")
+        } else {
+            showBottomToast("已无更早的故事")
+        }
+    }
+    
+    private func showTopToast(_ message: String) {
+        topToastMessage = message
+        withAnimation {
+            showTopToast = true
+        }
         
-        // 使用 Coordinator 中的 controllers
-        let controllers = context.coordinator.controllers
-        if initialIndex < controllers.count {
-            pvc.setViewControllers([controllers[initialIndex]], direction: .forward, animated: false)
-        } else if let first = controllers.first {
-            pvc.setViewControllers([first], direction: .forward, animated: false)
-        }
-        return pvc
-    }
-
-    func updateUIViewController(_ uiViewController: UIPageViewController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator { Coordinator(stories: stories) }
-
-    final class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        let controllers: [UIViewController]
-
-        init(stories: [StoryEntity]) {
-            self.controllers = stories.map { story in
-                UIHostingController(rootView: StoryDetailView(story: story))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation {
+                showTopToast = false
             }
-            super.init()
         }
-
-        func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-            guard let idx = controllers.firstIndex(of: viewController), idx > 0 else { return nil }
-            return controllers[idx - 1]
+    }
+    
+    private func showBottomToast(_ message: String) {
+        bottomToastMessage = message
+        withAnimation {
+            showBottomToast = true
         }
-
-        func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-            guard let idx = controllers.firstIndex(of: viewController), idx < controllers.count - 1 else { return nil }
-            return controllers[idx + 1]
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation {
+                showBottomToast = false
+            }
         }
     }
 }
 
+// MARK: - Page Coordinator
+class PageCoordinator: NSObject, ObservableObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+    let controllers: [UIViewController]
+    @Published var currentIndex: Int
+    var onReachBoundary: ((BoundaryType) -> Void)?
+    
+    enum BoundaryType {
+        case top    // 第一个往上滑，加载更早的数据
+        case bottom // 最后一个往下滑，加载更新的数据
+    }
+    
+    init(stories: [StoryEntity], initialIndex: Int) {
+        self.controllers = stories.map { story in
+            UIHostingController(rootView: StoryDetailView(story: story))
+        }
+        self.currentIndex = initialIndex
+        super.init()
+    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        guard let idx = controllers.firstIndex(of: viewController), idx > 0 else {
+            // 已经是第一个，尝试向上滑动时触发加载更早的数据
+            if let index = controllers.firstIndex(of: viewController), index == 0 {
+                onReachBoundary?(.top)
+            }
+            return nil
+        }
+        return controllers[idx - 1]
+    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        guard let idx = controllers.firstIndex(of: viewController), idx < controllers.count - 1 else {
+            // 已经是最后一个，尝试向下滑动时触发加载更新的数据
+            if let index = controllers.firstIndex(of: viewController), index == controllers.count - 1 {
+                onReachBoundary?(.bottom)
+            }
+            return nil
+        }
+        return controllers[idx + 1]
+    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        guard completed,
+              let visibleViewController = pageViewController.viewControllers?.first,
+              let index = controllers.firstIndex(of: visibleViewController) else { return }
+        currentIndex = index
+    }
+}
+
+// MARK: - Page View Controller Wrapper
+private struct PageViewControllerWrapper: UIViewControllerRepresentable {
+    @ObservedObject var coordinator: PageCoordinator
+    @Binding var currentIndex: Int
+    let onReachBoundary: (PageCoordinator.BoundaryType) -> Void
+    
+    func makeUIViewController(context: Context) -> UIPageViewController {
+        let pageVC = UIPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .vertical,
+            options: nil
+        )
+        pageVC.dataSource = coordinator
+        pageVC.delegate = coordinator
+        
+        // 设置边界回调
+        coordinator.onReachBoundary = onReachBoundary
+        
+        let controllers = coordinator.controllers
+        if coordinator.currentIndex < controllers.count {
+            pageVC.setViewControllers(
+                [controllers[coordinator.currentIndex]],
+                direction: .forward,
+                animated: false
+            )
+        }
+        
+        return pageVC
+    }
+    
+    func updateUIViewController(_ pageViewController: UIPageViewController, context: Context) {
+        // 同步当前索引
+        DispatchQueue.main.async {
+            if currentIndex != coordinator.currentIndex {
+                currentIndex = coordinator.currentIndex
+            }
+        }
+    }
+}
+
+// MARK: - Story Detail View
 struct StoryDetailView: View {
+    // MARK: - Properties
     let story: StoryEntity
+    
+    // MARK: - State
     @State private var showImageViewer = false
     @State private var selectedImageIndex = 0
     @State private var playingVideoIndex: Int?
     @State private var videoPlayers: [Int: AVPlayer] = [:]
+    
+    // MARK: - Services
     private let mediaService = MediaStorageService()
-
+    
+    // MARK: - Computed Properties
     private var mediaList: [MediaEntity] {
         guard let medias = story.medias as? Set<MediaEntity> else { return [] }
         return medias.sorted { ($0.createdAt ?? Date()) < ($1.createdAt ?? Date()) }
@@ -90,105 +274,122 @@ struct StoryDetailView: View {
     private var videoMediaList: [MediaEntity] {
         mediaList.filter { $0.type == "video" }
     }
-
+    
+    // MARK: - Body
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // 媒体展示区域
-                    if !mediaList.isEmpty {
-                        mediaDisplaySection
-                    }
-
-                    // 标题
-                    Text(story.title ?? "无标题")
-                        .font(.title)
-                        .bold()
-                        .padding(.horizontal)
-
-                    // 正文内容
-                    if let content = story.content, !content.isEmpty {
-                        ScrollView {
-                            Text(content)
-                                .font(.body)
-                                .padding(.horizontal)
-                        }
-                        .frame(maxHeight: geometry.size.height * 0.3)
-                    }
-
-                    // 位置信息
-                    if let city = story.locationCity, !city.isEmpty {
-                        HStack(spacing: 8) {
-                            Image(systemName: "mappin.circle.fill").foregroundColor(.blue)
-                            Text(city)
-                        }
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal)
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.vertical)
-                .frame(minHeight: geometry.size.height)
+                contentContainer(geometry: geometry)
             }
             .scrollDisabled(true)
         }
         .fullScreenCover(isPresented: $showImageViewer) {
-            ImageGalleryViewer(
-                images: loadAllImages(),
-                initialIndex: selectedImageIndex,
-                isPresented: $showImageViewer
-            )
+            imageGalleryViewer
         }
         .onDisappear {
-            // 清理所有视频播放器
-            stopAllVideos()
+            cleanupResources()
         }
+    }
+    
+    // MARK: - View Components
+    @ViewBuilder
+    private func contentContainer(geometry: GeometryProxy) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if !mediaList.isEmpty {
+                mediaDisplaySection
+            }
+            titleSection
+            contentSection(geometry: geometry)
+            locationSection
+            Spacer()
+        }
+        .padding(.vertical)
+        .frame(minHeight: geometry.size.height)
+    }
+    
+    private var titleSection: some View {
+        Text(story.title ?? "无标题")
+            .font(.title)
+            .bold()
+            .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    private func contentSection(geometry: GeometryProxy) -> some View {
+        if let content = story.content, !content.isEmpty {
+            ScrollView {
+                Text(content)
+                    .font(.body)
+                    .padding(.horizontal)
+            }
+            .frame(maxHeight: geometry.size.height * 0.3)
+        }
+    }
+    
+    @ViewBuilder
+    private var locationSection: some View {
+        if let city = story.locationCity, !city.isEmpty {
+            HStack(spacing: 8) {
+                Image(systemName: "mappin.circle.fill")
+                    .foregroundColor(.blue)
+                Text(city)
+            }
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+            .padding(.horizontal)
+        }
+    }
+    
+    private var imageGalleryViewer: some View {
+        ImageGalleryViewer(
+            images: loadAllImages(),
+            initialIndex: selectedImageIndex,
+            isPresented: $showImageViewer
+        )
     }
     
     // MARK: - Media Display Section
     @ViewBuilder
     private var mediaDisplaySection: some View {
         VStack(spacing: 0) {
-            // 图片区域
             if !imageMediaList.isEmpty {
                 imageGallerySection
             }
             
-            // 视频区域
             if !videoMediaList.isEmpty {
                 videoSection
                     .padding(.top, imageMediaList.isEmpty ? 0 : 16)
             }
-        }.frame(height: UIScreen.main.bounds.height / 2)
+        }
+        .frame(height: UIScreen.main.bounds.height / 2)
     }
     
     // MARK: - Image Gallery Section
     @ViewBuilder
     private var imageGallerySection: some View {
         if imageMediaList.count == 1 {
-            // 单张图片
             singleImageView(media: imageMediaList[0], index: 0)
         } else {
-            // 多张图片 - 横向滑动
-            TabView {
-                ForEach(Array(imageMediaList.enumerated()), id: \.element.id) { index, media in
-                    singleImageView(media: media, index: index)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .always))
-            .frame(height: UIScreen.main.bounds.height * 0.5)
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
+            multipleImagesView
         }
+    }
+    
+    private var multipleImagesView: some View {
+        TabView {
+            ForEach(Array(imageMediaList.enumerated()), id: \.element.id) { index, media in
+                singleImageView(media: media, index: index)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .always))
+        .frame(height: UIScreen.main.bounds.height * 0.5)
+        .indexViewStyle(.page(backgroundDisplayMode: .always))
     }
     
     @ViewBuilder
     private func singleImageView(media: MediaEntity, index: Int) -> some View {
         if let img = mediaService.loadImage(fileName: media.fileName ?? "") {
             Button {
-                selectedImageIndex = index
-                showImageViewer = true
+                openImageViewer(at: index)
             } label: {
                 Image(uiImage: img)
                     .resizable()
@@ -213,15 +414,17 @@ struct StoryDetailView: View {
     @ViewBuilder
     private func videoPlayerView(media: MediaEntity, index: Int) -> some View {
         if playingVideoIndex == index, let player = videoPlayers[index] {
-            // 正在播放状态
-            VideoPlayer(player: player)
-                .frame(maxWidth: .infinity)
-                .aspectRatio(contentMode: .fit)
-                .cornerRadius(8)
+            activeVideoPlayer(player: player)
         } else {
-            // 未播放状态 - 显示缩略图
             videoThumbnailView(media: media, index: index)
         }
+    }
+    
+    private func activeVideoPlayer(player: AVPlayer) -> some View {
+        VideoPlayer(player: player)
+            .frame(maxWidth: .infinity)
+            .aspectRatio(contentMode: .fit)
+            .cornerRadius(8)
     }
     
     @ViewBuilder
@@ -231,22 +434,32 @@ struct StoryDetailView: View {
             Button {
                 playVideo(fileName: media.fileName ?? "", at: index)
             } label: {
-                ZStack(alignment: .center) {
-                    Image(uiImage: img)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: .infinity)
-                        .cornerRadius(8)
-                    
-                    Circle()
-                        .fill(Color.black.opacity(0.6))
-                        .frame(width: 80, height: 80)
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.white)
-                }
+                videoThumbnailContent(image: img)
             }
             .buttonStyle(PlainButtonStyle())
+        }
+    }
+    
+    private func videoThumbnailContent(image: UIImage) -> some View {
+        ZStack(alignment: .center) {
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: .infinity)
+                .cornerRadius(8)
+            
+            playButtonOverlay
+        }
+    }
+    
+    private var playButtonOverlay: some View {
+        ZStack {
+            Circle()
+                .fill(Color.black.opacity(0.6))
+                .frame(width: 80, height: 80)
+            Image(systemName: "play.fill")
+                .font(.system(size: 40))
+                .foregroundColor(.white)
         }
     }
     
@@ -257,17 +470,20 @@ struct StoryDetailView: View {
         }
     }
     
+    private func openImageViewer(at index: Int) {
+        selectedImageIndex = index
+        showImageViewer = true
+    }
+    
     private func playVideo(fileName: String, at index: Int) {
-        // 停止其他正在播放的视频
         stopAllVideos()
         
-        // 加载并播放新视频
-        if let url = mediaService.loadVideoURL(fileName: fileName) {
-            let player = AVPlayer(url: url)
-            videoPlayers[index] = player
-            playingVideoIndex = index
-            player.play()
-        }
+        guard let url = mediaService.loadVideoURL(fileName: fileName) else { return }
+        
+        let player = AVPlayer(url: url)
+        videoPlayers[index] = player
+        playingVideoIndex = index
+        player.play()
     }
     
     private func stopVideo(at index: Int) {
@@ -282,6 +498,10 @@ struct StoryDetailView: View {
         }
         videoPlayers.removeAll()
         playingVideoIndex = nil
+    }
+    
+    private func cleanupResources() {
+        stopAllVideos()
     }
 }
 
