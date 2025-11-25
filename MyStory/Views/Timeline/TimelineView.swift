@@ -18,7 +18,7 @@ struct TimelineView: View {
     
     // MARK: - Body
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 storyListView
             }
@@ -47,11 +47,13 @@ struct TimelineView: View {
     }
     
     private func storyItemView(story: StoryEntity, index: Int) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
             dateHeaderView(for: story)
+            solidLineView
+            
             HStack(spacing: 2) {
                 storyCardButton(for: story)
-            }.padding(.horizontal, 16)
+            }.padding(.horizontal, 8)
         }
         .onAppear {
             handleItemAppear(index: index)
@@ -60,13 +62,19 @@ struct TimelineView: View {
     
     private func dateHeaderView(for story: StoryEntity) -> some View {
         HStack(spacing: 8) {
-            Circle()
-                .stroke(Color.red, lineWidth: 2)
-                .frame(width: 16, height: 16)
             Text(Self.formatDate(story.timestamp))
                 .font(.headline)
                 .foregroundColor(.black)
         }
+        .padding(.vertical, 8)
+    }
+    
+    // 时间下方的细横线
+    private var solidLineView: some View {
+        Rectangle()
+            .fill(Color.gray.opacity(0.3))
+            .frame(height: 1)
+            .padding(.bottom, 8)
     }
     
     @ViewBuilder

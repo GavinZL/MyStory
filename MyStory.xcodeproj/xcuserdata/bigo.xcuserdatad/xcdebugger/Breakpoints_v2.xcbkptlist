@@ -18,36 +18,6 @@
             endingLineNumber = "40"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "79EE4D52-B6BA-4872-A11E-4E557BCF701D - c36c923e91c2c5a2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 () -&gt; () in MyStory.VideoPlayerView.body.getter : some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Components/VideoPlayerView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40">
-               </Location>
-               <Location
-                  uuid = "79EE4D52-B6BA-4872-A11E-4E557BCF701D - c36c923e91c2c5a2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 () -&gt; () in MyStory.VideoPlayerView.body.getter : some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Components/VideoPlayerView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -80,36 +50,6 @@
             endingLineNumber = "132"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "5F198B9D-5D23-4F1A-8FAA-14962B487B1D - d4e2fd4403d4d0f2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 () -&gt; MyStory.VideoPlayerWrapper in closure #1 () -&gt; &lt;&lt;opaque return type of SwiftUI.View.withLoadingIndicator() -&gt; some&gt;&gt;.0 in MyStory.StoryEditorView.body.getter : some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Views/Editor/StoryEditorView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "132"
-                  endingLineNumber = "132">
-               </Location>
-               <Location
-                  uuid = "5F198B9D-5D23-4F1A-8FAA-14962B487B1D - d4e2fd4403d4d0f2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 () -&gt; MyStory.VideoPlayerWrapper in closure #1 () -&gt; &lt;&lt;opaque return type of SwiftUI.View.withLoadingIndicator() -&gt; some&gt;&gt;.0 in MyStory.StoryEditorView.body.getter : some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Views/Editor/StoryEditorView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "132"
-                  endingLineNumber = "132">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -126,36 +66,6 @@
             endingLineNumber = "132"
             landmarkName = "fullScreenDestination(for:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "7C278D83-E770-4AED-83B6-91CA39247125 - 6363e1e85a601b4c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "MyStory.TimelineView.setupViewModel() -&gt; ()"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Views/Timeline/TimelineView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "132"
-                  endingLineNumber = "132">
-               </Location>
-               <Location
-                  uuid = "7C278D83-E770-4AED-83B6-91CA39247125 - e63f330036565e13"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "MyStory.TimelineView.fullScreenDestination(for: MyStory.StoryEntity) -&gt; some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Views/Timeline/TimelineView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "133"
-                  endingLineNumber = "133">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -172,36 +82,6 @@
             endingLineNumber = "131"
             landmarkName = "fullScreenDestination(for:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "4F5F4DC1-A0FD-465F-BA4F-B923F9EE8EC0 - 6363e1e85a601b4c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "MyStory.TimelineView.setupViewModel() -&gt; ()"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Views/Timeline/TimelineView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "132"
-                  endingLineNumber = "132">
-               </Location>
-               <Location
-                  uuid = "4F5F4DC1-A0FD-465F-BA4F-B923F9EE8EC0 - e63f330036565edd"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "MyStory.TimelineView.fullScreenDestination(for: MyStory.StoryEntity) -&gt; some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bigo/Documents/AI/App/MyStory/MyStory/Views/Timeline/TimelineView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "131"
-                  endingLineNumber = "131">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -216,7 +96,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "187"
             endingLineNumber = "187"
-            landmarkName = "reloadStories()"
+            landmarkName = "deleteStory(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -232,7 +112,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "191"
             endingLineNumber = "191"
-            landmarkName = "formatDate(_:)"
+            landmarkName = "deleteStory(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

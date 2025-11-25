@@ -11,6 +11,12 @@ struct StoryCardView: View {
     private var isVideo: Bool {
         firstMedia?.type == "video"
     }
+    
+    // 计算图片宽高比，判断是横屏还是竖屏
+    private var isLandscape: Bool {
+        guard let image = firstImage else { return false }
+        return image.size.width > image.size.height
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -18,10 +24,10 @@ struct StoryCardView: View {
                 ZStack(alignment: .center) {
                     Image(uiImage: uiImg)
                         .resizable()
-                        .scaledToFill()
+                        .aspectRatio(contentMode: isLandscape ? .fit : .fill)
+                        .cornerRadius(8)
                         .frame(maxWidth: .infinity)
                         .frame(height: 200)
-                        .clipped()
                         .cornerRadius(8)
                     
                     if isVideo {
@@ -68,10 +74,10 @@ struct StoryCardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
+        .padding(5)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.red, lineWidth: 2)
+                .fill(Color.gray.opacity(0.05))
         )
     }
 
