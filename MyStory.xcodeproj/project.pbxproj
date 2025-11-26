@@ -27,6 +27,8 @@
 		1F7FA2E82ED33D42004D91C4 /* AIPolishView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2E72ED33D42004D91C4 /* AIPolishView.swift */; };
 		1F7FA2EE2ED34066004D91C4 /* CategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2E92ED34066004D91C4 /* CategoryViewModel.swift */; };
 		1F7FA2EF2ED34066004D91C4 /* AIPolishViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2EB2ED34066004D91C4 /* AIPolishViewModel.swift */; };
+		1FF01B202ED71AB400EDDEE4 /* CategoryStoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF01B1F2ED71AB400EDDEE4 /* CategoryStoryListView.swift */; };
+		1FF01B212ED71AB400EDDEE4 /* CategoryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF01B1E2ED71AB400EDDEE4 /* CategoryFormView.swift */; };
 		E100000001 /* MyStoryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000001 /* MyStoryApp.swift */; };
 		E100000002 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000002 /* CoreDataStack.swift */; };
 		E100000003 /* MediaStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000003 /* MediaStorageService.swift */; };
@@ -65,6 +67,8 @@
 		1F7FA2E72ED33D42004D91C4 /* AIPolishView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPolishView.swift; sourceTree = "<group>"; };
 		1F7FA2E92ED34066004D91C4 /* CategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewModel.swift; sourceTree = "<group>"; };
 		1F7FA2EB2ED34066004D91C4 /* AIPolishViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPolishViewModel.swift; sourceTree = "<group>"; };
+		1FF01B1E2ED71AB400EDDEE4 /* CategoryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryFormView.swift; sourceTree = "<group>"; };
+		1FF01B1F2ED71AB400EDDEE4 /* CategoryStoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryStoryListView.swift; sourceTree = "<group>"; };
 		E200000001 /* MyStoryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStoryApp.swift; sourceTree = "<group>"; };
 		E200000002 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		E200000003 /* MediaStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaStorageService.swift; sourceTree = "<group>"; };
@@ -177,6 +181,8 @@
 		1F7FA2DC2ED33D23004D91C4 /* Category */ = {
 			isa = PBXGroup;
 			children = (
+				1FF01B1E2ED71AB400EDDEE4 /* CategoryFormView.swift */,
+				1FF01B1F2ED71AB400EDDEE4 /* CategoryStoryListView.swift */,
 				1F7FA2DA2ED33D23004D91C4 /* CategoryListView.swift */,
 				1F7FA2DB2ED33D23004D91C4 /* CategoryView.swift */,
 			);
@@ -466,6 +472,8 @@
 				1F7FA2CF2ED33C9E004D91C4 /* StoryModel.swift in Sources */,
 				E100000009 /* StoryCardView.swift in Sources */,
 				1F7FA2A62ED33A99004D91C4 /* PersistenceController.swift in Sources */,
+				1FF01B202ED71AB400EDDEE4 /* CategoryStoryListView.swift in Sources */,
+				1FF01B212ED71AB400EDDEE4 /* CategoryFormView.swift in Sources */,
 				1F7FA2A72ED33A99004D91C4 /* KeychainStore.swift in Sources */,
 				E10000000A /* StoryEntity.swift in Sources */,
 				E10000000B /* MediaEntity.swift in Sources */,

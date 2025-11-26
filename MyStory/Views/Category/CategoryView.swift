@@ -2,6 +2,9 @@ import SwiftUI
 
 public struct CategoryView: View {
     @ObservedObject private var viewModel: CategoryViewModel
+    
+    // MARK: - State
+    @State private var showCategoryForm = false
 
     public init(viewModel: CategoryViewModel) {
         self.viewModel = viewModel
@@ -25,13 +28,22 @@ public struct CategoryView: View {
             }
         }
         .navigationTitle("分类")
+        .toolbar {
+            toolbarContent
+        }
+        .sheet(isPresented: $showCategoryForm) {
+            CategoryFormView(viewModel: viewModel)
+        }
     }
 
     private var cardGrid: some View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 ForEach(flatten(tree: viewModel.tree), id: \.id) { node in
-                    CategoryCardView(node: node)
+                    NavigationLink(destination: CategoryStoryListView(category: node)) {
+                        CategoryCardView(node: node)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
             .padding(.horizontal)
@@ -55,17 +67,30 @@ public struct CategoryView: View {
     }
 
     private func row(_ node: CategoryTreeNode) -> some View {
-        HStack {
-            Image(systemName: node.category.iconName)
-                .frame(width: 24)
-            Text(node.category.name)
-            Spacer()
-            Text("共 \(node.storyCount) 个故事")
-                .foregroundColor(.secondary)
-                .font(.footnote)
+        NavigationLink(destination: CategoryStoryListView(category: node)) {
+            HStack {
+                Image(systemName: node.category.iconName)
+                    .frame(width: 24)
+                Text(node.category.name)
+                Spacer()
+                Text("共 \(node.storyCount) 个故事")
+                    .foregroundColor(.secondary)
+                    .font(.footnote)
+            }
         }
     }
 
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            Button {
+                showCategoryForm = true
+            } label: {
+                Image(systemName: "plus")
+            }
+        }
+    }
+    
     private func flatten(tree: [CategoryTreeNode]) -> [CategoryTreeNode] {
         var result: [CategoryTreeNode] = []
         func walk(_ node: CategoryTreeNode) {

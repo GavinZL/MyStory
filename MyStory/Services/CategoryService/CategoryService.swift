@@ -34,22 +34,21 @@ public final class InMemoryCategoryService: CategoryService {
 
     public static func sample() -> InMemoryCategoryService {
         let svc = InMemoryCategoryService()
-        // Level 1
-        let life = CategoryModel(id: UUID(), name: "生活", iconName: "leaf", colorHex: "#34C759", level: 1, parentId: nil, sortOrder: 0, createdAt: Date())
-        let work = CategoryModel(id: UUID(), name: "工作", iconName: "briefcase", colorHex: "#0A84FF", level: 1, parentId: nil, sortOrder: 1, createdAt: Date())
-        // Level 2
-        let parenting = CategoryModel(id: UUID(), name: "育儿", iconName: "figure.2.and.child.holdinghands", colorHex: "#FF9F0A", level: 2, parentId: life.id, sortOrder: 0, createdAt: Date())
-        // Level 3
-        let baby = CategoryModel(id: UUID(), name: "大宝成长", iconName: "figure.child", colorHex: "#FF375F", level: 3, parentId: parenting.id, sortOrder: 0, createdAt: Date())
-
-        [life, work, parenting, baby].forEach { svc.categories[$0.id] = $0 }
-        svc.childrenMap[life.id] = [parenting.id]
-        svc.childrenMap[parenting.id] = [baby.id]
-        svc.childrenMap[work.id] = []
-        svc.storyCounts[life.id] = 12
-        svc.storyCounts[work.id] = 5
-        svc.storyCounts[parenting.id] = 7
-        svc.storyCounts[baby.id] = 3
+        // 初始化时只创建一个 Default 分类
+        let defaultCategory = CategoryModel(
+            id: UUID(),
+            name: "Default",
+            iconName: "folder.fill",
+            colorHex: "#007AFF",
+            level: 1,
+            parentId: nil,
+            sortOrder: 0,
+            createdAt: Date()
+        )
+        
+        svc.categories[defaultCategory.id] = defaultCategory
+        svc.childrenMap[defaultCategory.id] = []
+        svc.storyCounts[defaultCategory.id] = 0
         return svc
     }
 

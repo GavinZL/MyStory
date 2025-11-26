@@ -26,4 +26,11 @@ public final class CategoryViewModel: ObservableObject {
     public func toggleMode() {
         displayMode = (displayMode == .card) ? .list : .card
     }
+    
+    // MARK: - Category Management
+    
+    public func createCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String) throws {
+        try service.addCategory(name: name, level: level, parentId: parentId, iconName: iconName, colorHex: colorHex)
+        load()
+    }
 }

@@ -19,10 +19,12 @@ struct RootView: View {
                 }
             
             // 分类页面
-            CategoryView(viewModel: CategoryViewModel(service: InMemoryCategoryService.sample()))
-                .tabItem {
-                    Label("分类", systemImage: "folder.fill")
-                }
+            NavigationStack {
+                CategoryView(viewModel: CategoryViewModel(service: InMemoryCategoryService.sample()))
+            }
+            .tabItem {
+                Label("分类", systemImage: "folder.fill")
+            }
             
             // 设置页面
             SettingsView()
