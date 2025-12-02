@@ -62,7 +62,7 @@ struct TimelineView: View {
     
     private func dateHeaderView(for story: StoryEntity) -> some View {
         HStack(spacing: 8) {
-            Text(Self.formatDate(story.timestamp))
+            Text(Self.formatDate(story.timestamp ?? Date(timeIntervalSinceNow: 0)))
                 .font(.headline)
                 .foregroundColor(.black)
         }
@@ -157,7 +157,7 @@ struct TimelineView: View {
     }
     
     private func loadCoverImage(for story: StoryEntity) -> UIImage? {
-        guard let media = story.medias?.first else { return nil }
+        guard let media = (story.media as? Set<MediaEntity>)?.first else { return nil }
         
         // 根据媒体类型选择正确的加载方法
         if media.type == "video" {
@@ -168,7 +168,7 @@ struct TimelineView: View {
             return nil
         } else {
             // 图片：优先使用缩略图，其次使用原图
-            let fileName = media.thumbnailFileName ?? media.fileName
+            let fileName = (media.thumbnailFileName ?? media.fileName) ?? ""
             return mediaService.loadImage(fileName: fileName)
         }
     }

@@ -28,7 +28,7 @@ extension StoryEntity {
     @NSManaged public var longitude: Double
     @NSManaged public var mood: String?
     @NSManaged public var syncStatus: Int16
-    @NSManaged public var isDeleted: Bool
+    @NSManaged public override var isDeleted: Bool
     @NSManaged public var categories: NSSet?
     @NSManaged public var media: NSSet?
 

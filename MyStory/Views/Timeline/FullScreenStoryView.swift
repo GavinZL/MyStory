@@ -60,7 +60,7 @@ struct FullScreenStoryView: View {
     
     private var navigationTitle: String {
         if currentIndex < stories.count {
-            return stories[currentIndex].title
+            return stories[currentIndex].title ?? "unknown"
         }
         return "故事详情"
     }
@@ -263,7 +263,7 @@ struct StoryDetailView: View {
     
     // MARK: - Computed Properties
     private var mediaList: [MediaEntity] {
-        guard let medias = story.medias as? Set<MediaEntity> else { return [] }
+        guard let medias = story.media as? Set<MediaEntity> else { return [] }
         return medias.sorted { ($0.createdAt ?? Date()) < ($1.createdAt ?? Date()) }
     }
     

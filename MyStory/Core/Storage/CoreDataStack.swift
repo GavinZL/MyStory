@@ -97,6 +97,58 @@ final class CoreDataStack: ObservableObject {
             s_locationName, s_locationCity, s_latitude, s_longitude
         ]
 
+        // CategoryEntity
+        let categoryEntity = NSEntityDescription()
+        categoryEntity.name = "CategoryEntity"
+        categoryEntity.managedObjectClassName = "CategoryEntity"
+        
+        let c_id = NSAttributeDescription()
+        c_id.name = "id"
+        c_id.attributeType = .UUIDAttributeType
+        c_id.isOptional = false
+        
+        let c_name = NSAttributeDescription()
+        c_name.name = "name"
+        c_name.attributeType = .stringAttributeType
+        c_name.isOptional = false
+        
+        let c_nameEn = NSAttributeDescription()
+        c_nameEn.name = "nameEn"
+        c_nameEn.attributeType = .stringAttributeType
+        c_nameEn.isOptional = true
+        
+        let c_iconName = NSAttributeDescription()
+        c_iconName.name = "iconName"
+        c_iconName.attributeType = .stringAttributeType
+        c_iconName.isOptional = false
+        
+        let c_colorHex = NSAttributeDescription()
+        c_colorHex.name = "colorHex"
+        c_colorHex.attributeType = .stringAttributeType
+        c_colorHex.isOptional = true
+        c_colorHex.defaultValue = "#007AFF"
+        
+        let c_level = NSAttributeDescription()
+        c_level.name = "level"
+        c_level.attributeType = .integer16AttributeType
+        c_level.isOptional = false
+        c_level.defaultValue = 1
+        
+        let c_sortOrder = NSAttributeDescription()
+        c_sortOrder.name = "sortOrder"
+        c_sortOrder.attributeType = .integer32AttributeType
+        c_sortOrder.isOptional = false
+        c_sortOrder.defaultValue = 0
+        
+        let c_createdAt = NSAttributeDescription()
+        c_createdAt.name = "createdAt"
+        c_createdAt.attributeType = .dateAttributeType
+        c_createdAt.isOptional = false
+        
+        categoryEntity.properties = [
+            c_id, c_name, c_nameEn, c_iconName, c_colorHex, c_level, c_sortOrder, c_createdAt
+        ]
+
         // MediaEntity
         let mediaEntity = NSEntityDescription()
         mediaEntity.name = "MediaEntity"
@@ -142,9 +194,9 @@ final class CoreDataStack: ObservableObject {
         m_duration.attributeType = .doubleAttributeType
         m_duration.isOptional = true
 
-        // Relationships
+        // Relationships: Story <-> Media
         let r_story_to_media = NSRelationshipDescription()
-        r_story_to_media.name = "medias"
+        r_story_to_media.name = "media"
         r_story_to_media.destinationEntity = mediaEntity
         r_story_to_media.minCount = 0
         r_story_to_media.maxCount = 0 // to-many
@@ -159,14 +211,56 @@ final class CoreDataStack: ObservableObject {
 
         r_story_to_media.inverseRelationship = r_media_to_story
         r_media_to_story.inverseRelationship = r_story_to_media
+        
+        // Relationships: Story <-> Category (Many-to-Many)
+        let r_story_to_categories = NSRelationshipDescription()
+        r_story_to_categories.name = "categories"
+        r_story_to_categories.destinationEntity = categoryEntity
+        r_story_to_categories.minCount = 0
+        r_story_to_categories.maxCount = 0 // to-many
+        r_story_to_categories.deleteRule = .nullifyDeleteRule
+        
+        let r_category_to_stories = NSRelationshipDescription()
+        r_category_to_stories.name = "stories"
+        r_category_to_stories.destinationEntity = storyEntity
+        r_category_to_stories.minCount = 0
+        r_category_to_stories.maxCount = 0 // to-many
+        r_category_to_stories.deleteRule = .nullifyDeleteRule
+        
+        r_story_to_categories.inverseRelationship = r_category_to_stories
+        r_category_to_stories.inverseRelationship = r_story_to_categories
+        
+        // Relationships: Category parent-children (self-referencing)
+        let r_category_to_parent = NSRelationshipDescription()
+        r_category_to_parent.name = "parent"
+        r_category_to_parent.destinationEntity = categoryEntity
+        r_category_to_parent.minCount = 0
+        r_category_to_parent.maxCount = 1 // to-one
+        r_category_to_parent.deleteRule = .nullifyDeleteRule
+        
+        let r_category_to_children = NSRelationshipDescription()
+        r_category_to_children.name = "children"
+        r_category_to_children.destinationEntity = categoryEntity
+        r_category_to_children.minCount = 0
+        r_category_to_children.maxCount = 0 // to-many
+        r_category_to_children.deleteRule = .cascadeDeleteRule
+        
+        r_category_to_parent.inverseRelationship = r_category_to_children
+        r_category_to_children.inverseRelationship = r_category_to_parent
 
         storyEntity.properties.append(r_story_to_media)
+        storyEntity.properties.append(r_story_to_categories)
+        
+        categoryEntity.properties.append(r_category_to_stories)
+        categoryEntity.properties.append(r_category_to_parent)
+        categoryEntity.properties.append(r_category_to_children)
+        
         mediaEntity.properties = [
             m_id, m_type, m_fileName, m_thumbnail, m_createdAt, m_width, m_height, m_duration,
             r_media_to_story
         ]
 
-        model.entities = [storyEntity, mediaEntity]
+        model.entities = [storyEntity, categoryEntity, mediaEntity]
         return model
     }
 }

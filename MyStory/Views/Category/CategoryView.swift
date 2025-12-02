@@ -5,6 +5,7 @@ public struct CategoryView: View {
     
     // MARK: - State
     @State private var showCategoryForm = false
+    @State private var expandedCategories: Set<UUID> = []  // 用于跟踪展开的分类
 
     public init(viewModel: CategoryViewModel) {
         self.viewModel = viewModel
@@ -34,14 +35,19 @@ public struct CategoryView: View {
         .sheet(isPresented: $showCategoryForm) {
             CategoryFormView(viewModel: viewModel)
         }
+        .onAppear {
+            // 重新加载分类树以更新故事计数
+            viewModel.load()
+        }
     }
 
     private var cardGrid: some View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(flatten(tree: viewModel.tree), id: \.id) { node in
-                    NavigationLink(destination: CategoryStoryListView(category: node)) {
-                        CategoryCardView(node: node)
+                // 只显示一级分类
+                ForEach(viewModel.tree, id: \.id) { node in
+                    NavigationLink(destination: CategoryLevelView(parentNode: node, currentLevel: 2, viewModel: viewModel)) {
+                        CategoryCardView(node: node, displayMode: .children)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -52,15 +58,12 @@ public struct CategoryView: View {
 
     private var listTree: some View {
         List {
-            ForEach(viewModel.tree) { node in
-                Section(header: row(node)) {
-                    ForEach(node.children) { child in
-                        row(child)
-                        ForEach(child.children) { grand in
-                            row(grand).padding(.leading, 24)
-                        }
-                    }
-                }
+            ForEach(viewModel.tree) { level1Node in
+                CategoryListItem(
+                    node: level1Node,
+                    level: 1,
+                    expandedCategories: $expandedCategories
+                )
             }
         }
         .listStyle(.insetGrouped)
@@ -91,13 +94,188 @@ public struct CategoryView: View {
         }
     }
     
-    private func flatten(tree: [CategoryTreeNode]) -> [CategoryTreeNode] {
-        var result: [CategoryTreeNode] = []
-        func walk(_ node: CategoryTreeNode) {
-            result.append(node)
-            node.children.forEach(walk)
+    // MARK: - Helper Functions
+    
+    /// 计算分类的子分类数量
+    private func childrenCount(_ node: CategoryTreeNode) -> Int {
+        return node.children.count
+    }
+}
+
+// MARK: - Category List Item
+
+/// 分类列表项组件
+private struct CategoryListItem: View {
+    let node: CategoryTreeNode
+    let level: Int  // 1, 2, or 3
+    @Binding var expandedCategories: Set<UUID>
+    
+    var body: some View {
+        Group {
+            if level == 3 {
+                // 三级分类：根据是否有故事决定行为
+                CategoryStoryNavigationView(node: node) {
+                    categoryRow
+                }
+            } else {
+                // 一级和二级分类：点击展开/折叠
+                Button(action: toggleExpansion) {
+                    categoryRow
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                // 如果展开，显示子分类
+                if isExpanded && !node.children.isEmpty {
+                    ForEach(node.children) { childNode in
+                        CategoryListItem(
+                            node: childNode,
+                            level: level + 1,
+                            expandedCategories: $expandedCategories
+                        )
+                        .padding(.leading, 24)  // 缩进显示层级
+                    }
+                }
+            }
         }
-        tree.forEach(walk)
-        return result
+    }
+    
+    // MARK: - View Components
+    
+    private var categoryRow: some View {
+        HStack(spacing: 12) {
+            // 展开/折叠指示器（只有一二级且有子分类时显示）
+            if level < 3 && !node.children.isEmpty {
+                Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(width: 16)
+            } else if level < 3 {
+                // 占位，保持对齐
+                Color.clear.frame(width: 16)
+            }
+            
+            // 分类图标
+            Image(systemName: node.category.iconName)
+                .foregroundColor(Color(hex: node.category.colorHex))
+                .frame(width: 24)
+            
+            // 分类名称
+            Text(node.category.name)
+                .font(.body)
+            
+            Spacer()
+            
+            // 统计信息
+            Text(statisticsText)
+                .foregroundColor(.secondary)
+                .font(.footnote)
+            
+            // 三级分类显示导航箭头
+            if level == 3 {
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())  // 确保整个区域可点击
+    }
+    
+    // MARK: - Helper Properties
+    
+    /// 是否展开
+    private var isExpanded: Bool {
+        expandedCategories.contains(node.id)
+    }
+    
+    /// 统计信息文本
+    private var statisticsText: String {
+        switch level {
+        case 1:
+            // 一级分类：显示子目录数量
+            let count = node.children.count
+            return "共 \(count) 个子目录"
+        case 2:
+            // 二级分类：显示子目录数量（三级分类数量）
+            let count = node.children.count
+            return "共 \(count) 个子目录"
+        case 3:
+            // 三级分类：显示故事数量
+            return "共 \(node.storyCount) 个故事"
+        default:
+            return ""
+        }
+    }
+    
+    // MARK: - Actions
+    
+    /// 切换展开/折叠状态
+    private func toggleExpansion() {
+        if expandedCategories.contains(node.id) {
+            expandedCategories.remove(node.id)
+        } else {
+            expandedCategories.insert(node.id)
+        }
+    }
+}
+
+// MARK: - Category Story Navigation View
+
+/// 三级分类导航视图
+/// 根据是否有故事决定显示故事列表还是创建故事
+private struct CategoryStoryNavigationView<Content: View>: View {
+    let node: CategoryTreeNode
+    let content: Content
+    
+    @Environment(\.managedObjectContext) private var context
+    @State private var showEditor = false
+    @State private var navigateToStories = false
+    
+    init(node: CategoryTreeNode, @ViewBuilder content: () -> Content) {
+        self.node = node
+        self.content = content()
+    }
+    
+    var body: some View {
+        Button(action: handleTap) {
+            content
+        }
+        .buttonStyle(PlainButtonStyle())
+        .sheet(isPresented: $showEditor) {
+            StoryEditorView() {
+                // 创建完成后的回调
+                // TODO: 将来可以添加自动关联到该分类的功能
+            }
+        }
+        .background(
+            // 隐藏的 NavigationLink，当有故事时使用
+            NavigationLink(
+                destination: CategoryStoryListView(category: node),
+                isActive: $navigateToStories
+            ) {
+                EmptyView()
+            }
+            .hidden()
+        )
+    }
+    
+    // MARK: - Helper Properties
+    
+    /// 是否有故事
+    private var hasStories: Bool {
+        return node.storyCount > 0
+    }
+    
+    // MARK: - Actions
+    
+    /// 处理点击事件
+    private func handleTap() {
+        if hasStories {
+            // 有故事：跳转到故事列表
+            navigateToStories = true
+        } else {
+            // 没有故事：显示创建故事编辑器
+            showEditor = true
+        }
     }
 }

@@ -43,6 +43,10 @@ struct StoryEditorView: View {
     @State private var showVideoPlayer = false
     @State private var selectedVideoURL: URL?
     
+    // ⚠️ 新增：分类选择
+    @State private var selectedCategories: Set<UUID> = []
+    @State private var showCategoryPicker = false
+    
     // MARK: - Services
     @State private var locationService = LocationService()
     @State private var mediaService = MediaStorageService()
@@ -70,16 +74,20 @@ struct StoryEditorView: View {
         guard let story = existingStory else { return }
         
         // Initialize basic info
-        _title = State(initialValue: story.title)
+        _title = State(initialValue: story.title ?? "none")
         _content = State(initialValue: story.content ?? "")
         
+        // ⚠️ 新增：加载已有分类
+        if let categories = story.categories as? Set<CategoryEntity> {
+            let categoryIds = Set(categories.compactMap { $0.id })
+            _selectedCategories = State(initialValue: categoryIds)
+        }
+        
         // Initialize location
-        if let city = story.locationCity,
-           let lat = story.latitude?.doubleValue,
-           let lng = story.longitude?.doubleValue {
+        if let city = story.locationCity {
             _locationInfo = State(initialValue: LocationInfo(
-                latitude: lat,
-                longitude: lng,
+                latitude: story.latitude,
+                longitude: story.longitude,
                 name: story.locationName,
                 address: nil,
                 city: city,
@@ -89,12 +97,13 @@ struct StoryEditorView: View {
         
         // Initialize media
         let mediaService = MediaStorageService()
-        guard let medias = story.medias else { return }
+        guard let mediaSet = story.media as? Set<MediaEntity> else { return }
+        let medias = Array(mediaSet)
         
         // Load images
         let imageMedias = medias.filter { $0.type == "image" }
         let loadedImages = imageMedias.compactMap { media -> UIImage? in
-            mediaService.loadImage(fileName: media.fileName)
+            mediaService.loadImage(fileName: media.fileName ?? "")
         }
         _images = State(initialValue: loadedImages)
         
@@ -103,7 +112,7 @@ struct StoryEditorView: View {
         if let videoMedia = videoMedias.first {
             _videoFileName = State(initialValue: videoMedia.fileName)
             
-            if let videoURL = mediaService.loadVideoURL(fileName: videoMedia.fileName) {
+            if let videoURL = mediaService.loadVideoURL(fileName: videoMedia.fileName ?? "") {
                 _videoURLs = State(initialValue: [videoURL])
             }
             
@@ -120,6 +129,7 @@ struct StoryEditorView: View {
             Form {
                 titleSection
                 contentSection
+                categorySection  // ⚠️ 新增分类选择区
                 mediaSection
                 locationSection
             }
@@ -129,6 +139,9 @@ struct StoryEditorView: View {
             }
             .fullScreenCover(isPresented: $showVideoPlayer) {
                 VideoPlayerWrapper(videoURL: $selectedVideoURL)
+            }
+            .sheet(isPresented: $showCategoryPicker) {
+                categoryPickerSheet  // ⚠️ 分类选择器
             }
             .withLoadingIndicator()
         }
@@ -145,6 +158,36 @@ struct StoryEditorView: View {
         Section(header: Text("内容")) {
             TextEditor(text: $content)
                 .frame(minHeight: 150)
+        }
+    }
+    
+    // ⚠️ 新增：分类选择器视图
+    private var categoryPickerSheet: some View {
+        SimpleCategoryPicker(
+            selectedCategories: $selectedCategories,
+            onDismiss: { showCategoryPicker = false }
+        )
+    }
+    
+    // ⚠️ 新增：分类选择区
+    private var categorySection: some View {
+        Section(header: Text("分类")) {
+            Button {
+                showCategoryPicker = true
+            } label: {
+                HStack {
+                    if selectedCategories.isEmpty {
+                        Text("选择分类")
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("已选择 \(selectedCategories.count) 个分类")
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
         }
     }
     
@@ -423,6 +466,7 @@ struct StoryEditorView: View {
         let story = getOrCreateStory()
         updateStoryBasicInfo(story)
         updateStoryLocation(story)
+        updateStoryCategories(story)  // ⚠️ 新增：关联分类
         
         if existingStory == nil {
             saveMediaToStory(story)
@@ -460,8 +504,25 @@ struct StoryEditorView: View {
         
         story.locationName = info.name
         story.locationCity = info.city
-        story.latitude = NSNumber(value: info.latitude)
-        story.longitude = NSNumber(value: info.longitude)
+        story.latitude = Double(truncating: NSNumber(value: info.latitude))
+        story.longitude = Double(truncating: NSNumber(value: info.longitude))
+    }
+    
+    // ⚠️ 新增：更新故事分类关联
+    private func updateStoryCategories(_ story: StoryEntity) {
+        // 清除现有关联
+        if let existingCategories = story.categories {
+            story.removeFromCategories(existingCategories)
+        }
+        
+        // 添加新选择的分类
+        let categoryService = CoreDataCategoryService(context: context)
+        for categoryId in selectedCategories {
+            if let categoryEntity = categoryService.fetchCategory(id: categoryId) {
+                story.addToCategories(categoryEntity)
+                print("✅ [故事编辑器] 关联分类: \(categoryEntity.name ?? "Unknown") -> 故事: \(story.title ?? "Untitled")")
+            }
+        }
     }
     
     private func saveMediaToStory(_ story: StoryEntity) {

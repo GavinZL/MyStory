@@ -5,7 +5,7 @@ struct StoryCardView: View {
     let firstImage: UIImage?
     
     private var firstMedia: MediaEntity? {
-        story.medias?.first
+        (story.media as? Set<MediaEntity>)?.first
     }
     
     private var isVideo: Bool {
@@ -51,7 +51,7 @@ struct StoryCardView: View {
                     )
             }
 
-            Text(story.title)
+            Text(story.title ?? "None")
                 .font(.headline)
                 .lineLimit(2)
                 .foregroundColor(.primary)

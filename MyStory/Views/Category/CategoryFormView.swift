@@ -8,8 +8,16 @@ struct CategoryFormView: View {
     // MARK: - Properties
     @ObservedObject var viewModel: CategoryViewModel
     
+    /// 父级分类节点（可选）
+    let parentNode: CategoryTreeNode?
+    
+    /// 预设层级（可选）
+    let presetLevel: Int?
+    
     // MARK: - State
     @State private var categoryName: String = ""
+    @State private var selectedLevel: Int = 1
+    @State private var selectedParent: CategoryTreeNode?
     @State private var selectedIcon: String = "folder.fill"
     @State private var selectedColor: String = "#007AFF"
     @State private var showError: Bool = false
@@ -27,15 +35,43 @@ struct CategoryFormView: View {
         "#5856D6", "#AF52DE", "#00C7BE", "#FF2D55"
     ]
     
+    // MARK: - Initialization
+    
+    init(
+        viewModel: CategoryViewModel,
+        parentNode: CategoryTreeNode? = nil,
+        presetLevel: Int? = nil
+    ) {
+        self.viewModel = viewModel
+        self.parentNode = parentNode
+        self.presetLevel = presetLevel
+    }
+    
     // MARK: - Body
+    
     var body: some View {
         NavigationView {
             Form {
+                // 如果有预设层级，不显示层级选择器
+                if presetLevel == nil {
+                    levelSection
+                } else {
+                    // 显示当前层级信息
+                    currentLevelInfoSection
+                }
+                
+                // 如果有父节点，显示父分类信息
+                if let parent = parentNode {
+                    parentInfoSection(parent: parent)
+                } else if presetLevel == nil {
+                    parentSection
+                }
+                
                 nameSection
                 iconSection
                 colorSection
             }
-            .navigationTitle("新建分类")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 toolbarContent
@@ -45,10 +81,74 @@ struct CategoryFormView: View {
             } message: {
                 Text(errorMessage)
             }
+            .onAppear {
+                setupInitialValues()
+            }
         }
     }
     
     // MARK: - View Components
+    
+    /// 当前层级信息区（不可编辑）
+    private var currentLevelInfoSection: some View {
+        Section(header: Text("分类层级")) {
+            HStack {
+                Text("层级")
+                Spacer()
+                Text(levelDisplayName(for: effectiveLevel))
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    /// 父分类信息区（不可编辑）
+    private func parentInfoSection(parent: CategoryTreeNode) -> some View {
+        Section(header: Text("父分类")) {
+            HStack {
+                Image(systemName: parent.category.iconName)
+                    .foregroundColor(Color(hex: parent.category.colorHex))
+                Text(breadcrumbPath(for: parent))
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    private var levelSection: some View {
+        Section(header: Text("分类层级")) {
+            Picker("层级", selection: $selectedLevel) {
+                Text("一级分类").tag(1)
+                Text("二级分类").tag(2)
+                Text("三级分类（故事线）").tag(3)
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: selectedLevel) { _ in
+                // 切换层级时重置父分类
+                selectedParent = nil
+            }
+        }
+    }
+    
+    private var parentSection: some View {
+        Group {
+            if selectedLevel > 1 {
+                Section(header: Text("选择父分类")) {
+                    if availableParents.isEmpty {
+                        Text("暂无可用的父分类")
+                            .foregroundColor(.secondary)
+                    } else {
+                        Picker("父分类", selection: $selectedParent) {
+                            Text("请选择...").tag(nil as CategoryTreeNode?)
+                            ForEach(availableParents, id: \.id) { node in
+                                Text(parentDisplayName(node)).tag(node as CategoryTreeNode?)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                    }
+                }
+            }
+        }
+    }
+    
     private var nameSection: some View {
         Section(header: Text("分类名称")) {
             TextField("请输入分类名称", text: $categoryName)
@@ -129,11 +229,24 @@ struct CategoryFormView: View {
     
     // MARK: - Actions
     private func saveCategory() {
+        // 验证输入
+        let effectiveLevelValue = effectiveLevel
+        
+        if effectiveLevelValue > 1 {
+            // 如果有预设父节点，使用它；否则检查是否选择了父分类
+            if parentNode == nil && selectedParent == nil {
+                errorMessage = "请选择父分类"
+                showError = true
+                return
+            }
+        }
+        
         do {
+            let parentId = parentNode?.id ?? selectedParent?.id
             try viewModel.createCategory(
                 name: categoryName,
-                level: 1,
-                parentId: nil,
+                level: effectiveLevelValue,
+                parentId: parentId,
                 iconName: selectedIcon,
                 colorHex: selectedColor
             )
@@ -142,6 +255,87 @@ struct CategoryFormView: View {
             errorMessage = error.localizedDescription
             showError = true
         }
+    }
+    
+    // MARK: - Helper Methods
+    
+    /// 设置初始值
+    private func setupInitialValues() {
+        if let presetLevel = presetLevel {
+            selectedLevel = presetLevel
+        }
+        
+        if let parentNode = parentNode {
+            selectedParent = parentNode
+        }
+    }
+    
+    /// 获取实际使用的层级
+    private var effectiveLevel: Int {
+        return presetLevel ?? selectedLevel
+    }
+    
+    /// 获取导航栏标题
+    private var navigationTitle: String {
+        if let level = presetLevel {
+            return "新建" + levelDisplayName(for: level)
+        }
+        return "新建分类"
+    }
+    
+    /// 获取层级显示名称
+    private func levelDisplayName(for level: Int) -> String {
+        switch level {
+        case 1:
+            return "一级分类"
+        case 2:
+            return "二级分类"
+        case 3:
+            return "三级分类（故事线）"
+        default:
+            return "分类"
+        }
+    }
+    
+    /// 生成面包屑路径
+    private func breadcrumbPath(for node: CategoryTreeNode) -> String {
+        var path = node.category.name
+        
+        // 如果是二级分类，查找一级父分类
+        if node.category.level == 2 {
+            if let parent = viewModel.tree.first(where: { $0.children.contains { $0.id == node.id } }) {
+                path = "\(parent.category.name) > \(path)"
+            }
+        }
+        
+        return path
+    }
+    
+    /// 获取可用的父分类列表
+    private var availableParents: [CategoryTreeNode] {
+        switch selectedLevel {
+        case 2:
+            // 二级分类的父分类必须是一级
+            return viewModel.tree
+        case 3:
+            // 三级分类的父分类必须是二级
+            return viewModel.tree.flatMap { $0.children }
+        default:
+            return []
+        }
+    }
+    
+    /// 生成父分类的显示名称（包含层级路径）
+    private func parentDisplayName(_ node: CategoryTreeNode) -> String {
+        if node.category.level == 1 {
+            return node.category.name
+        } else if node.category.level == 2 {
+            // 查找一级父分类
+            if let parent = viewModel.tree.first(where: { $0.children.contains { $0.id == node.id } }) {
+                return "\(parent.category.name) > \(node.category.name)"
+            }
+        }
+        return node.category.name
     }
 }
 

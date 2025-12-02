@@ -1,36 +1,39 @@
 import SwiftUI
 import CoreData
 
-// MARK: - Category Story List View
+/// 分类故事列表视图
+/// 显示指定分类及其子分类下的所有故事
 struct CategoryStoryListView: View {
     // MARK: - Properties
+    
+    /// 分类节点
     let category: CategoryTreeNode
     
     // MARK: - Environment
+    
     @Environment(\.managedObjectContext) private var context
     @EnvironmentObject private var coreData: CoreDataStack
     
-    // MARK: - FetchRequest
-    @FetchRequest private var stories: FetchedResults<StoryEntity>
-    
     // MARK: - State
-    @State private var showEditor = false
-    @State private var selectedStory: StoryEntity?
     
-    // MARK: - Initializer
+    @State private var stories: [StoryEntity] = []
+    @State private var selectedStory: StoryEntity?
+    @State private var showEditor = false
+    
+    // MARK: - Services
+    
+    @State private var mediaService = MediaStorageService()
+    
+    // MARK: - Initialization
+    
     init(category: CategoryTreeNode) {
         self.category = category
-        
-        // 初始化 FetchRequest（目前获取所有故事，后续可按分类过滤）
-        _stories = FetchRequest<StoryEntity>(
-            sortDescriptors: [NSSortDescriptor(keyPath: \StoryEntity.timestamp, ascending: false)],
-            animation: .default
-        )
     }
     
     // MARK: - Body
+    
     var body: some View {
-        Group {
+        ScrollView {
             if stories.isEmpty {
                 emptyStateView
             } else {
@@ -45,80 +48,110 @@ struct CategoryStoryListView: View {
         .sheet(isPresented: $showEditor) {
             editorSheet
         }
+        .onAppear {
+            loadStories()
+        }
     }
     
     // MARK: - View Components
+    
+    /// 空状态视图
     private var emptyStateView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "doc.text")
+        VStack(spacing: 16) {
+            Image(systemName: "tray")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
             
-            Text("暂无故事")
-                .font(.title2)
-                .fontWeight(.medium)
-            
-            Text("点击右上角 + 按钮创建新故事")
-                .font(.body)
+            Text("该分类下还没有故事")
+                .font(.headline)
                 .foregroundColor(.secondary)
             
             Button {
                 createNewStory()
             } label: {
-                Label("创建新故事", systemImage: "plus.circle.fill")
-                    .font(.headline)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
+                Label("创建第一个故事", systemImage: "plus.circle.fill")
+                    .font(.body)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
                     .background(Color.accentColor)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
     }
     
+    /// 故事列表视图
     private var storyListView: some View {
-        List {
+        LazyVStack(alignment: .leading, spacing: 20) {
             ForEach(stories, id: \.objectID) { story in
-                storyRow(story: story)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        selectedStory = story
-                        showEditor = true
-                    }
+                storyItemView(story: story)
             }
         }
-        .listStyle(.plain)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 12)
     }
     
-    private func storyRow(story: StoryEntity) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(story.title)
+    /// 单个故事项视图
+    private func storyItemView(story: StoryEntity) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            dateHeaderView(for: story)
+            solidLineView
+            
+            HStack(spacing: 2) {
+                storyCardButton(for: story)
+            }.padding(.horizontal, 8)
+        }
+    }
+    
+    /// 日期头部视图
+    private func dateHeaderView(for story: StoryEntity) -> some View {
+        HStack(spacing: 8) {
+            Text(formatDate(story.timestamp ?? Date()))
                 .font(.headline)
-            
-            if let content = story.content, !content.isEmpty {
-                Text(content)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
-            
-            HStack {
-                if let city = story.locationCity {
-                    Label(city, systemImage: "mappin.circle")
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                }
-                
-                Spacer()
-                
-                Text(formatDate(story.timestamp))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+                .foregroundColor(.black)
         }
         .padding(.vertical, 8)
     }
     
+    /// 分隔线
+    private var solidLineView: some View {
+        Rectangle()
+            .fill(Color.gray.opacity(0.3))
+            .frame(height: 1)
+            .padding(.bottom, 8)
+    }
+    
+    /// 故事卡片按钮
+    @ViewBuilder
+    private func storyCardButton(for story: StoryEntity) -> some View {
+        NavigationLink(destination: fullScreenDestination(for: story)) {
+            StoryCardView(story: story, firstImage: loadCoverImage(for: story))
+        }
+        .buttonStyle(PlainButtonStyle())
+        .contextMenu {
+            contextMenuItems(for: story)
+        }
+    }
+    
+    /// 上下文菜单项
+    @ViewBuilder
+    private func contextMenuItems(for story: StoryEntity) -> some View {
+        Button {
+            editStory(story)
+        } label: {
+            Label("编辑", systemImage: "pencil")
+        }
+        
+        Button(role: .destructive) {
+            deleteStory(story)
+        } label: {
+            Label("删除", systemImage: "trash")
+        }
+    }
+    
+    /// 工具栏内容
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -130,28 +163,103 @@ struct CategoryStoryListView: View {
         }
     }
     
+    /// 编辑器弹窗
     @ViewBuilder
     private var editorSheet: some View {
         if let story = selectedStory {
             StoryEditorView(existingStory: story) {
-                selectedStory = nil
+                loadStories()
             }
         } else {
             StoryEditorView {
-                selectedStory = nil
+                loadStories()
             }
         }
     }
     
+    /// 全屏故事视图目标
+    @ViewBuilder
+    private func fullScreenDestination(for story: StoryEntity) -> some View {
+        if let index = stories.firstIndex(where: { $0.objectID == story.objectID }) {
+            FullScreenStoryView(
+                stories: stories,
+                initialIndex: index,
+                onLoadMore: { },
+                hasMoreData: false
+            )
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    /// 加载故事
+    private func loadStories() {
+        let categoryIds = collectCategoryIds(category)
+        
+        let request = StoryEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "ANY categories.id IN %@", categoryIds as NSArray)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoryEntity.timestamp, ascending: false)]
+        
+        do {
+            stories = try context.fetch(request)
+        } catch {
+            print("Error fetching stories: \(error)")
+            stories = []
+        }
+    }
+    
+    /// 递归收集分类及其所有子分类的 ID
+    private func collectCategoryIds(_ node: CategoryTreeNode) -> [UUID] {
+        var ids = [node.id]
+        for child in node.children {
+            ids.append(contentsOf: collectCategoryIds(child))
+        }
+        return ids
+    }
+    
+    /// 加载封面图片
+    private func loadCoverImage(for story: StoryEntity) -> UIImage? {
+        guard let media = (story.media as? Set<MediaEntity>)?.first else { return nil }
+        
+        // 根据媒体类型选择正确的加载方法
+        if media.type == "video" {
+            // 视频封面：优先使用thumbnailFileName
+            if let thumbFileName = media.thumbnailFileName {
+                return mediaService.loadVideoThumbnail(fileName: thumbFileName)
+            }
+            return nil
+        } else {
+            // 图片：优先使用缩略图，其次使用原图
+            let fileName = (media.thumbnailFileName ?? media.fileName) ?? ""
+            return mediaService.loadImage(fileName: fileName)
+        }
+    }
+    
+    /// 格式化日期
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy年MM月dd日 HH:mm"
+        return formatter.string(from: date)
+    }
+    
     // MARK: - Actions
+    
+    /// 创建新故事
     private func createNewStory() {
         selectedStory = nil
         showEditor = true
     }
     
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日"
-        return formatter.string(from: date)
+    /// 编辑故事
+    private func editStory(_ story: StoryEntity) {
+        selectedStory = story
+        showEditor = true
+    }
+    
+    /// 删除故事
+    private func deleteStory(_ story: StoryEntity) {
+        context.delete(story)
+        stories.removeAll { $0.objectID == story.objectID }
+        coreData.save()
     }
 }

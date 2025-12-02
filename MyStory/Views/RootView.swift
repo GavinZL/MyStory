@@ -1,14 +1,8 @@
-//
-//  RootView.swift
-//  MyStory
-//
-//  应用根视图 - 主导航容器
-//
-
 import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject var router: AppRouter
+    @Environment(\.managedObjectContext) private var context
     
     var body: some View {
         TabView {
@@ -20,7 +14,7 @@ struct RootView: View {
             
             // 分类页面
             NavigationStack {
-                CategoryView(viewModel: CategoryViewModel(service: InMemoryCategoryService.sample()))
+                CategoryView(viewModel: CategoryViewModel(service: CoreDataCategoryService(context: context)))
             }
             .tabItem {
                 Label("分类", systemImage: "folder.fill")
