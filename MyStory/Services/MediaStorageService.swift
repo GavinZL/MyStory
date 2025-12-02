@@ -15,7 +15,9 @@ final class MediaStorageService: ObservableObject {
         let fileName = UUID().uuidString + ".heic"
         let keyId = (fileName as NSString).deletingPathExtension
         let url = try ensureImageDir().appendingPathComponent(fileName)
-        guard let data = image.heicData(compressionQuality: 0.8) ?? image.jpegData(compressionQuality: 0.8) else {
+        // 保存前先修正图片方向
+        let fixedImage = image.fixedOrientation()
+        guard let data = fixedImage.heicData(compressionQuality: 0.8) ?? fixedImage.jpegData(compressionQuality: 0.8) else {
             throw NSError(domain: "Media", code: -1, userInfo: [NSLocalizedDescriptionKey: "无法编码图片"])
         }
         let enc = try encrypt(data: data, keyId: keyId)
@@ -28,10 +30,12 @@ final class MediaStorageService: ObservableObject {
         let fileName = fileId + ".heic"
         let thumbName = fileId + "_thumb.heic"
         let dir = try ensureImageDir()
-        guard let fullData = image.heicData(compressionQuality: 0.8) ?? image.jpegData(compressionQuality: 0.8) else {
+        // 保存前先修正图片方向
+        let fixedImage = image.fixedOrientation()
+        guard let fullData = fixedImage.heicData(compressionQuality: 0.8) ?? fixedImage.jpegData(compressionQuality: 0.8) else {
             throw NSError(domain: "Media", code: -2, userInfo: [NSLocalizedDescriptionKey: "无法编码原图"])
         }
-        let thumbImg = generateThumbnail(from: image, maxEdge: 800)
+        let thumbImg = generateThumbnail(from: fixedImage, maxEdge: 800)
         guard let thumbData = thumbImg.heicData(compressionQuality: 0.6) ?? thumbImg.jpegData(compressionQuality: 0.6) else {
             throw NSError(domain: "Media", code: -3, userInfo: [NSLocalizedDescriptionKey: "无法编码缩略图"])
         }
@@ -69,6 +73,7 @@ final class MediaStorageService: ObservableObject {
         guard let enc = try? Data(contentsOf: url) else { return nil }
         let keyId = (fileName as NSString).deletingPathExtension
         guard let dec = try? decrypt(data: enc, keyId: keyId) else { return nil }
+        // 加载时图片方向已在保存时修正，直接返回
         return UIImage(data: dec)
     }
     
@@ -77,6 +82,7 @@ final class MediaStorageService: ObservableObject {
         guard let enc = try? Data(contentsOf: url) else { return nil }
         let keyId = (fileName as NSString).deletingPathExtension
         guard let dec = try? decrypt(data: enc, keyId: keyId) else { return nil }
+        // 加载时图片方向已在保存时修正，直接返回
         return UIImage(data: dec)
     }
     
@@ -275,5 +281,67 @@ private extension UIImage {
         CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
         guard CGImageDestinationFinalize(destination) else { return nil }
         return data as Data
+    }
+    
+    /// 修正图片方向，确保显示正确
+    func fixedOrientation() -> UIImage {
+        // 如果图片方向已经是正确的，直接返回
+        if imageOrientation == .up {
+            return self
+        }
+        
+        // 根据图片方向重绘图片
+        guard let cgImage = self.cgImage else { return self }
+        guard let colorSpace = cgImage.colorSpace else { return self }
+        guard let context = CGContext(
+            data: nil,
+            width: Int(size.width),
+            height: Int(size.height),
+            bitsPerComponent: cgImage.bitsPerComponent,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: cgImage.bitmapInfo.rawValue
+        ) else { return self }
+        
+        // 根据方向应用变换
+        var transform = CGAffineTransform.identity
+        
+        switch imageOrientation {
+        case .down, .downMirrored:
+            transform = transform.translatedBy(x: size.width, y: size.height)
+            transform = transform.rotated(by: .pi)
+        case .left, .leftMirrored:
+            transform = transform.translatedBy(x: size.width, y: 0)
+            transform = transform.rotated(by: .pi / 2)
+        case .right, .rightMirrored:
+            transform = transform.translatedBy(x: 0, y: size.height)
+            transform = transform.rotated(by: -.pi / 2)
+        default:
+            break
+        }
+        
+        switch imageOrientation {
+        case .upMirrored, .downMirrored:
+            transform = transform.translatedBy(x: size.width, y: 0)
+            transform = transform.scaledBy(x: -1, y: 1)
+        case .leftMirrored, .rightMirrored:
+            transform = transform.translatedBy(x: size.height, y: 0)
+            transform = transform.scaledBy(x: -1, y: 1)
+        default:
+            break
+        }
+        
+        context.concatenate(transform)
+        
+        // 绘制图片
+        switch imageOrientation {
+        case .left, .leftMirrored, .right, .rightMirrored:
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: size.height, height: size.width))
+        default:
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        }
+        
+        guard let newCGImage = context.makeImage() else { return self }
+        return UIImage(cgImage: newCGImage)
     }
 }

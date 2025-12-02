@@ -62,7 +62,8 @@ public struct CategoryView: View {
                 CategoryListItem(
                     node: level1Node,
                     level: 1,
-                    expandedCategories: $expandedCategories
+                    expandedCategories: $expandedCategories,
+                    viewModel: viewModel  // 传递 viewModel
                 )
             }
         }
@@ -109,12 +110,13 @@ private struct CategoryListItem: View {
     let node: CategoryTreeNode
     let level: Int  // 1, 2, or 3
     @Binding var expandedCategories: Set<UUID>
+    @ObservedObject var viewModel: CategoryViewModel  // 新增
     
     var body: some View {
         Group {
             if level == 3 {
                 // 三级分类：根据是否有故事决定行为
-                CategoryStoryNavigationView(node: node) {
+                CategoryStoryNavigationView(node: node, viewModel: viewModel) {
                     categoryRow
                 }
             } else {
@@ -130,7 +132,8 @@ private struct CategoryListItem: View {
                         CategoryListItem(
                             node: childNode,
                             level: level + 1,
-                            expandedCategories: $expandedCategories
+                            expandedCategories: $expandedCategories,
+                            viewModel: viewModel  // 传递 viewModel
                         )
                         .padding(.leading, 24)  // 缩进显示层级
                     }
@@ -226,13 +229,15 @@ private struct CategoryListItem: View {
 private struct CategoryStoryNavigationView<Content: View>: View {
     let node: CategoryTreeNode
     let content: Content
+    @ObservedObject var viewModel: CategoryViewModel  // 新增
     
     @Environment(\.managedObjectContext) private var context
     @State private var showEditor = false
     @State private var navigateToStories = false
     
-    init(node: CategoryTreeNode, @ViewBuilder content: () -> Content) {
+    init(node: CategoryTreeNode, viewModel: CategoryViewModel, @ViewBuilder content: () -> Content) {
         self.node = node
+        self.viewModel = viewModel
         self.content = content()
     }
     
@@ -246,11 +251,13 @@ private struct CategoryStoryNavigationView<Content: View>: View {
             let categoryService = CoreDataCategoryService(context: context)
             if let categoryEntity = categoryService.fetchCategory(id: node.id) {
                 StoryEditorView(category: categoryEntity) {
-                    // 创建完成后的回调，自动关联到该分类
+                    // 创建完成后的回调，刷新分类树
+                    viewModel.load()
                 }
             } else {
                 StoryEditorView {
                     // 如果查询失败，不传入分类
+                    viewModel.load()
                 }
             }
         }
