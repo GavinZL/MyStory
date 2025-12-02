@@ -19,6 +19,7 @@ struct VideoPlayerWrapper: View {
 struct StoryEditorView: View {
     // MARK: - Properties
     let existingStory: StoryEntity?
+    let category: CategoryEntity?  // 传入的分类信息
     let onSaveComplete: (() -> Void)?
     
     // MARK: - Environment
@@ -43,9 +44,8 @@ struct StoryEditorView: View {
     @State private var showVideoPlayer = false
     @State private var selectedVideoURL: URL?
     
-    // ⚠️ 新增：分类选择
-    @State private var selectedCategories: Set<UUID> = []
-    @State private var showCategoryPicker = false
+    // 分类ID（从传入的category初始化）
+    private let categoryId: UUID?
     
     // MARK: - Services
     @State private var locationService = LocationService()
@@ -67,8 +67,10 @@ struct StoryEditorView: View {
     }
     
     // MARK: - Initializer
-    init(existingStory: StoryEntity? = nil, onSaveComplete: (() -> Void)? = nil) {
+    init(existingStory: StoryEntity? = nil, category: CategoryEntity? = nil, onSaveComplete: (() -> Void)? = nil) {
         self.existingStory = existingStory
+        self.category = category
+        self.categoryId = category?.id
         self.onSaveComplete = onSaveComplete
         
         guard let story = existingStory else { return }
@@ -76,12 +78,6 @@ struct StoryEditorView: View {
         // Initialize basic info
         _title = State(initialValue: story.title ?? "none")
         _content = State(initialValue: story.content ?? "")
-        
-        // ⚠️ 新增：加载已有分类
-        if let categories = story.categories as? Set<CategoryEntity> {
-            let categoryIds = Set(categories.compactMap { $0.id })
-            _selectedCategories = State(initialValue: categoryIds)
-        }
         
         // Initialize location
         if let city = story.locationCity {
@@ -129,7 +125,6 @@ struct StoryEditorView: View {
             Form {
                 titleSection
                 contentSection
-                categorySection  // ⚠️ 新增分类选择区
                 mediaSection
                 locationSection
             }
@@ -140,9 +135,7 @@ struct StoryEditorView: View {
             .fullScreenCover(isPresented: $showVideoPlayer) {
                 VideoPlayerWrapper(videoURL: $selectedVideoURL)
             }
-            .sheet(isPresented: $showCategoryPicker) {
-                categoryPickerSheet  // ⚠️ 分类选择器
-            }
+
             .withLoadingIndicator()
         }
     }
@@ -161,35 +154,7 @@ struct StoryEditorView: View {
         }
     }
     
-    // ⚠️ 新增：分类选择器视图
-    private var categoryPickerSheet: some View {
-        SimpleCategoryPicker(
-            selectedCategories: $selectedCategories,
-            onDismiss: { showCategoryPicker = false }
-        )
-    }
-    
-    // ⚠️ 新增：分类选择区
-    private var categorySection: some View {
-        Section(header: Text("分类")) {
-            Button {
-                showCategoryPicker = true
-            } label: {
-                HStack {
-                    if selectedCategories.isEmpty {
-                        Text("选择分类")
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text("已选择 \(selectedCategories.count) 个分类")
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-    }
+
     
     private var mediaSection: some View {
         Section(header: Text("媒体")) {
@@ -508,20 +473,13 @@ struct StoryEditorView: View {
         story.longitude = Double(truncating: NSNumber(value: info.longitude))
     }
     
-    // ⚠️ 新增：更新故事分类关联
+    // 更新故事分类关联
     private func updateStoryCategories(_ story: StoryEntity) {
-        // 清除现有关联
-        if let existingCategories = story.categories {
-            story.removeFromCategories(existingCategories)
-        }
-        
-        // 添加新选择的分类
+        // 如果传入了分类，则关联该分类
         let categoryService = CoreDataCategoryService(context: context)
-        for categoryId in selectedCategories {
-            if let categoryEntity = categoryService.fetchCategory(id: categoryId) {
-                story.addToCategories(categoryEntity)
-                print("✅ [故事编辑器] 关联分类: \(categoryEntity.name ?? "Unknown") -> 故事: \(story.title ?? "Untitled")")
-            }
+        if let categoryId = categoryId, let categoryEntity = categoryService.fetchCategory(id: categoryId) {
+            story.addToCategories(categoryEntity)
+            print("✅ [故事编辑器] 关联分类: \(categoryEntity.name ?? "Unknown") -> 故事: \(story.title ?? "Untitled")")
         }
     }
     

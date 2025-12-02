@@ -171,8 +171,16 @@ struct CategoryStoryListView: View {
                 loadStories()
             }
         } else {
-            StoryEditorView {
-                loadStories()
+            // 传入分类实体（从 CategoryModel 的 ID 查询）
+            let categoryService = CoreDataCategoryService(context: context)
+            if let categoryEntity = categoryService.fetchCategory(id: category.id) {
+                StoryEditorView(category: categoryEntity) {
+                    loadStories()
+                }
+            } else {
+                StoryEditorView {
+                    loadStories()
+                }
             }
         }
     }

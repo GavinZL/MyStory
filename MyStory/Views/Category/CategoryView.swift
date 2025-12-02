@@ -242,9 +242,16 @@ private struct CategoryStoryNavigationView<Content: View>: View {
         }
         .buttonStyle(PlainButtonStyle())
         .sheet(isPresented: $showEditor) {
-            StoryEditorView() {
-                // 创建完成后的回调
-                // TODO: 将来可以添加自动关联到该分类的功能
+            // 从 node 中查询分类实体
+            let categoryService = CoreDataCategoryService(context: context)
+            if let categoryEntity = categoryService.fetchCategory(id: node.id) {
+                StoryEditorView(category: categoryEntity) {
+                    // 创建完成后的回调，自动关联到该分类
+                }
+            } else {
+                StoryEditorView {
+                    // 如果查询失败，不传入分类
+                }
             }
         }
         .background(
