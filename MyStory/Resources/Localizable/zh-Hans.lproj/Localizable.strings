@@ -129,3 +129,15 @@
 "categoryPicker.title" = "选择分类";
 "categoryPicker.empty" = "还没有分类";
 "categoryPicker.createHint" = "请先在分类tab创建分类";
+
+// MARK: - Search
+"search.title" = "搜索";
+"search.placeholder" = "搜索分类、故事标题或内容";
+"search.noResults" = "没有找到相关结果";
+"search.matchInTitle" = "匹配标题";
+"search.matchInContent" = "匹配内容";
+"search.moreStories" = "还有 %d 个故事...";
+"search.emptyState.title" = "开始搜索";
+"search.emptyState.message" = "输入关键词搜索分类、故事标题或内容";
+"search.noResults.title" = "没有找到结果";
+"search.noResults.message" = "没有找到与 \"%@\" 相关的内容";

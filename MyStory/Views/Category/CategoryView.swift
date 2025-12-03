@@ -5,7 +5,10 @@ public struct CategoryView: View {
     
     // MARK: - State
     @State private var showCategoryForm = false
+    @State private var showSearchView = false  // 控制搜索视图显示
     @State private var expandedCategories: Set<UUID> = []  // 用于跟踪展开的分类
+    @State private var selectedCategory: CategoryEntity?  // 用于搜索结果跳转
+    @State private var navigateToStoryList = false  // 控制跳转到故事列表
 
     public init(viewModel: CategoryViewModel) {
         self.viewModel = viewModel
@@ -21,6 +24,7 @@ public struct CategoryView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
 
+            // 显示分类列表
             switch viewModel.displayMode {
             case .card:
                 cardGrid
@@ -35,6 +39,22 @@ public struct CategoryView: View {
         .sheet(isPresented: $showCategoryForm) {
             CategoryFormView(viewModel: viewModel)
         }
+        .sheet(isPresented: $showSearchView) {
+            CategorySearchView(viewModel: viewModel) { category in
+                // 搜索结果点击回调：跳转到故事列表
+                handleSearchResultSelection(category)
+            }
+        }
+        .background(
+            // 隐藏的 NavigationLink 用于跳转到故事列表
+            NavigationLink(
+                destination: destinationView,
+                isActive: $navigateToStoryList
+            ) {
+                EmptyView()
+            }
+            .hidden()
+        )
         .onAppear {
             // 重新加载分类树以更新故事计数
             viewModel.load()
@@ -87,10 +107,18 @@ public struct CategoryView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
-            Button {
-                showCategoryForm = true
-            } label: {
-                Image(systemName: "plus")
+            HStack(spacing: 16) {
+                Button {
+                    showSearchView = true
+                } label: {
+                    Image(systemName: "magnifyingglass")
+                }
+                
+                Button {
+                    showCategoryForm = true
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }
@@ -100,6 +128,37 @@ public struct CategoryView: View {
     /// 计算分类的子分类数量
     private func childrenCount(_ node: CategoryTreeNode) -> Int {
         return node.children.count
+    }
+    
+    /// 处理搜索结果选择
+    private func handleSearchResultSelection(_ category: CategoryEntity) {
+        selectedCategory = category
+        navigateToStoryList = true
+    }
+    
+    /// 目标视图（TimelineView 按分类筛选）
+    @ViewBuilder
+    private var destinationView: some View {
+        if let category = selectedCategory {
+            CategoryStoryListView(category: CategoryTreeNode(
+                id: category.id ?? UUID(),
+                category: CategoryModel(
+                    id: category.id ?? UUID(),
+                    name: category.name ?? "",
+                    iconName: category.iconName ?? "folder.fill",
+                    colorHex: category.colorHex ?? "#007AFF",
+                    level: Int(category.level),
+                    parentId: category.parent?.id,
+                    sortOrder: Int(category.sortOrder),
+                    createdAt: category.createdAt ?? Date()
+                ),
+                children: [],
+                isExpanded: false,
+                storyCount: category.stories?.count ?? 0
+            ))
+        } else {
+            EmptyView()
+        }
     }
 }
 

@@ -18,6 +18,9 @@ public enum CategoryDisplayMode: String, CaseIterable, Identifiable {
 public final class CategoryViewModel: ObservableObject {
     @Published public private(set) var tree: [CategoryTreeNode] = []
     @Published public var displayMode: CategoryDisplayMode = .card
+    @Published public var searchText: String = ""
+    @Published public private(set) var searchResults: [CategorySearchResult] = []
+    @Published public private(set) var isSearching: Bool = false
 
     private let service: CategoryService
 
@@ -39,5 +42,26 @@ public final class CategoryViewModel: ObservableObject {
     public func createCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String) throws {
         try service.addCategory(name: name, level: level, parentId: parentId, iconName: iconName, colorHex: colorHex)
         load()
+    }
+    
+    // MARK: - Search
+    
+    public func performSearch() {
+        let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !keyword.isEmpty else {
+            searchResults = []
+            isSearching = false
+            return
+        }
+        
+        isSearching = true
+        searchResults = service.searchStories(keyword: keyword)
+    }
+    
+    public func clearSearch() {
+        searchText = ""
+        searchResults = []
+        isSearching = false
     }
 }

@@ -129,3 +129,15 @@
 "categoryPicker.title" = "Select Category";
 "categoryPicker.empty" = "No categories yet";
 "categoryPicker.createHint" = "Please create categories in Category tab first";
+
+// MARK: - Search
+"search.title" = "Search";
+"search.placeholder" = "Search categories, story titles or content";
+"search.noResults" = "No results found";
+"search.matchInTitle" = "Match in Title";
+"search.matchInContent" = "Match in Content";
+"search.moreStories" = "And %d more stories...";
+"search.emptyState.title" = "Start Searching";
+"search.emptyState.message" = "Enter keywords to search categories, story titles or content";
+"search.noResults.title" = "No Results Found";
+"search.noResults.message" = "No content found related to \"%@\"";

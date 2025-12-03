@@ -41,6 +41,10 @@
 		1FDA9BF92EE05D9200818D62 /* LanguageSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9BF82EE05D9200818D62 /* LanguageSettingsView.swift */; };
 		1FDA9BFB2EE063EA00818D62 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9BFA2EE063EA00818D62 /* AppTheme.swift */; };
 		1FDA9BFD2EE0678100818D62 /* ThemeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9BFC2EE0678100818D62 /* ThemeSettingsView.swift */; };
+		1FDA9BFF2EE06D6900818D62 /* CategorySearchResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9BFE2EE06D6900818D62 /* CategorySearchResultView.swift */; };
+		1FDA9C032EE0727100818D62 /* CategorySearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9C022EE0727100818D62 /* CategorySearchView.swift */; };
+		1FDA9C012EE06DA100818D62 /* SearchResultModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9C002EE06DA100818D62 /* SearchResultModel.swift */; };
+		1FDA9C032EE072B200818D62 /* CategorySearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9C022EE072B200818D62 /* CategorySearchView.swift */; };
 		1FF01B202ED71AB400EDDEE4 /* CategoryStoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF01B1F2ED71AB400EDDEE4 /* CategoryStoryListView.swift */; };
 		1FF01B212ED71AB400EDDEE4 /* CategoryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF01B1E2ED71AB400EDDEE4 /* CategoryFormView.swift */; };
 		E100000001 /* MyStoryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000001 /* MyStoryApp.swift */; };
@@ -95,6 +99,10 @@
 		1FDA9BF82EE05D9200818D62 /* LanguageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSettingsView.swift; sourceTree = "<group>"; };
 		1FDA9BFA2EE063EA00818D62 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		1FDA9BFC2EE0678100818D62 /* ThemeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSettingsView.swift; sourceTree = "<group>"; };
+		1FDA9BFE2EE06D6900818D62 /* CategorySearchResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySearchResultView.swift; sourceTree = "<group>"; };
+		1FDA9C022EE0727100818D62 /* CategorySearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySearchView.swift; sourceTree = "<group>"; };
+		1FDA9C002EE06DA100818D62 /* SearchResultModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultModel.swift; sourceTree = "<group>"; };
+		1FDA9C022EE072B200818D62 /* CategorySearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySearchView.swift; sourceTree = "<group>"; };
 		1FF01B1E2ED71AB400EDDEE4 /* CategoryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryFormView.swift; sourceTree = "<group>"; };
 		1FF01B1F2ED71AB400EDDEE4 /* CategoryStoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryStoryListView.swift; sourceTree = "<group>"; };
 		E200000001 /* MyStoryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStoryApp.swift; sourceTree = "<group>"; };
@@ -181,6 +189,7 @@
 		1F7FA2CB2ED33C9E004D91C4 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				1FDA9C002EE06DA100818D62 /* SearchResultModel.swift */,
 				1F7FA2C82ED33C9E004D91C4 /* LocationInfo.swift */,
 				1F7FA2C92ED33C9E004D91C4 /* SearchHistoryItem.swift */,
 				1F7FA2CA2ED33C9E004D91C4 /* StoryModel.swift */,
@@ -208,6 +217,8 @@
 		1F7FA2DC2ED33D23004D91C4 /* Category */ = {
 			isa = PBXGroup;
 			children = (
+				1FDA9C022EE072B200818D62 /* CategorySearchView.swift */,
+				1FDA9BFE2EE06D6900818D62 /* CategorySearchResultView.swift */,
 				1FDA9BDD2EDF16A900818D62 /* CategoryLevelView.swift */,
 				1FF01B1E2ED71AB400EDDEE4 /* CategoryFormView.swift */,
 				1FF01B1F2ED71AB400EDDEE4 /* CategoryStoryListView.swift */,
@@ -501,6 +512,8 @@
 				E100000002 /* CoreDataStack.swift in Sources */,
 				E100000003 /* MediaStorageService.swift in Sources */,
 				E100000004 /* LocationService.swift in Sources */,
+				1FDA9C012EE06DA100818D62 /* SearchResultModel.swift in Sources */,
+				1FDA9C032EE072B200818D62 /* CategorySearchView.swift in Sources */,
 				1F7FA2C22ED33C57004D91C4 /* RootView.swift in Sources */,
 				1FDA9BFD2EE0678100818D62 /* ThemeSettingsView.swift in Sources */,
 				E100000005 /* TimelineView.swift in Sources */,
@@ -519,6 +532,7 @@
 				1FDA9BDE2EDF16A900818D62 /* CategoryLevelView.swift in Sources */,
 				1F7FA2CD2ED33C9E004D91C4 /* LocationInfo.swift in Sources */,
 				1F7FA2CE2ED33C9E004D91C4 /* CategoryModel.swift in Sources */,
+				1FDA9BFF2EE06D6900818D62 /* CategorySearchResultView.swift in Sources */,
 				1F7FA2E22ED33D23004D91C4 /* CategoryListView.swift in Sources */,
 				1FDA9BE22EDF23C500818D62 /* StoryEntity+CoreDataProperties.swift in Sources */,
 				1F7FA2EE2ED34066004D91C4 /* CategoryViewModel.swift in Sources */,

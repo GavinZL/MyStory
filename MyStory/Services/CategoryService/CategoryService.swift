@@ -34,6 +34,9 @@ public protocol CategoryService {
     // 统计
     func storyCount(for id: UUID) -> Int
     func totalStoryCount(for id: UUID) -> Int
+    
+    // 搜索
+    func searchStories(keyword: String) -> [CategorySearchResult]
 }
 
 public final class InMemoryCategoryService: CategoryService {
@@ -148,6 +151,11 @@ public final class InMemoryCategoryService: CategoryService {
     
     public func totalStoryCount(for id: UUID) -> Int {
         aggregatedStoryCount(for: id)
+    }
+    
+    public func searchStories(keyword: String) -> [CategorySearchResult] {
+        // InMemory 服务不实现搜索功能
+        return []
     }
 
     private func buildNode(for id: UUID) -> CategoryTreeNode {
@@ -371,6 +379,109 @@ public final class CoreDataCategoryService: CategoryService {
         return total
     }
     
+    // MARK: - Search
+    
+    public func searchStories(keyword: String) -> [CategorySearchResult] {
+        guard !keyword.isEmpty else { return [] }
+        
+        let trimmedKeyword = keyword.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        var results: [CategorySearchResult] = []
+        
+        // 获取所有三级分类，并预加载 stories 关系数据
+        let request = CategoryEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "level == %d", 3)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \CategoryEntity.sortOrder, ascending: true)]
+        // ⚠️ 关键：预加载 stories 关系数据，避免 fault 导致数据为空
+        request.relationshipKeyPathsForPrefetching = ["stories", "parent", "parent.parent"]
+        
+        var level3Categories: [CategoryEntity] = []
+        do {
+            level3Categories = try context.fetch(request)
+        } catch {
+            print("⚠️ [CategoryService] Error fetching level 3 categories for search: \(error)")
+            return []
+        }
+        
+        for category in level3Categories {
+            var matchedStories: [StoryMatch] = []
+            
+            // 1. 搜索三级分类名称
+            let categoryNameMatch = (category.name ?? "").lowercased().contains(trimmedKeyword)
+            
+            // 2. 搜索该分类下的所有故事
+            if let stories = category.stories as? Set<StoryEntity> {
+                for story in stories {
+                    // ⚠️ 异常处理：检查故事对象是否有效
+                    guard !story.isFault, let storyId = story.id else {
+                        print("⚠️ [CategoryService] Skipping invalid story in category '\(category.name ?? "Unknown")'")
+                        continue
+                    }
+                    
+                    let titleLower = (story.title ?? "").lowercased()
+                    let contentLower = (story.plainTextContent ?? "").lowercased()
+                    
+                    var matchScore = 0
+                    var matchType: StoryMatch.MatchType? = nil
+                    var snippet = ""
+                    
+                    // 标题匹配（更高分数）
+                    if titleLower.contains(trimmedKeyword) {
+                        matchScore = 100
+                        matchType = .title
+                        snippet = story.title ?? ""
+                    }
+                    // 内容匹配
+                    else if contentLower.contains(trimmedKeyword) {
+                        matchScore = 50
+                        matchType = .content
+                        // 提取匹配的文本片段
+                        snippet = extractSnippet(from: story.plainTextContent ?? "", keyword: trimmedKeyword)
+                    }
+                    
+                    // 如果有匹配，添加到结果
+                    if let type = matchType {
+                        let match = StoryMatch(
+                            story: story,
+                            matchType: type,
+                            matchSnippet: snippet,
+                            matchScore: matchScore
+                        )
+                        matchedStories.append(match)
+                    }
+                }
+            }
+            
+            // 如果分类名称匹配或有故事匹配，添加到结果
+            if categoryNameMatch || !matchedStories.isEmpty {
+                // ⚠️ 异常处理：检查分类对象是否有效
+                guard let categoryId = category.id else {
+                    print("⚠️ [CategoryService] Skipping category with nil id")
+                    continue
+                }
+                
+                // 按匹配分数排序故事
+                matchedStories.sort { $0.matchScore > $1.matchScore }
+                
+                // 构建分类路径
+                let categoryPath = buildCategoryPath(for: category)
+                
+                // 如果分类名称匹配但没有故事匹配，也要显示（但分数较低）
+                let result = CategorySearchResult(
+                    category: category,
+                    categoryPath: categoryPath,
+                    matchedStories: matchedStories
+                )
+                
+                results.append(result)
+            }
+        }
+        
+        // 按总分排序
+        results.sort { $0.totalScore > $1.totalScore }
+        
+        return results
+    }
+    
     // MARK: - Private Methods
     
     private func buildNode(from entity: CategoryEntity) -> CategoryTreeNode {
@@ -400,5 +511,75 @@ public final class CoreDataCategoryService: CategoryService {
             isExpanded: false,
             storyCount: storyCount
         )
+    }
+    
+    /// 构建分类路径（例如：“生活 > 旅行 > 日本之旅”）
+    private func buildCategoryPath(for category: CategoryEntity) -> String {
+        var pathComponents: [String] = []
+        var currentCategory: CategoryEntity? = category
+        var visitedCategories: Set<NSManagedObjectID> = []  // 防止循环引用
+        
+        while let cat = currentCategory {
+            // ⚠️ 异常处理：防止循环引用
+            guard !visitedCategories.contains(cat.objectID) else {
+                print("⚠️ [CategoryService] Circular reference detected in category hierarchy")
+                break
+            }
+            visitedCategories.insert(cat.objectID)
+            
+            // ⚠️ 异常处理：检查分类名称是否有效
+            let categoryName = cat.name ?? "Unknown"
+            pathComponents.insert(categoryName, at: 0)
+            
+            // 移动到父分类
+            currentCategory = cat.parent
+            
+            // ⚠️ 异常处理：防止无限循环（最多3级）
+            if pathComponents.count >= 3 {
+                break
+            }
+        }
+        
+        return pathComponents.joined(separator: " > ")
+    }
+    
+    /// 提取包含关键字的文本片段
+    private func extractSnippet(from text: String, keyword: String) -> String {
+        // ⚠️ 异常处理：检查输入是否为空
+        guard !text.isEmpty, !keyword.isEmpty else {
+            return String(text.prefix(50))
+        }
+        
+        let lowerText = text.lowercased()
+        let lowerKeyword = keyword.lowercased()
+        
+        guard let range = lowerText.range(of: lowerKeyword) else {
+            return String(text.prefix(50))
+        }
+        
+        // 计算片段范围（关键字前后各取20个字符）
+        let startDistance = text.distance(from: text.startIndex, to: range.lowerBound)
+        let snippetStart = max(0, startDistance - 20)
+        let snippetEnd = min(text.count, startDistance + keyword.count + 20)
+        
+        // ⚠️ 异常处理：防止索引越界
+        guard snippetStart < text.count, snippetEnd <= text.count, snippetStart < snippetEnd else {
+            return String(text.prefix(50))
+        }
+        
+        let start = text.index(text.startIndex, offsetBy: snippetStart)
+        let end = text.index(text.startIndex, offsetBy: snippetEnd)
+        
+        var snippet = String(text[start..<end])
+        
+        // 添加省略号
+        if snippetStart > 0 {
+            snippet = "..." + snippet
+        }
+        if snippetEnd < text.count {
+            snippet = snippet + "..."
+        }
+        
+        return snippet
     }
 }

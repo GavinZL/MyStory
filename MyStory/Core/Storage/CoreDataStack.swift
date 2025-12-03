@@ -56,6 +56,11 @@ final class CoreDataStack: ObservableObject {
         s_content.name = "content"
         s_content.attributeType = .stringAttributeType
         s_content.isOptional = true
+        
+        let s_plainTextContent = NSAttributeDescription()
+        s_plainTextContent.name = "plainTextContent"
+        s_plainTextContent.attributeType = .stringAttributeType
+        s_plainTextContent.isOptional = true
 
         let s_timestamp = NSAttributeDescription()
         s_timestamp.name = "timestamp"
@@ -81,6 +86,11 @@ final class CoreDataStack: ObservableObject {
         s_locationCity.name = "locationCity"
         s_locationCity.attributeType = .stringAttributeType
         s_locationCity.isOptional = true
+        
+        let s_locationAddress = NSAttributeDescription()
+        s_locationAddress.name = "locationAddress"
+        s_locationAddress.attributeType = .stringAttributeType
+        s_locationAddress.isOptional = true
 
         let s_latitude = NSAttributeDescription()
         s_latitude.name = "latitude"
@@ -91,10 +101,28 @@ final class CoreDataStack: ObservableObject {
         s_longitude.name = "longitude"
         s_longitude.attributeType = .doubleAttributeType
         s_longitude.isOptional = true
+        
+        let s_mood = NSAttributeDescription()
+        s_mood.name = "mood"
+        s_mood.attributeType = .stringAttributeType
+        s_mood.isOptional = true
+        
+        let s_syncStatus = NSAttributeDescription()
+        s_syncStatus.name = "syncStatus"
+        s_syncStatus.attributeType = .integer16AttributeType
+        s_syncStatus.isOptional = false
+        s_syncStatus.defaultValue = 0
+        
+        let s_isDeleted = NSAttributeDescription()
+        s_isDeleted.name = "isDeleted"
+        s_isDeleted.attributeType = .booleanAttributeType
+        s_isDeleted.isOptional = false
+        s_isDeleted.defaultValue = false
 
         storyEntity.properties = [
-            s_id, s_title, s_content, s_timestamp, s_createdAt, s_updatedAt,
-            s_locationName, s_locationCity, s_latitude, s_longitude
+            s_id, s_title, s_content, s_plainTextContent, s_timestamp, s_createdAt, s_updatedAt,
+            s_locationName, s_locationCity, s_locationAddress, s_latitude, s_longitude,
+            s_mood, s_syncStatus, s_isDeleted
         ]
 
         // CategoryEntity
