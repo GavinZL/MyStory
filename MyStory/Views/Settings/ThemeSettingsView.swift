@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ThemeSettingsView: View {
-    @StateObject private var themeManager = ThemeManager.shared
+    @ObservedObject private var themeManager = ThemeManager.shared
     @Environment(\.dismiss) var dismiss
     
     var body: some View {

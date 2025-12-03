@@ -10,7 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var router: AppRouter
     @StateObject private var localizationManager = LocalizationManager.shared
-    @StateObject private var themeManager = ThemeManager.shared
+    @ObservedObject private var themeManager = ThemeManager.shared
     @State private var showLanguageSettings = false
     @State private var showThemeSettings = false
     

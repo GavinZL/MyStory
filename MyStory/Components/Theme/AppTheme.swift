@@ -63,7 +63,9 @@ class ThemeManager: ObservableObject {
 }
 
 struct AppTheme {
+    @MainActor
     struct Colors {
+        @MainActor
         static var primary: Color {
             switch ThemeManager.shared.currentTheme {
             case .classic:
@@ -75,6 +77,7 @@ struct AppTheme {
             }
         }
         
+        @MainActor
         static var background: Color {
             switch ThemeManager.shared.currentTheme {
             case .classic:
@@ -86,6 +89,7 @@ struct AppTheme {
             }
         }
         
+        @MainActor
         static var surface: Color {
             switch ThemeManager.shared.currentTheme {
             case .classic:
@@ -161,5 +165,25 @@ struct AppTheme {
         static let small = ShadowToken(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
         static let medium = ShadowToken(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
         static let large = ShadowToken(color: Color.black.opacity(0.16), radius: 12, x: 0, y: 8)
+    }
+}
+
+// MARK: - Color Extension
+extension Color {
+    init?(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+        
+        var rgb: UInt64 = 0
+        
+        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else {
+            return nil
+        }
+        
+        self.init(
+            red: Double((rgb & 0xFF0000) >> 16) / 255.0,
+            green: Double((rgb & 0x00FF00) >> 8) / 255.0,
+            blue: Double(rgb & 0x0000FF) / 255.0
+        )
     }
 }

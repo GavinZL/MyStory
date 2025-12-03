@@ -4,6 +4,7 @@ struct RootView: View {
     @EnvironmentObject var router: AppRouter
     @Environment(\.managedObjectContext) private var context
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         TabView {
@@ -28,6 +29,7 @@ struct RootView: View {
                 }
         }
         .accentColor(AppTheme.Colors.primary)
+        .id(themeManager.currentTheme) // 强制在主题变化时重新渲染
     }
 }
 
