@@ -75,7 +75,7 @@ struct CategoryStoryListView: View {
                     .padding(.vertical, 10)
                     .background(Color.accentColor)
                     .foregroundColor(.white)
-                    .cornerRadius(10)
+                    .cornerRadius(AppTheme.Radius.m)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -89,8 +89,8 @@ struct CategoryStoryListView: View {
                 storyItemView(story: story)
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 12)
+        .padding(.horizontal, AppTheme.Spacing.s)
+        .padding(.vertical, AppTheme.Spacing.m)
     }
     
     /// 单个故事项视图
@@ -107,20 +107,20 @@ struct CategoryStoryListView: View {
     
     /// 日期头部视图
     private func dateHeaderView(for story: StoryEntity) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: AppTheme.Spacing.s) {
             Text(formatDate(story.timestamp ?? Date()))
                 .font(.headline)
-                .foregroundColor(.black)
+                .foregroundColor(AppTheme.Colors.textPrimary)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, AppTheme.Spacing.s)
     }
     
     /// 分隔线
     private var solidLineView: some View {
         Rectangle()
-            .fill(Color.gray.opacity(0.3))
+            .fill(AppTheme.Colors.border.opacity(0.3))
             .frame(height: 1)
-            .padding(.bottom, 8)
+            .padding(.bottom, AppTheme.Spacing.s)
     }
     
     /// 故事卡片按钮

@@ -218,15 +218,15 @@ struct StoryEditorView: View {
         let columns = [
             GridItem(.flexible(), spacing: 8),
             GridItem(.flexible(), spacing: 8),
-            GridItem(.flexible(), spacing: 8)
+            GridItem(.flexible(), spacing: AppTheme.Spacing.s)
         ]
         
-        return LazyVGrid(columns: columns, spacing: 8) {
+        return LazyVGrid(columns: columns, spacing: AppTheme.Spacing.s) {
             ForEach(Array(images.enumerated()), id: \.offset) { index, img in
                 imageItemView(image: img, index: index)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, AppTheme.Spacing.xs)
     }
     
     private func imageItemView(image: UIImage, index: Int) -> some View {
@@ -237,7 +237,7 @@ struct StoryEditorView: View {
                 .frame(width: (UIScreen.main.bounds.width - 64) / 3,
                        height: (UIScreen.main.bounds.width - 64) / 3)
                 .clipped()
-                .cornerRadius(8)
+                .cornerRadius(AppTheme.Radius.s)
             
             Button {
                 images.remove(at: index)
@@ -246,7 +246,7 @@ struct StoryEditorView: View {
                     .foregroundColor(.white)
                     .background(Circle().fill(Color.black.opacity(0.6)))
             }
-            .padding(4)
+            .padding(AppTheme.Spacing.xs)
         }
     }
     
@@ -254,7 +254,7 @@ struct StoryEditorView: View {
     private var videoThumbnailView: some View {
         let columns = [GridItem(.flexible(), spacing: 8)]
         
-        return LazyVGrid(columns: columns, spacing: 8) {
+        return LazyVGrid(columns: columns, spacing: AppTheme.Spacing.s) {
             ZStack(alignment: .topTrailing) {
                 if let thumbnail = videoThumbnails.first {
                     videoThumbnailButton(thumbnail: thumbnail)
@@ -262,7 +262,7 @@ struct StoryEditorView: View {
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, AppTheme.Spacing.xs)
     }
     
     private func videoThumbnailButton(thumbnail: UIImage) -> some View {
@@ -276,7 +276,7 @@ struct StoryEditorView: View {
                     .frame(width: UIScreen.main.bounds.width - 64,
                            height: UIScreen.main.bounds.width - 64)
                     .clipped()
-                    .cornerRadius(8)
+                    .cornerRadius(AppTheme.Radius.s)
                 
                 Circle()
                     .fill(Color.black.opacity(0.6))
@@ -298,14 +298,14 @@ struct StoryEditorView: View {
                 .foregroundColor(.white)
                 .background(Circle().fill(Color.black.opacity(0.6)))
         }
-        .padding(4)
+        .padding(AppTheme.Spacing.xs)
     }
     
     // MARK: - Location Views
     private var locationDisplayView: some View {
         HStack {
             Label(locationInfoText, systemImage: "mappin.circle.fill")
-                .foregroundColor(.blue)
+                .foregroundColor(AppTheme.Colors.primary)
             Spacer()
             Button {
                 locationInfo = nil

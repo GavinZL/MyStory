@@ -1,88 +1,165 @@
-//
-//  AppTheme.swift
-//  MyStory
-//
-//  应用主题配置
-//
-
 import SwiftUI
 
-// MARK: - 颜色定义
-
-extension Color {
-    // 主色调
-    static let appPrimary = Color("AppPrimary", bundle: nil) ?? Color.blue
-    static let appSecondary = Color("AppSecondary", bundle: nil) ?? Color.gray
+// MARK: - Theme Type
+enum ThemeType: String, CaseIterable, Identifiable {
+    case classic = "classic"
+    case ocean = "ocean"
+    case sunset = "sunset"
     
-    // 语义化颜色
-    static let appBackground = Color("AppBackground", bundle: nil) ?? Color(uiColor: .systemBackground)
-    static let appSecondaryBackground = Color("AppSecondaryBackground", bundle: nil) ?? Color(uiColor: .secondarySystemBackground)
-    static let appText = Color("AppText", bundle: nil) ?? Color(uiColor: .label)
-    static let appSecondaryText = Color("AppSecondaryText", bundle: nil) ?? Color(uiColor: .secondaryLabel)
-    static let appBorder = Color("AppBorder", bundle: nil) ?? Color(uiColor: .separator)
+    var id: String { rawValue }
     
-    // 状态颜色
-    static let appSuccess = Color.green
-    static let appWarning = Color.orange
-    static let appError = Color.red
-    static let appInfo = Color.blue
-}
-
-// MARK: - 字体定义
-
-extension Font {
-    // 标题字体
-    static let appLargeTitle = Font.system(size: 34, weight: .bold, design: .default)
-    static let appTitle = Font.system(size: 28, weight: .bold, design: .default)
-    static let appTitle2 = Font.system(size: 22, weight: .bold, design: .default)
-    static let appTitle3 = Font.system(size: 20, weight: .semibold, design: .default)
-    
-    // 正文字体
-    static let appBody = Font.system(size: 17, weight: .regular, design: .default)
-    static let appBodyBold = Font.system(size: 17, weight: .semibold, design: .default)
-    static let appCallout = Font.system(size: 16, weight: .regular, design: .default)
-    static let appSubheadline = Font.system(size: 15, weight: .regular, design: .default)
-    static let appFootnote = Font.system(size: 13, weight: .regular, design: .default)
-    static let appCaption = Font.system(size: 12, weight: .regular, design: .default)
-    static let appCaption2 = Font.system(size: 11, weight: .regular, design: .default)
-}
-
-// MARK: - 间距定义
-
-struct AppSpacing {
-    static let xxSmall: CGFloat = 4
-    static let xSmall: CGFloat = 8
-    static let small: CGFloat = 12
-    static let medium: CGFloat = 16
-    static let large: CGFloat = 20
-    static let xLarge: CGFloat = 24
-    static let xxLarge: CGFloat = 32
-}
-
-// MARK: - 圆角定义
-
-struct AppCornerRadius {
-    static let small: CGFloat = 8
-    static let medium: CGFloat = 12
-    static let large: CGFloat = 16
-    static let xLarge: CGFloat = 20
-}
-
-// MARK: - 阴影定义
-
-struct AppShadow {
-    static func small() -> some View {
-        Color.clear
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+    var displayName: String {
+        switch self {
+        case .classic:
+            return "settings.theme.classic".localized
+        case .ocean:
+            return "settings.theme.ocean".localized
+        case .sunset:
+            return "settings.theme.sunset".localized
+        }
     }
     
-    static func medium() -> some View {
-        Color.clear
-            .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+    var description: String {
+        switch self {
+        case .classic:
+            return "settings.theme.classic.description".localized
+        case .ocean:
+            return "settings.theme.ocean.description".localized
+        case .sunset:
+            return "settings.theme.sunset.description".localized
+        }
     }
     
-    static func large() -> some View {
-        Color.clear
-            .shadow(color: Color.black.opacity(0.2), radius: 16, x: 0, y: 8)
+    var previewColors: (primary: Color, surface: Color) {
+        switch self {
+        case .classic:
+            return (primary: Color(hex: "007AFF") ?? .blue, surface: Color(hex: "F2F2F7") ?? .gray)
+        case .ocean:
+            return (primary: Color(hex: "00B4D8") ?? .cyan, surface: Color(hex: "E8F4F8") ?? .gray)
+        case .sunset:
+            return (primary: Color(hex: "FF6B6B") ?? .orange, surface: Color(hex: "FFF0E8") ?? .gray)
+        }
+    }
+}
+
+// MARK: - Theme Manager
+class ThemeManager: ObservableObject {
+    static let shared = ThemeManager()
+    
+    @Published var currentTheme: ThemeType {
+        didSet {
+            UserDefaults.standard.set(currentTheme.rawValue, forKey: "selectedTheme")
+        }
+    }
+    
+    private init() {
+        let savedTheme = UserDefaults.standard.string(forKey: "selectedTheme") ?? ThemeType.classic.rawValue
+        self.currentTheme = ThemeType(rawValue: savedTheme) ?? .classic
+    }
+    
+    func setTheme(_ theme: ThemeType) {
+        currentTheme = theme
+    }
+}
+
+struct AppTheme {
+    struct Colors {
+        static var primary: Color {
+            switch ThemeManager.shared.currentTheme {
+            case .classic:
+                return Color(hex: "007AFF") ?? .blue
+            case .ocean:
+                return Color(hex: "00B4D8") ?? .cyan
+            case .sunset:
+                return Color(hex: "FF6B6B") ?? .orange
+            }
+        }
+        
+        static var background: Color {
+            switch ThemeManager.shared.currentTheme {
+            case .classic:
+                return Color(hex: "FFFFFF") ?? .white
+            case .ocean:
+                return Color(hex: "F0F9FF") ?? Color(red: 0.94, green: 0.98, blue: 1.0)
+            case .sunset:
+                return Color(hex: "FFF5F5") ?? Color(red: 1.0, green: 0.96, blue: 0.96)
+            }
+        }
+        
+        static var surface: Color {
+            switch ThemeManager.shared.currentTheme {
+            case .classic:
+                return Color(hex: "F2F2F7") ?? Color(red: 0.95, green: 0.95, blue: 0.97)
+            case .ocean:
+                return Color(hex: "E8F4F8") ?? Color(red: 0.91, green: 0.96, blue: 0.97)
+            case .sunset:
+                return Color(hex: "FFF0E8") ?? Color(red: 1.0, green: 0.94, blue: 0.91)
+            }
+        }
+        
+        static var textPrimary: Color {
+            Color(hex: "1C1C1E") ?? Color(red: 0.11, green: 0.11, blue: 0.12)
+        }
+        
+        static var textSecondary: Color {
+            Color(hex: "8E8E93") ?? .gray
+        }
+        
+        static var border: Color {
+            Color(hex: "D1D1D6") ?? Color(red: 0.82, green: 0.82, blue: 0.84)
+        }
+        
+        static var success: Color {
+            Color(hex: "34C759") ?? .green
+        }
+        
+        static var warning: Color {
+            Color(hex: "FF9500") ?? .orange
+        }
+        
+        static var error: Color {
+            Color(hex: "FF3B30") ?? .red
+        }
+    }
+
+    struct Typography {
+        static let largeTitle = Font.largeTitle
+        static let title1 = Font.title
+        static let title2 = Font.title2
+        static let title3 = Font.title3
+        static let headline = Font.headline
+        static let body = Font.body
+        static let callout = Font.callout
+        static let subheadline = Font.subheadline
+        static let footnote = Font.footnote
+        static let caption = Font.caption
+    }
+
+    struct Spacing {
+        static let xs: CGFloat = 4
+        static let s: CGFloat = 8
+        static let m: CGFloat = 12
+        static let l: CGFloat = 16
+        static let xl: CGFloat = 24
+        static let xxl: CGFloat = 32
+    }
+
+    struct Radius {
+        static let s: CGFloat = 8
+        static let m: CGFloat = 12
+        static let l: CGFloat = 16
+    }
+
+    struct ShadowToken {
+        let color: Color
+        let radius: CGFloat
+        let x: CGFloat
+        let y: CGFloat
+    }
+
+    struct Shadow {
+        static let small = ShadowToken(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+        static let medium = ShadowToken(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
+        static let large = ShadowToken(color: Color.black.opacity(0.16), radius: 12, x: 0, y: 8)
     }
 }

@@ -24,8 +24,8 @@ struct CategoryListView: View {
                 
                 // 分类内容（占位）
                 Text("category.page".localized)
-                    .font(.appTitle)
-                    .foregroundColor(.appSecondaryText)
+                    .font(AppTheme.Typography.title2)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                 
                 Spacer()
             }

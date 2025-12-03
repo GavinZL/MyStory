@@ -30,7 +30,7 @@ struct LanguageSettingsView: View {
                                 Spacer()
                                 if selectedLanguage == language {
                                     Image(systemName: "checkmark")
-                                        .foregroundColor(.appPrimary)
+                                        .foregroundColor(AppTheme.Colors.primary)
                                 }
                             }
                         }

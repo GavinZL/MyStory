@@ -42,8 +42,8 @@ struct TimelineView: View {
                 storyItemView(story: story, index: index)
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 12)
+        .padding(.horizontal, AppTheme.Spacing.s)
+        .padding(.vertical, AppTheme.Spacing.m)
     }
     
     private func storyItemView(story: StoryEntity, index: Int) -> some View {
@@ -61,20 +61,20 @@ struct TimelineView: View {
     }
     
     private func dateHeaderView(for story: StoryEntity) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: AppTheme.Spacing.s) {
             Text(Self.formatDate(story.timestamp ?? Date(timeIntervalSinceNow: 0)))
                 .font(.headline)
-                .foregroundColor(.black)
+                .foregroundColor(AppTheme.Colors.textPrimary)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, AppTheme.Spacing.s)
     }
     
     // 时间下方的细横线
     private var solidLineView: some View {
         Rectangle()
-            .fill(Color.gray.opacity(0.3))
+            .fill(AppTheme.Colors.border.opacity(0.3))
             .frame(height: 1)
-            .padding(.bottom, 8)
+            .padding(.bottom, AppTheme.Spacing.s)
     }
     
     @ViewBuilder

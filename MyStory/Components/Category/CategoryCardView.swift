@@ -16,14 +16,14 @@ public struct CategoryCardView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: AppTheme.Spacing.s) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: AppTheme.Radius.m)
                     .fill(Color(UIColor.secondarySystemBackground))
                     .frame(height: 100)
                 Image(systemName: node.category.iconName)
                     .font(.system(size: 42))
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(AppTheme.Colors.primary)
             }
             Text(node.category.name)
                 .font(.headline)
@@ -40,8 +40,8 @@ public struct CategoryCardView: View {
                     .foregroundColor(.secondary)
             }
         }
-        .padding(12)
-        .background(RoundedRectangle(cornerRadius: 12).strokeBorder(.gray.opacity(0.2)))
+        .padding(AppTheme.Spacing.m)
+        .background(RoundedRectangle(cornerRadius: AppTheme.Radius.m).strokeBorder(AppTheme.Colors.border.opacity(0.2)))
     }
     
     // MARK: - Helper Properties

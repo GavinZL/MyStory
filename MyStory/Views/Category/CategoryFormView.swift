@@ -157,23 +157,23 @@ struct CategoryFormView: View {
     
     private var iconSection: some View {
         Section(header: Text("category.icon".localized)) {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 16) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: AppTheme.Spacing.l) {
                 ForEach(iconOptions, id: \.self) { icon in
                     iconButton(icon: icon)
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, AppTheme.Spacing.s)
         }
     }
     
     private var colorSection: some View {
         Section(header: Text("category.color".localized)) {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 16) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: AppTheme.Spacing.l) {
                 ForEach(colorOptions, id: \.self) { color in
                     colorButton(color: color)
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, AppTheme.Spacing.s)
         }
     }
     
@@ -188,7 +188,7 @@ struct CategoryFormView: View {
                 
                 Image(systemName: icon)
                     .font(.system(size: 24))
-                    .foregroundColor(selectedIcon == icon ? .blue : .primary)
+                    .foregroundColor(selectedIcon == icon ? AppTheme.Colors.primary : .primary)
             }
         }
     }

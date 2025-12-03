@@ -19,16 +19,16 @@ struct StoryCardView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xl) {
             if let uiImg = firstImage {
                 ZStack(alignment: .center) {
                     Image(uiImage: uiImg)
                         .resizable()
                         .aspectRatio(contentMode: isLandscape ? .fit : .fill)
-                        .cornerRadius(8)
+                        .cornerRadius(AppTheme.Radius.s)
                         .frame(maxWidth: .infinity)
                         .frame(height: 200)
-                        .cornerRadius(8)
+                        .cornerRadius(AppTheme.Radius.s)
                     
                     if isVideo {
                         Circle()
@@ -40,14 +40,14 @@ struct StoryCardView: View {
                     }
                 }
             } else {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.15))
+                RoundedRectangle(cornerRadius: AppTheme.Radius.s)
+                    .fill(AppTheme.Colors.surface.opacity(0.15))
                     .frame(maxWidth: .infinity)
                     .frame(height: 200)
                     .overlay(
                         Image(systemName: "photo")
                             .font(.system(size: 28))
-                            .foregroundColor(.gray)
+                            .foregroundColor(AppTheme.Colors.border)
                     )
             }
 
@@ -57,8 +57,8 @@ struct StoryCardView: View {
                 .foregroundColor(.primary)
 
             if let city = story.locationCity, !city.isEmpty {
-                HStack(spacing: 6) {
-                    Image(systemName: "mappin.circle.fill").foregroundColor(.blue)
+                HStack(spacing: AppTheme.Spacing.xs) {
+                    Image(systemName: "mappin.circle.fill").foregroundColor(AppTheme.Colors.primary)
                     Text(city)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -74,10 +74,10 @@ struct StoryCardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(5)
+        .padding(AppTheme.Spacing.xs)
         .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.gray.opacity(0.05))
+            RoundedRectangle(cornerRadius: AppTheme.Radius.s)
+                .fill(AppTheme.Colors.surface.opacity(0.05))
         )
     }
 

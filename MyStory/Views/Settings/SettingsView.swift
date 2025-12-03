@@ -10,7 +10,9 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var router: AppRouter
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var themeManager = ThemeManager.shared
     @State private var showLanguageSettings = false
+    @State private var showThemeSettings = false
     
     var body: some View {
         NavigationStack {
@@ -31,11 +33,20 @@ struct SettingsView: View {
                     }
                     .foregroundColor(.primary)
                     
-                    NavigationLink {
-                        Text("settings.themeSetting".localized)
+                    Button {
+                        showThemeSettings = true
                     } label: {
-                        Label("settings.theme".localized, systemImage: "paintbrush")
+                        HStack {
+                            Label("settings.theme".localized, systemImage: "paintbrush")
+                            Spacer()
+                            Text(themeManager.currentTheme.displayName)
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
+                    .foregroundColor(.primary)
                 }
                 
                 Section("settings.about".localized) {
@@ -43,13 +54,16 @@ struct SettingsView: View {
                         Text("settings.version".localized)
                         Spacer()
                         Text("1.0.0")
-                            .foregroundColor(.appSecondaryText)
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 }
             }
             .navigationTitle("settings.title".localized)
             .sheet(isPresented: $showLanguageSettings) {
                 LanguageSettingsView()
+            }
+            .sheet(isPresented: $showThemeSettings) {
+                ThemeSettingsView()
             }
         }
     }

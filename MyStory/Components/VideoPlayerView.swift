@@ -28,7 +28,7 @@ struct VideoPlayerView: View {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 32))
                             .foregroundColor(.white)
-                            .shadow(radius: 4)
+                            .shadow(radius: AppTheme.Shadow.small.radius)
                     }
                     .padding()
                 }

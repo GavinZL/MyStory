@@ -27,7 +27,7 @@ struct RootView: View {
                     Label("tab.settings".localized, systemImage: "gearshape.fill")
                 }
         }
-        .accentColor(.appPrimary)
+        .accentColor(AppTheme.Colors.primary)
     }
 }
 

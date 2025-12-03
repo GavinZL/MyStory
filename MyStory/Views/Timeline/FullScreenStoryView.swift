@@ -71,7 +71,7 @@ struct FullScreenStoryView: View {
                 .font(.subheadline)
                 .foregroundColor(.white)
                 .padding(.horizontal, 20)
-                .padding(.vertical, 12)
+                .padding(.vertical, AppTheme.Spacing.m)
                 .background(
                     Capsule()
                         .fill(Color.black.opacity(0.7))
@@ -90,7 +90,7 @@ struct FullScreenStoryView: View {
                 .font(.subheadline)
                 .foregroundColor(.white)
                 .padding(.horizontal, 20)
-                .padding(.vertical, 12)
+                .padding(.vertical, AppTheme.Spacing.m)
                 .background(
                     Capsule()
                         .fill(Color.black.opacity(0.7))
@@ -294,7 +294,7 @@ struct StoryDetailView: View {
     // MARK: - View Components
     @ViewBuilder
     private func contentContainer(geometry: GeometryProxy) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.l) {
             if !mediaList.isEmpty {
                 mediaDisplaySection
             }
@@ -331,7 +331,7 @@ struct StoryDetailView: View {
         if let city = story.locationCity, !city.isEmpty {
             HStack(spacing: 8) {
                 Image(systemName: "mappin.circle.fill")
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppTheme.Colors.primary)
                 Text(city)
             }
             .font(.subheadline)
@@ -403,7 +403,7 @@ struct StoryDetailView: View {
     // MARK: - Video Section
     @ViewBuilder
     private var videoSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: AppTheme.Spacing.m) {
             ForEach(Array(videoMediaList.enumerated()), id: \.element.id) { index, media in
                 videoPlayerView(media: media, index: index)
             }
@@ -424,7 +424,7 @@ struct StoryDetailView: View {
         VideoPlayer(player: player)
             .frame(maxWidth: .infinity)
             .aspectRatio(contentMode: .fit)
-            .cornerRadius(8)
+            .cornerRadius(AppTheme.Radius.s)
     }
     
     @ViewBuilder
@@ -446,7 +446,7 @@ struct StoryDetailView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(maxWidth: .infinity)
-                .cornerRadius(8)
+                .cornerRadius(AppTheme.Radius.s)
             
             playButtonOverlay
         }
@@ -558,7 +558,7 @@ struct ImageGalleryViewer: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
                         .background(Color.black.opacity(0.6))
-                        .cornerRadius(16)
+                        .cornerRadius(AppTheme.Radius.l)
                         .padding(.bottom, 20)
                 }
             }

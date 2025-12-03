@@ -49,7 +49,7 @@ struct SimpleCategoryPicker: View {
     
     /// 空状态视图
     private var emptyStateView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppTheme.Spacing.l) {
             Image(systemName: "folder.badge.plus")
                 .font(.system(size: 50))
                 .foregroundColor(.secondary)
@@ -173,7 +173,7 @@ private struct CategoryPickerItem: View {
                         level: 3,
                         selectedCategories: $selectedCategories
                     )
-                    .padding(.leading, 24)
+                    .padding(.leading, AppTheme.Spacing.xl)
                 }
             }
         }
@@ -192,7 +192,7 @@ private struct CategoryPickerItem: View {
                 toggleSelection()
             }
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: AppTheme.Spacing.m) {
                 // 展开/折叠图标（仅二级分类有子分类时显示）
                 if level == 2 && !node.children.isEmpty {
                     Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
@@ -216,10 +216,10 @@ private struct CategoryPickerItem: View {
                 // 选中状态指示器
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppTheme.Colors.primary)
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, AppTheme.Spacing.s)
             .contentShape(Rectangle())
         }
         .buttonStyle(PlainButtonStyle())
