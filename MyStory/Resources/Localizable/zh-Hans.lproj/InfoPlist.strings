@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings (Simplified Chinese)
+  MyStory
+*/
+
+"CFBundleDisplayName" = "我的故事";
+"NSCameraUsageDescription" = "需要访问您的相机以拍摄照片";
+"NSLocationWhenInUseUsageDescription" = "需要获取您的位置，以便为故事添加地点信息";
+"NSPhotoLibraryUsageDescription" = "需要访问您的相册以添加照片到故事中";

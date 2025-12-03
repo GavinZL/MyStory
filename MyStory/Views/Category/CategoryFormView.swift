@@ -76,8 +76,8 @@ struct CategoryFormView: View {
             .toolbar {
                 toolbarContent
             }
-            .alert("错误", isPresented: $showError) {
-                Button("确定", role: .cancel) {}
+            .alert("common.error".localized, isPresented: $showError) {
+                Button("common.confirm".localized, role: .cancel) {}
             } message: {
                 Text(errorMessage)
             }
@@ -91,9 +91,9 @@ struct CategoryFormView: View {
     
     /// 当前层级信息区（不可编辑）
     private var currentLevelInfoSection: some View {
-        Section(header: Text("分类层级")) {
+        Section(header: Text("category.level".localized)) {
             HStack {
-                Text("层级")
+                Text("category.level".localized)
                 Spacer()
                 Text(levelDisplayName(for: effectiveLevel))
                     .foregroundColor(.secondary)
@@ -103,7 +103,7 @@ struct CategoryFormView: View {
     
     /// 父分类信息区（不可编辑）
     private func parentInfoSection(parent: CategoryTreeNode) -> some View {
-        Section(header: Text("父分类")) {
+        Section(header: Text("category.parent".localized)) {
             HStack {
                 Image(systemName: parent.category.iconName)
                     .foregroundColor(Color(hex: parent.category.colorHex))
@@ -114,11 +114,11 @@ struct CategoryFormView: View {
     }
     
     private var levelSection: some View {
-        Section(header: Text("分类层级")) {
-            Picker("层级", selection: $selectedLevel) {
-                Text("一级分类").tag(1)
-                Text("二级分类").tag(2)
-                Text("三级分类（故事线）").tag(3)
+        Section(header: Text("category.level".localized)) {
+            Picker("category.level".localized, selection: $selectedLevel) {
+                Text("category.level1".localized).tag(1)
+                Text("category.level2".localized).tag(2)
+                Text("category.level3".localized).tag(3)
             }
             .pickerStyle(.segmented)
             .onChange(of: selectedLevel) { _ in
@@ -131,13 +131,13 @@ struct CategoryFormView: View {
     private var parentSection: some View {
         Group {
             if selectedLevel > 1 {
-                Section(header: Text("选择父分类")) {
+                Section(header: Text("category.selectParent".localized)) {
                     if availableParents.isEmpty {
-                        Text("暂无可用的父分类")
+                        Text("category.noParentAvailable".localized)
                             .foregroundColor(.secondary)
                     } else {
-                        Picker("父分类", selection: $selectedParent) {
-                            Text("请选择...").tag(nil as CategoryTreeNode?)
+                        Picker("category.parent".localized, selection: $selectedParent) {
+                            Text("category.pleaseSelect".localized).tag(nil as CategoryTreeNode?)
                             ForEach(availableParents, id: \.id) { node in
                                 Text(parentDisplayName(node)).tag(node as CategoryTreeNode?)
                             }
@@ -150,13 +150,13 @@ struct CategoryFormView: View {
     }
     
     private var nameSection: some View {
-        Section(header: Text("分类名称")) {
-            TextField("请输入分类名称", text: $categoryName)
+        Section(header: Text("category.name".localized)) {
+            TextField("category.namePlaceholder".localized, text: $categoryName)
         }
     }
     
     private var iconSection: some View {
-        Section(header: Text("选择图标")) {
+        Section(header: Text("category.icon".localized)) {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 16) {
                 ForEach(iconOptions, id: \.self) { icon in
                     iconButton(icon: icon)
@@ -167,7 +167,7 @@ struct CategoryFormView: View {
     }
     
     private var colorSection: some View {
-        Section(header: Text("选择颜色")) {
+        Section(header: Text("category.color".localized)) {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 16) {
                 ForEach(colorOptions, id: \.self) { color in
                     colorButton(color: color)
@@ -214,13 +214,13 @@ struct CategoryFormView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
-            Button("取消") {
+            Button("common.cancel".localized) {
                 dismiss()
             }
         }
         
         ToolbarItem(placement: .navigationBarTrailing) {
-            Button("完成") {
+            Button("common.done".localized) {
                 saveCategory()
             }
             .disabled(categoryName.isEmpty)
@@ -235,7 +235,7 @@ struct CategoryFormView: View {
         if effectiveLevelValue > 1 {
             // 如果有预设父节点，使用它；否则检查是否选择了父分类
             if parentNode == nil && selectedParent == nil {
-                errorMessage = "请选择父分类"
+                errorMessage = "category.error.selectParent".localized
                 showError = true
                 return
             }
@@ -278,22 +278,23 @@ struct CategoryFormView: View {
     /// 获取导航栏标题
     private var navigationTitle: String {
         if let level = presetLevel {
-            return "新建" + levelDisplayName(for: level)
+            let levelName = levelDisplayName(for: level)
+            return String(format: "category.newLevel".localized, levelName)
         }
-        return "新建分类"
+        return "category.new".localized
     }
     
     /// 获取层级显示名称
     private func levelDisplayName(for level: Int) -> String {
         switch level {
         case 1:
-            return "一级分类"
+            return "category.level1".localized
         case 2:
-            return "二级分类"
+            return "category.level2".localized
         case 3:
-            return "三级分类（故事线）"
+            return "category.level3".localized
         default:
-            return "分类"
+            return "category.level.short".localized
         }
     }
     

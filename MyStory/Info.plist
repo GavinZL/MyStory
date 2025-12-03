@@ -5,7 +5,12 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>我的故事</string>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>zh-Hans</string>
+		<string>en</string>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,11 +28,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>需要访问您的相机以拍摄照片</string>
+	<string>$(PRODUCT_NAME) needs access to your camera to take photos</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>需要获取您的位置，以便为故事添加地点信息</string>
+	<string>$(PRODUCT_NAME) needs access to your location to add location information to your stories</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>需要访问您的相册以添加照片到故事中</string>
+	<string>$(PRODUCT_NAME) needs access to your photo library to add photos to your stories</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

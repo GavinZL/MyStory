@@ -4,6 +4,7 @@ import CoreData
 @main
 struct MyStoryApp: App {
     @StateObject private var coreDataStack = CoreDataStack()
+    @StateObject private var localizationManager = LocalizationManager.shared
 
     var body: some Scene {
         WindowGroup {
@@ -11,6 +12,7 @@ struct MyStoryApp: App {
                 .environment(\.managedObjectContext, coreDataStack.viewContext)
                 .environmentObject(coreDataStack)
                 .environmentObject(AppRouter())
+                .environmentObject(localizationManager)
         }
     }
 }

@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings (English)
+  MyStory
+*/
+
+"CFBundleDisplayName" = "MyStory";
+"NSCameraUsageDescription" = "Camera access is needed to take photos";
+"NSLocationWhenInUseUsageDescription" = "Location access is needed to add location information to your stories";
+"NSPhotoLibraryUsageDescription" = "Photo library access is needed to add photos to your stories";

@@ -62,7 +62,7 @@ struct FullScreenStoryView: View {
         if currentIndex < stories.count {
             return stories[currentIndex].title ?? "unknown"
         }
-        return "故事详情"
+        return "fullscreen.storyDetail".localized
     }
     
     private var topToastView: some View {
@@ -116,18 +116,18 @@ struct FullScreenStoryView: View {
     private func handleLoadEarlierData() {
         if hasMoreData {
             onLoadMore?()
-            showTopToast("正在加载更早的故事...")
+            showTopToast("fullscreen.loadingEarlier".localized)
         } else {
-            showTopToast("已无更新的故事")
+            showTopToast("fullscreen.noMoreNewer".localized)
         }
     }
     
     private func handleLoadNewerData() {
         if hasMoreData {
             onLoadMore?()
-            showBottomToast("正在加载更新的故事...")
+            showBottomToast("fullscreen.loadingNewer".localized)
         } else {
-            showBottomToast("已无更早的故事")
+            showBottomToast("fullscreen.noMoreEarlier".localized)
         }
     }
     

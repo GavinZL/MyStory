@@ -22,7 +22,7 @@ struct TimelineView: View {
             ScrollView {
                 storyListView
             }
-            .navigationTitle("时间轴")
+            .navigationTitle("timeline.title".localized)
             .toolbar {
                 toolbarContent
             }
@@ -93,13 +93,13 @@ struct TimelineView: View {
         Button {
             editStory(story)
         } label: {
-            Label("编辑", systemImage: "pencil")
+            Label("timeline.edit".localized, systemImage: "pencil")
         }
         
         Button(role: .destructive) {
             deleteStory(story)
         } label: {
-            Label("删除", systemImage: "trash")
+            Label("timeline.delete".localized, systemImage: "trash")
         }
     }
     
@@ -197,7 +197,8 @@ struct TimelineView: View {
     // MARK: - Date Formatting
     private static func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日 HH:MM"
+        let dateFormat = "timeline.dateFormat".localized
+        formatter.dateFormat = dateFormat
         return formatter.string(from: date)
     }
 }

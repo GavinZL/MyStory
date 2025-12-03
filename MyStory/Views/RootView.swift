@@ -3,13 +3,14 @@ import SwiftUI
 struct RootView: View {
     @EnvironmentObject var router: AppRouter
     @Environment(\.managedObjectContext) private var context
+    @StateObject private var localizationManager = LocalizationManager.shared
     
     var body: some View {
         TabView {
             // 时间轴页面
             TimelineView()
                 .tabItem {
-                    Label("时间轴", systemImage: "clock.fill")
+                    Label("tab.timeline".localized, systemImage: "clock.fill")
                 }
             
             // 分类页面
@@ -17,13 +18,13 @@ struct RootView: View {
                 CategoryView(viewModel: CategoryViewModel(service: CoreDataCategoryService(context: context)))
             }
             .tabItem {
-                Label("分类", systemImage: "folder.fill")
+                Label("tab.category".localized, systemImage: "folder.fill")
             }
             
             // 设置页面
             SettingsView()
                 .tabItem {
-                    Label("设置", systemImage: "gearshape.fill")
+                    Label("tab.settings".localized, systemImage: "gearshape.fill")
                 }
         }
         .accentColor(.appPrimary)

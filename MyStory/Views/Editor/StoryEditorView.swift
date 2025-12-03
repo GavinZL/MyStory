@@ -128,7 +128,7 @@ struct StoryEditorView: View {
                 mediaSection
                 locationSection
             }
-            .navigationTitle(existingStory != nil ? "编辑故事" : "新建故事")
+            .navigationTitle(existingStory != nil ? "story.edit".localized : "story.new".localized)
             .toolbar {
                 toolbarContent
             }
@@ -142,13 +142,13 @@ struct StoryEditorView: View {
     
     // MARK: - View Components
     private var titleSection: some View {
-        Section(header: Text("标题")) {
-            TextField("请输入故事标题", text: $title)
+        Section(header: Text("story.title".localized)) {
+            TextField("story.titlePlaceholder".localized, text: $title)
         }
     }
     
     private var contentSection: some View {
-        Section(header: Text("内容")) {
+        Section(header: Text("story.content".localized)) {
             TextEditor(text: $content)
                 .frame(minHeight: 150)
         }
@@ -157,7 +157,7 @@ struct StoryEditorView: View {
 
     
     private var mediaSection: some View {
-        Section(header: Text("媒体")) {
+        Section(header: Text("story.media".localized)) {
             mediaPickerButton
             
             if !images.isEmpty {
@@ -171,7 +171,7 @@ struct StoryEditorView: View {
     }
     
     private var locationSection: some View {
-        Section(header: Text("位置")) {
+        Section(header: Text("story.location".localized)) {
             if locationInfo != nil {
                 locationDisplayView
             } else {
@@ -183,7 +183,7 @@ struct StoryEditorView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
-            Button("取消") { dismiss() }
+            Button("common.cancel".localized) { dismiss() }
         }
         
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -191,7 +191,7 @@ struct StoryEditorView: View {
                 if isSaving {
                     ProgressView()
                 } else {
-                    Text("保存")
+                    Text("common.save".localized)
                 }
             }
             .disabled(!canSave)
@@ -206,7 +206,7 @@ struct StoryEditorView: View {
             maxSelectionCount: videoURLs.isEmpty ? 9 : 1,
             matching: allowedMediaFilter
         ) {
-            Label("添加图片/视频", systemImage: "photo.on.rectangle")
+            Label("story.addMedia".localized, systemImage: "photo.on.rectangle")
         }
         .onChange(of: mediaItems) { items in
             handleMediaItemsChange(items)
@@ -322,12 +322,12 @@ struct StoryEditorView: View {
                 self.locationInfo = info
             }
         } label: {
-            Label("添加位置", systemImage: "mappin.circle")
+            Label("story.addLocation".localized, systemImage: "mappin.circle")
         }
     }
     
     private var locationInfoText: String {
-        locationInfo?.city ?? locationInfo?.name ?? "已选择位置"
+        locationInfo?.city ?? locationInfo?.name ?? "story.locationSelected".localized
     }
     
     // MARK: - Media Handling
@@ -347,7 +347,7 @@ struct StoryEditorView: View {
             
             if isVideo {
                 images.removeAll()
-                LoadingIndicatorManager.shared.show(message: "正在加载视频...")
+                LoadingIndicatorManager.shared.show(message: "story.videoLoading".localized)
             } else {
                 videoURLs.removeAll()
                 videoThumbnails.removeAll()

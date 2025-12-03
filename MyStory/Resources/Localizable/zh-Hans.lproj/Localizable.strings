@@ -1,0 +1,121 @@
+/* 
+  Localizable.strings (Simplified Chinese)
+  MyStory
+*/
+
+// MARK: - Common
+"common.cancel" = "取消";
+"common.save" = "保存";
+"common.done" = "完成";
+"common.delete" = "删除";
+"common.edit" = "编辑";
+"common.add" = "添加";
+"common.confirm" = "确定";
+"common.error" = "错误";
+"common.loading" = "加载中...";
+
+// MARK: - Tab Bar
+"tab.timeline" = "时间轴";
+"tab.category" = "分类";
+"tab.settings" = "设置";
+
+// MARK: - Timeline
+"timeline.title" = "时间轴";
+"timeline.edit" = "编辑";
+"timeline.delete" = "删除";
+"timeline.dateFormat" = "yyyy年MM月dd日 HH:mm";
+
+// MARK: - Story Editor
+"story.new" = "新建故事";
+"story.edit" = "编辑故事";
+"story.title" = "标题";
+"story.titlePlaceholder" = "请输入故事标题";
+"story.content" = "内容";
+"story.contentPlaceholder" = "请输入故事内容";
+"story.media" = "媒体";
+"story.addMedia" = "添加图片/视频";
+"story.location" = "位置";
+"story.addLocation" = "添加位置";
+"story.locationSelected" = "已选择位置";
+"story.videoLoading" = "正在加载视频...";
+
+// MARK: - Category
+"category.title" = "分类";
+"category.new" = "新建分类";
+"category.level" = "层级";
+"category.parent" = "父分类";
+"category.selectParent" = "选择父分类";
+"category.noParentAvailable" = "暂无可用的父分类";
+"category.pleaseSelect" = "请选择...";
+"category.name" = "分类名称";
+"category.namePlaceholder" = "请输入分类名称";
+"category.icon" = "选择图标";
+"category.color" = "选择颜色";
+"category.displayMode" = "显示模式";
+"category.page" = "分类页面";
+
+// Category Levels
+"category.level1" = "一级分类";
+"category.level2" = "二级分类";
+"category.level3" = "三级分类（故事线）";
+"category.level.short" = "分类";
+"category.newLevel" = "新建%@";
+
+// Category Statistics
+"category.storyCount" = "共 %d 个故事";
+"category.childrenCount" = "共 %d 个子目录";
+"category.secondLevelCount" = "共 %d 个二级分类";
+"category.thirdLevelCount" = "共 %d 个三级分类";
+
+// Category Display Modes
+"category.mode.card" = "卡片";
+"category.mode.list" = "列表";
+
+// Category Errors
+"category.error.selectParent" = "请选择父分类";
+
+// MARK: - Settings
+"settings.title" = "设置";
+"settings.general" = "通用";
+"settings.language" = "语言";
+"settings.languageSetting" = "语言设置";
+"settings.theme" = "主题";
+"settings.themeSetting" = "主题设置";
+"settings.about" = "关于";
+"settings.version" = "版本";
+"settings.currentLanguage" = "当前语言";
+
+// Language Options
+"language.chinese" = "简体中文";
+"language.english" = "English";
+
+// MARK: - Permissions
+"permission.camera" = "需要访问您的相机以拍摄照片";
+"permission.location" = "需要获取您的位置，以便为故事添加地点信息";
+"permission.photos" = "需要访问您的相册以添加照片到故事中";
+
+// MARK: - App Info
+"app.name" = "我的故事";
+"app.displayName" = "我的故事";
+
+// MARK: - Full Screen Story
+"fullscreen.storyDetail" = "故事详情";
+"fullscreen.loadingEarlier" = "正在加载更早的故事...";
+"fullscreen.loadingNewer" = "正在加载更新的故事...";
+"fullscreen.noMoreNewer" = "已无更新的故事";
+"fullscreen.noMoreEarlier" = "已无更早的故事";
+
+// MARK: - Category Story List
+"categoryStory.empty" = "该分类下还没有故事";
+"categoryStory.createFirst" = "创建第一个故事";
+"categoryStory.edit" = "编辑";
+"categoryStory.delete" = "删除";
+
+// MARK: - AI Polish
+"ai.polish.title" = "AI 文本润色";
+"ai.polish.start" = "开始润色";
+
+// MARK: - Category Picker
+"categoryPicker.title" = "选择分类";
+"categoryPicker.empty" = "还没有分类";
+"categoryPicker.createHint" = "请先在分类tab创建分类";

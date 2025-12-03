@@ -62,14 +62,14 @@ struct CategoryStoryListView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
             
-            Text("该分类下还没有故事")
+            Text("categoryStory.empty".localized)
                 .font(.headline)
                 .foregroundColor(.secondary)
             
             Button {
                 createNewStory()
             } label: {
-                Label("创建第一个故事", systemImage: "plus.circle.fill")
+                Label("categoryStory.createFirst".localized, systemImage: "plus.circle.fill")
                     .font(.body)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
@@ -141,13 +141,13 @@ struct CategoryStoryListView: View {
         Button {
             editStory(story)
         } label: {
-            Label("编辑", systemImage: "pencil")
+            Label("categoryStory.edit".localized, systemImage: "pencil")
         }
         
         Button(role: .destructive) {
             deleteStory(story)
         } label: {
-            Label("删除", systemImage: "trash")
+            Label("categoryStory.delete".localized, systemImage: "trash")
         }
     }
     
@@ -246,7 +246,8 @@ struct CategoryStoryListView: View {
     /// 格式化日期
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日 HH:mm"
+        let dateFormat = "timeline.dateFormat".localized
+        formatter.dateFormat = dateFormat
         return formatter.string(from: date)
     }
     

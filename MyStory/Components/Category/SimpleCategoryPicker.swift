@@ -34,7 +34,7 @@ struct SimpleCategoryPicker: View {
                     categoryTreeView
                 }
             }
-            .navigationTitle("选择分类")
+            .navigationTitle("categoryPicker.title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 toolbarContent
@@ -54,11 +54,11 @@ struct SimpleCategoryPicker: View {
                 .font(.system(size: 50))
                 .foregroundColor(.secondary)
             
-            Text("还没有分类")
+            Text("categoryPicker.empty".localized)
                 .font(.headline)
                 .foregroundColor(.secondary)
             
-            Text("请先在分类tab创建分类")
+            Text("categoryPicker.createHint".localized)
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
@@ -79,13 +79,13 @@ struct SimpleCategoryPicker: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
-            Button("取消") {
+            Button("common.cancel".localized) {
                 onDismiss()
             }
         }
         
         ToolbarItem(placement: .navigationBarTrailing) {
-            Button("完成") {
+            Button("common.done".localized) {
                 onDismiss()
             }
         }

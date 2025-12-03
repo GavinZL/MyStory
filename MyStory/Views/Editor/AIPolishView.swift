@@ -9,7 +9,7 @@ public struct AIPolishView: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("AI 文本润色")
+            Text("ai.polish.title".localized)
                 .font(.title2)
                 .bold()
                 .padding(.horizontal)
@@ -23,7 +23,7 @@ public struct AIPolishView: View {
             HStack {
                 Spacer()
                 Button(action: { viewModel.polish() }) {
-                    if viewModel.isLoading { ProgressView() } else { Text("开始润色") }
+                    if viewModel.isLoading { ProgressView() } else { Text("ai.polish.start".localized) }
                 }
                 .buttonStyle(.borderedProminent)
                 Spacer()

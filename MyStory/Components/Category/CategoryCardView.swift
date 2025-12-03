@@ -35,7 +35,7 @@ public struct CategoryCardView: View {
                     .font(.footnote)
                     .foregroundColor(.secondary)
             case .stories:
-                Text("共 \(node.storyCount) 个故事")
+                Text(String(format: "category.storyCount".localized, node.storyCount))
                     .font(.footnote)
                     .foregroundColor(.secondary)
             }
@@ -50,11 +50,11 @@ public struct CategoryCardView: View {
     private var childrenCountText: String {
         let count = node.children.count
         if node.category.level == 1 {
-            return "共 \(count) 个二级分类"
+            return String(format: "category.secondLevelCount".localized, count)
         } else if node.category.level == 2 {
-            return "共 \(count) 个三级分类"
+            return String(format: "category.thirdLevelCount".localized, count)
         } else {
-            return "共 \(count) 个子分类"
+            return String(format: "category.childrenCount".localized, count)
         }
     }
 }

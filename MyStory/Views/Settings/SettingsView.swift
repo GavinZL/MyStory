@@ -9,34 +9,48 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var router: AppRouter
+    @StateObject private var localizationManager = LocalizationManager.shared
+    @State private var showLanguageSettings = false
     
     var body: some View {
         NavigationStack {
             List {
-                Section("通用") {
-                    NavigationLink {
-                        Text("语言设置")
+                Section("settings.general".localized) {
+                    Button {
+                        showLanguageSettings = true
                     } label: {
-                        Label("语言", systemImage: "globe")
+                        HStack {
+                            Label("settings.language".localized, systemImage: "globe")
+                            Spacer()
+                            Text(localizationManager.currentLanguage.displayName)
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
+                    .foregroundColor(.primary)
                     
                     NavigationLink {
-                        Text("主题设置")
+                        Text("settings.themeSetting".localized)
                     } label: {
-                        Label("主题", systemImage: "paintbrush")
+                        Label("settings.theme".localized, systemImage: "paintbrush")
                     }
                 }
                 
-                Section("关于") {
+                Section("settings.about".localized) {
                     HStack {
-                        Text("版本")
+                        Text("settings.version".localized)
                         Spacer()
                         Text("1.0.0")
                             .foregroundColor(.appSecondaryText)
                     }
                 }
             }
-            .navigationTitle("设置")
+            .navigationTitle("settings.title".localized)
+            .sheet(isPresented: $showLanguageSettings) {
+                LanguageSettingsView()
+            }
         }
     }
 }

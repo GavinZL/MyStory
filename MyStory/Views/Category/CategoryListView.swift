@@ -23,13 +23,13 @@ struct CategoryListView: View {
 //                }
                 
                 // 分类内容（占位）
-                Text("分类页面")
+                Text("category.page".localized)
                     .font(.appTitle)
                     .foregroundColor(.appSecondaryText)
                 
                 Spacer()
             }
-            .navigationTitle("分类")
+            .navigationTitle("category.title".localized)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {

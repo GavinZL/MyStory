@@ -13,7 +13,7 @@ public struct CategoryView: View {
 
     public var body: some View {
         VStack(spacing: 12) {
-            Picker("显示模式", selection: $viewModel.displayMode) {
+            Picker("category.displayMode".localized, selection: $viewModel.displayMode) {
                 ForEach(CategoryDisplayMode.allCases) { mode in
                     Text(mode.title).tag(mode)
                 }
@@ -28,7 +28,7 @@ public struct CategoryView: View {
                 listTree
             }
         }
-        .navigationTitle("分类")
+        .navigationTitle("category.title".localized)
         .toolbar {
             toolbarContent
         }
@@ -77,7 +77,7 @@ public struct CategoryView: View {
                     .frame(width: 24)
                 Text(node.category.name)
                 Spacer()
-                Text("共 \(node.storyCount) 个故事")
+                Text(String(format: "category.storyCount".localized, node.storyCount))
                     .foregroundColor(.secondary)
                     .font(.footnote)
             }
@@ -197,14 +197,14 @@ private struct CategoryListItem: View {
         case 1:
             // 一级分类：显示子目录数量
             let count = node.children.count
-            return "共 \(count) 个子目录"
+            return String(format: "category.childrenCount".localized, count)
         case 2:
             // 二级分类：显示子目录数量（三级分类数量）
             let count = node.children.count
-            return "共 \(count) 个子目录"
+            return String(format: "category.childrenCount".localized, count)
         case 3:
             // 三级分类：显示故事数量
-            return "共 \(node.storyCount) 个故事"
+            return String(format: "category.storyCount".localized, node.storyCount)
         default:
             return ""
         }

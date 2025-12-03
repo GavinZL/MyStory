@@ -5,7 +5,14 @@ public enum CategoryDisplayMode: String, CaseIterable, Identifiable {
     case card
     case list
     public var id: String { rawValue }
-    public var title: String { self == .card ? "卡片" : "列表" }
+    public var title: String { 
+        switch self {
+        case .card:
+            return "category.mode.card".localized
+        case .list:
+            return "category.mode.list".localized
+        }
+    }
 }
 
 public final class CategoryViewModel: ObservableObject {

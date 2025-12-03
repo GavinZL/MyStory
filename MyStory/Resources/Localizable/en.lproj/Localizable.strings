@@ -1,0 +1,121 @@
+/* 
+  Localizable.strings (English)
+  MyStory
+*/
+
+// MARK: - Common
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+"common.done" = "Done";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.add" = "Add";
+"common.confirm" = "OK";
+"common.error" = "Error";
+"common.loading" = "Loading...";
+
+// MARK: - Tab Bar
+"tab.timeline" = "Timeline";
+"tab.category" = "Categories";
+"tab.settings" = "Settings";
+
+// MARK: - Timeline
+"timeline.title" = "Timeline";
+"timeline.edit" = "Edit";
+"timeline.delete" = "Delete";
+"timeline.dateFormat" = "MMM dd, yyyy HH:mm";
+
+// MARK: - Story Editor
+"story.new" = "New Story";
+"story.edit" = "Edit Story";
+"story.title" = "Title";
+"story.titlePlaceholder" = "Enter story title";
+"story.content" = "Content";
+"story.contentPlaceholder" = "Enter story content";
+"story.media" = "Media";
+"story.addMedia" = "Add Image/Video";
+"story.location" = "Location";
+"story.addLocation" = "Add Location";
+"story.locationSelected" = "Location Selected";
+"story.videoLoading" = "Loading video...";
+
+// MARK: - Category
+"category.title" = "Categories";
+"category.new" = "New Category";
+"category.level" = "Level";
+"category.parent" = "Parent Category";
+"category.selectParent" = "Select Parent";
+"category.noParentAvailable" = "No parent available";
+"category.pleaseSelect" = "Please select...";
+"category.name" = "Category Name";
+"category.namePlaceholder" = "Enter category name";
+"category.icon" = "Select Icon";
+"category.color" = "Select Color";
+"category.displayMode" = "Display Mode";
+"category.page" = "Categories";
+
+// Category Levels
+"category.level1" = "Level 1";
+"category.level2" = "Level 2";
+"category.level3" = "Level 3 (Storyline)";
+"category.level.short" = "Category";
+"category.newLevel" = "New %@";
+
+// Category Statistics
+"category.storyCount" = "%d stories";
+"category.childrenCount" = "%d subcategories";
+"category.secondLevelCount" = "%d Level 2 categories";
+"category.thirdLevelCount" = "%d Level 3 categories";
+
+// Category Display Modes
+"category.mode.card" = "Card";
+"category.mode.list" = "List";
+
+// Category Errors
+"category.error.selectParent" = "Please select a parent category";
+
+// MARK: - Settings
+"settings.title" = "Settings";
+"settings.general" = "General";
+"settings.language" = "Language";
+"settings.languageSetting" = "Language Settings";
+"settings.theme" = "Theme";
+"settings.themeSetting" = "Theme Settings";
+"settings.about" = "About";
+"settings.version" = "Version";
+"settings.currentLanguage" = "Current Language";
+
+// Language Options
+"language.chinese" = "简体中文";
+"language.english" = "English";
+
+// MARK: - Permissions
+"permission.camera" = "Camera access is needed to take photos";
+"permission.location" = "Location access is needed to add location info to your stories";
+"permission.photos" = "Photo library access is needed to add photos to your stories";
+
+// MARK: - App Info
+"app.name" = "MyStory";
+"app.displayName" = "MyStory";
+
+// MARK: - Full Screen Story
+"fullscreen.storyDetail" = "Story Detail";
+"fullscreen.loadingEarlier" = "Loading earlier stories...";
+"fullscreen.loadingNewer" = "Loading newer stories...";
+"fullscreen.noMoreNewer" = "No more newer stories";
+"fullscreen.noMoreEarlier" = "No more earlier stories";
+
+// MARK: - Category Story List
+"categoryStory.empty" = "No stories in this category yet";
+"categoryStory.createFirst" = "Create the first story";
+"categoryStory.edit" = "Edit";
+"categoryStory.delete" = "Delete";
+
+// MARK: - AI Polish
+"ai.polish.title" = "AI Text Polish";
+"ai.polish.start" = "Start Polish";
+
+// MARK: - Category Picker
+"categoryPicker.title" = "Select Category";
+"categoryPicker.empty" = "No categories yet";
+"categoryPicker.createHint" = "Please create categories in Category tab first";
