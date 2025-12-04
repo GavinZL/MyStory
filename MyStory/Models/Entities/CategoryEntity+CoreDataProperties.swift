@@ -21,7 +21,7 @@ extension CategoryEntity {
     @NSManaged public var colorHex: String?
     @NSManaged public var level: Int16
     @NSManaged public var sortOrder: Int32
-    @NSManaged public var createdAt: Date?
+    @NSManaged public var createdAt: Date
     @NSManaged public var parent: CategoryEntity?
     @NSManaged public var children: NSSet?
     @NSManaged public var stories: NSSet?

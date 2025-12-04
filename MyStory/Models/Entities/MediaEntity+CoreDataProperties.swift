@@ -24,7 +24,7 @@ extension MediaEntity {
     @NSManaged public var duration: Double
     @NSManaged public var thumbnailFileName: String?
     @NSManaged public var encryptionKeyId: String?
-    @NSManaged public var createdAt: Date?
+    @NSManaged public var createdAt: Date
     @NSManaged public var story: StoryEntity?
 
 }

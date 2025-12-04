@@ -18,9 +18,9 @@ extension StoryEntity {
     @NSManaged public var title: String?
     @NSManaged public var content: String?
     @NSManaged public var plainTextContent: String?
-    @NSManaged public var timestamp: Date?
-    @NSManaged public var createdAt: Date?
-    @NSManaged public var updatedAt: Date?
+    @NSManaged public var timestamp: Date
+    @NSManaged public var createdAt: Date
+    @NSManaged public var updatedAt: Date
     @NSManaged public var locationName: String?
     @NSManaged public var locationAddress: String?
     @NSManaged public var locationCity: String?

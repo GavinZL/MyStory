@@ -493,7 +493,7 @@ public final class CoreDataCategoryService: CategoryService {
             level: Int(entity.level),
             parentId: entity.parent?.id,
             sortOrder: Int(entity.sortOrder),
-            createdAt: entity.createdAt ?? Date()
+            createdAt: entity.createdAt
         )
         
         // 递归构建子节点

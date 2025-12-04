@@ -150,7 +150,7 @@ public struct CategoryView: View {
                     level: Int(category.level),
                     parentId: category.parent?.id,
                     sortOrder: Int(category.sortOrder),
-                    createdAt: category.createdAt ?? Date()
+                    createdAt: category.createdAt
                 ),
                 children: [],
                 isExpanded: false,

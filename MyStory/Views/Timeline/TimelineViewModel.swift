@@ -27,7 +27,7 @@ final class TimelineViewModel: ObservableObject {
         let request = NSFetchRequest<StoryEntity>(entityName: "StoryEntity")
         request.fetchLimit = pageSize
         request.fetchOffset = currentPage * pageSize
-        request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoryEntity.timestamp, ascending: false)]
         do {
             let result = try ctx.fetch(request)
             stories.append(contentsOf: result)

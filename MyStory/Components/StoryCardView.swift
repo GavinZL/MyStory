@@ -8,6 +8,15 @@ struct StoryCardView: View {
         (story.media as? Set<MediaEntity>)?.first
     }
     
+    private var categoryNamesText: String? {
+        guard let categories = story.categories as? Set<CategoryEntity>, !categories.isEmpty else {
+            return nil
+        }
+        let names = categories.compactMap { $0.name?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        guard !names.isEmpty else { return nil }
+        return names.joined(separator: " >> ")
+    }
+    
     private var isVideo: Bool {
         firstMedia?.type == "video"
     }
@@ -55,7 +64,18 @@ struct StoryCardView: View {
                 .font(.headline)
                 .lineLimit(2)
                 .foregroundColor(.primary)
-
+            
+            if let categoryNamesText = categoryNamesText {
+                HStack(spacing: AppTheme.Spacing.xs) {
+                    Image(systemName: "folder.fill")
+                        .foregroundColor(AppTheme.Colors.primary)
+                    Text(categoryNamesText)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            
             if let city = story.locationCity, !city.isEmpty {
                 HStack(spacing: AppTheme.Spacing.xs) {
                     Image(systemName: "mappin.circle.fill").foregroundColor(AppTheme.Colors.primary)

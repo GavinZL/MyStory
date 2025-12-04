@@ -264,7 +264,7 @@ struct StoryDetailView: View {
     // MARK: - Computed Properties
     private var mediaList: [MediaEntity] {
         guard let medias = story.media as? Set<MediaEntity> else { return [] }
-        return medias.sorted { ($0.createdAt ?? Date()) < ($1.createdAt ?? Date()) }
+        return medias.sorted { $0.createdAt < $1.createdAt }
     }
     
     private var imageMediaList: [MediaEntity] {

@@ -108,7 +108,7 @@ struct CategoryStoryListView: View {
     /// 日期头部视图
     private func dateHeaderView(for story: StoryEntity) -> some View {
         HStack(spacing: AppTheme.Spacing.s) {
-            Text(formatDate(story.timestamp ?? Date()))
+            Text(formatDate(story.timestamp))
                 .font(.headline)
                 .foregroundColor(AppTheme.Colors.textPrimary)
         }

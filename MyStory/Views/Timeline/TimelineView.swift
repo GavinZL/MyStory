@@ -62,7 +62,7 @@ struct TimelineView: View {
     
     private func dateHeaderView(for story: StoryEntity) -> some View {
         HStack(spacing: AppTheme.Spacing.s) {
-            Text(Self.formatDate(story.timestamp ?? Date(timeIntervalSinceNow: 0)))
+            Text(Self.formatDate(story.timestamp))
                 .font(.headline)
                 .foregroundColor(AppTheme.Colors.textPrimary)
         }
