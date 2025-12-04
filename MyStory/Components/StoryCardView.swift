@@ -3,6 +3,8 @@ import SwiftUI
 struct StoryCardView: View {
     let story: StoryEntity
     let firstImage: UIImage?
+    let hideCategoryDisplay: Bool
+    let onCategoryTap: (() -> Void)?
     
     private var firstMedia: MediaEntity? {
         (story.media as? Set<MediaEntity>)?.first
@@ -65,7 +67,7 @@ struct StoryCardView: View {
                 .lineLimit(2)
                 .foregroundColor(.primary)
             
-            if let categoryNamesText = categoryNamesText {
+            if !hideCategoryDisplay, let categoryNamesText = categoryNamesText {
                 HStack(spacing: AppTheme.Spacing.xs) {
                     Image(systemName: "folder.fill")
                         .foregroundColor(AppTheme.Colors.primary)
@@ -73,6 +75,9 @@ struct StoryCardView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .lineLimit(1)
+                }
+                .onTapGesture {
+                    onCategoryTap?()
                 }
             }
             

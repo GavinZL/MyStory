@@ -19,6 +19,8 @@ struct CategoryStoryListView: View {
     @State private var stories: [StoryEntity] = []
     @State private var selectedStory: StoryEntity?
     @State private var showEditor = false
+    @State private var navigateToCategoryList = false
+    @State private var tappedCategoryNode: CategoryTreeNode?
     
     // MARK: - Services
     
@@ -40,6 +42,12 @@ struct CategoryStoryListView: View {
                 storyListView
             }
         }
+        .background(
+            NavigationLink(destination: categoryDestinationView, isActive: $navigateToCategoryList) {
+                EmptyView()
+            }
+            .hidden()
+        )
         .navigationTitle(category.category.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -85,7 +93,7 @@ struct CategoryStoryListView: View {
     /// 故事列表视图
     private var storyListView: some View {
         LazyVStack(alignment: .leading, spacing: 20) {
-            ForEach(stories, id: \.objectID) { story in
+            ForEach(stories, id: \ .objectID) { story in
                 storyItemView(story: story)
             }
         }
@@ -103,6 +111,29 @@ struct CategoryStoryListView: View {
                 storyCardButton(for: story)
             }.padding(.horizontal, 8)
         }
+    }
+    
+    /// 从 story 推导分类节点，用于跳转 CategoryStoryListView
+    private func categoryNode(from story: StoryEntity) -> CategoryTreeNode? {
+        guard let categories = story.categories as? Set<CategoryEntity>, let categoryEntity = categories.first else {
+            return nil
+        }
+        return CategoryTreeNode(
+            id: categoryEntity.id ?? UUID(),
+            category: CategoryModel(
+                id: categoryEntity.id ?? UUID(),
+                name: categoryEntity.name ?? "",
+                iconName: categoryEntity.iconName ?? "folder.fill",
+                colorHex: categoryEntity.colorHex ?? "#007AFF",
+                level: Int(categoryEntity.level),
+                parentId: categoryEntity.parent?.id,
+                sortOrder: Int(categoryEntity.sortOrder),
+                createdAt: categoryEntity.createdAt
+            ),
+            children: [],
+            isExpanded: false,
+            storyCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0
+        )
     }
     
     /// 日期头部视图
@@ -127,7 +158,14 @@ struct CategoryStoryListView: View {
     @ViewBuilder
     private func storyCardButton(for story: StoryEntity) -> some View {
         NavigationLink(destination: fullScreenDestination(for: story)) {
-            StoryCardView(story: story, firstImage: loadCoverImage(for: story))
+            StoryCardView(story: story, firstImage: loadCoverImage(for: story), hideCategoryDisplay: true) {
+                if let node = categoryNode(from: story) {
+                    // 如果与当前分类相同，禁止跳转
+                    if node.id == category.id { return }
+                    tappedCategoryNode = node
+                    navigateToCategoryList = true
+                }
+            }
         }
         .buttonStyle(PlainButtonStyle())
         .contextMenu {
@@ -195,6 +233,16 @@ struct CategoryStoryListView: View {
                 onLoadMore: { },
                 hasMoreData: false
             )
+        }
+    }
+    
+    /// 分类列表跳转目标
+    @ViewBuilder
+    private var categoryDestinationView: some View {
+        if let node = tappedCategoryNode {
+            CategoryStoryListView(category: node)
+        } else {
+            EmptyView()
         }
     }
     

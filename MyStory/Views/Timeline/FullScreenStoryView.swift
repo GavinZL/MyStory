@@ -17,6 +17,8 @@ struct FullScreenStoryView: View {
     @State private var showBottomToast = false
     @State private var topToastMessage = ""
     @State private var bottomToastMessage = ""
+    @State private var navigateToCategoryList = false
+    @State private var tappedCategoryNode: CategoryTreeNode?
     
     // MARK: - Initializer
     init(stories: [StoryEntity], initialIndex: Int, onLoadMore: (() -> Void)? = nil, hasMoreData: Bool = true) {
@@ -36,6 +38,11 @@ struct FullScreenStoryView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar(.hidden, for: .tabBar)
             
+            NavigationLink(destination: categoryDestinationView, isActive: $navigateToCategoryList) {
+                EmptyView()
+            }
+            .hidden()
+            
             // 顶部提示
             if showTopToast {
                 topToastView
@@ -45,6 +52,21 @@ struct FullScreenStoryView: View {
             if showBottomToast {
                 bottomToastView
             }
+        }
+        .onAppear {
+            coordinator.onCategoryTap = { node in
+                tappedCategoryNode = node
+                navigateToCategoryList = true
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var categoryDestinationView: some View {
+        if let node = tappedCategoryNode {
+            CategoryStoryListView(category: node)
+        } else {
+            EmptyView()
         }
     }
     
@@ -163,15 +185,17 @@ class PageCoordinator: NSObject, ObservableObject, UIPageViewControllerDataSourc
     let controllers: [UIViewController]
     @Published var currentIndex: Int
     var onReachBoundary: ((BoundaryType) -> Void)?
+    var onCategoryTap: ((CategoryTreeNode) -> Void)?
     
     enum BoundaryType {
         case top    // 第一个往上滑，加载更早的数据
         case bottom // 最后一个往下滑，加载更新的数据
     }
     
-    init(stories: [StoryEntity], initialIndex: Int) {
+    init(stories: [StoryEntity], initialIndex: Int, onCategoryTap: ((CategoryTreeNode) -> Void)? = nil) {
+        self.onCategoryTap = onCategoryTap
         self.controllers = stories.map { story in
-            UIHostingController(rootView: StoryDetailView(story: story))
+            UIHostingController(rootView: StoryDetailView(story: story, onCategoryTap: onCategoryTap))
         }
         self.currentIndex = initialIndex
         super.init()
@@ -251,6 +275,7 @@ private struct PageViewControllerWrapper: UIViewControllerRepresentable {
 struct StoryDetailView: View {
     // MARK: - Properties
     let story: StoryEntity
+    let onCategoryTap: ((CategoryTreeNode) -> Void)?
     
     // MARK: - State
     @State private var showImageViewer = false
@@ -262,6 +287,34 @@ struct StoryDetailView: View {
     private let mediaService = MediaStorageService()
     
     // MARK: - Computed Properties
+    private var categoryNamesText: String? {
+        guard let categories = story.categories as? Set<CategoryEntity>, !categories.isEmpty else { return nil }
+        let names = categories.compactMap { $0.name?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        guard !names.isEmpty else { return nil }
+        return names.joined(separator: " >> ")
+    }
+    
+    private func categoryNode() -> CategoryTreeNode? {
+        guard let categories = story.categories as? Set<CategoryEntity>, let categoryEntity = categories.first else { return nil }
+        return CategoryTreeNode(
+            id: categoryEntity.id ?? UUID(),
+            category: CategoryModel(
+                id: categoryEntity.id ?? UUID(),
+                name: categoryEntity.name ?? "",
+                iconName: categoryEntity.iconName ?? "folder.fill",
+                colorHex: categoryEntity.colorHex ?? "#007AFF",
+                level: Int(categoryEntity.level),
+                parentId: categoryEntity.parent?.id,
+                sortOrder: Int(categoryEntity.sortOrder),
+                createdAt: categoryEntity.createdAt
+            ),
+            children: [],
+            isExpanded: false,
+            storyCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0
+        )
+    }
+    
+    // MARK: - Media Properties
     private var mediaList: [MediaEntity] {
         guard let medias = story.media as? Set<MediaEntity> else { return [] }
         return medias.sorted { $0.createdAt < $1.createdAt }
@@ -299,6 +352,7 @@ struct StoryDetailView: View {
                 mediaDisplaySection
             }
             titleSection
+            categorySection
             contentSection(geometry: geometry)
             locationSection
             Spacer()
@@ -312,6 +366,26 @@ struct StoryDetailView: View {
             .font(.title)
             .bold()
             .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    private var categorySection: some View {
+        if let text = categoryNamesText {
+            HStack(spacing: 8) {
+                Image(systemName: "folder.fill")
+                    .foregroundColor(AppTheme.Colors.primary)
+                Text(text)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal)
+            .onTapGesture {
+                if let node = categoryNode() {
+                    onCategoryTap?(node)
+                }
+            }
+        }
     }
     
     @ViewBuilder

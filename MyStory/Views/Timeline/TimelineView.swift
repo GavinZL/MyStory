@@ -12,6 +12,8 @@ struct TimelineView: View {
     @StateObject private var vm = TimelineViewModel()
     @State private var selectedStory: StoryEntity?
     @State private var showEditor = false
+    @State private var navigateToCategoryList = false
+    @State private var tappedCategoryNode: CategoryTreeNode?
     
     // MARK: - Services
     @State private var mediaService = MediaStorageService()
@@ -22,6 +24,12 @@ struct TimelineView: View {
             ScrollView {
                 storyListView
             }
+            .background(
+                NavigationLink(destination: categoryDestinationView, isActive: $navigateToCategoryList) {
+                    EmptyView()
+                }
+                .hidden()
+            )
             .navigationTitle("timeline.title".localized)
             .toolbar {
                 toolbarContent
@@ -80,12 +88,39 @@ struct TimelineView: View {
     @ViewBuilder
     private func storyCardButton(for story: StoryEntity) -> some View {
         NavigationLink(destination: fullScreenDestination(for: story)) {
-            StoryCardView(story: story, firstImage: loadCoverImage(for: story))
+            StoryCardView(story: story, firstImage: loadCoverImage(for: story), hideCategoryDisplay: false, onCategoryTap: {
+                if let node = categoryNode(from: story) {
+                    tappedCategoryNode = node
+                    navigateToCategoryList = true
+                }
+            })
         }
         .buttonStyle(PlainButtonStyle())
         .contextMenu {
             contextMenuItems(for: story)
         }
+    }
+    
+    private func categoryNode(from story: StoryEntity) -> CategoryTreeNode? {
+        guard let categories = story.categories as? Set<CategoryEntity>, let categoryEntity = categories.first else {
+            return nil
+        }
+        return CategoryTreeNode(
+            id: categoryEntity.id ?? UUID(),
+            category: CategoryModel(
+                id: categoryEntity.id ?? UUID(),
+                name: categoryEntity.name ?? "",
+                iconName: categoryEntity.iconName ?? "folder.fill",
+                colorHex: categoryEntity.colorHex ?? "#007AFF",
+                level: Int(categoryEntity.level),
+                parentId: categoryEntity.parent?.id,
+                sortOrder: Int(categoryEntity.sortOrder),
+                createdAt: categoryEntity.createdAt
+            ),
+            children: [],
+            isExpanded: false,
+            storyCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0
+        )
     }
     
     @ViewBuilder
@@ -140,7 +175,14 @@ struct TimelineView: View {
             )
         }
     }
-    
+    @ViewBuilder
+    private var categoryDestinationView: some View {
+        if let node = tappedCategoryNode {
+            CategoryStoryListView(category: node)
+        } else {
+            EmptyView()
+        }
+    }
 
     // MARK: - Helper Methods
     private func setupViewModel() {
