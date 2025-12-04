@@ -44,6 +44,10 @@ struct StoryEditorView: View {
     @State private var showVideoPlayer = false
     @State private var selectedVideoURL: URL?
     
+    // MARK: - Category Selection State
+    @State private var selectedCategoryIds: Set<UUID> = []
+    @State private var showCategoryPickerSheet = false
+    
     // 分类ID（从传入的category初始化）
     private let categoryId: UUID?
     
@@ -124,6 +128,7 @@ struct StoryEditorView: View {
         NavigationView {
             Form {
                 titleSection
+                categorySection
                 contentSection
                 mediaSection
                 locationSection
@@ -135,6 +140,14 @@ struct StoryEditorView: View {
             .fullScreenCover(isPresented: $showVideoPlayer) {
                 VideoPlayerWrapper(videoURL: $selectedVideoURL)
             }
+            .sheet(isPresented: $showCategoryPickerSheet) {
+                SimpleCategoryPicker(selectedCategories: $selectedCategoryIds) {
+                    showCategoryPickerSheet = false
+                }
+            }
+            .onAppear {
+                setupInitialCategorySelection()
+            }
 
             .withLoadingIndicator()
         }
@@ -145,6 +158,36 @@ struct StoryEditorView: View {
         Section(header: Text("story.title".localized)) {
             TextField("story.titlePlaceholder".localized, text: $title)
         }
+    }
+    
+    private var categorySection: some View {
+        Section(header: Text("story.category".localized)) {
+            Button {
+                showCategoryPickerSheet = true
+            } label: {
+                HStack {
+                    Image(systemName: "folder.fill")
+                        .foregroundColor(AppTheme.Colors.primary)
+                    Text(selectedCategoryDisplayText)
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+    
+    private var selectedCategoryDisplayText: String {
+        let service = CoreDataCategoryService(context: context)
+        let names: [String] = selectedCategoryIds.compactMap { id in
+            service.fetchCategory(id: id)?.name
+        }
+        return names.isEmpty ? "Default" : names.joined(separator: " >> ")
     }
     
     private var contentSection: some View {
@@ -423,6 +466,19 @@ struct StoryEditorView: View {
         videoFileName = nil
     }
     
+    // 初始化分类选择（在视图出现时）
+    private func setupInitialCategorySelection() {
+        if !selectedCategoryIds.isEmpty { return }
+        if let story = existingStory, let set = story.categories as? Set<CategoryEntity> {
+            let ids = set.compactMap { $0.id }
+            if !ids.isEmpty { selectedCategoryIds = Set(ids); return }
+        }
+        if let cid = categoryId { selectedCategoryIds = [cid]; return }
+        if let defaultEntity = fetchDefaultCategory(), let did = defaultEntity.id {
+            selectedCategoryIds = [did]
+        }
+    }
+    
     // MARK: - Save Story
     private func save() {
         guard !isSaving else { return }
@@ -475,12 +531,126 @@ struct StoryEditorView: View {
     
     // 更新故事分类关联
     private func updateStoryCategories(_ story: StoryEntity) {
-        // 如果传入了分类，则关联该分类
         let categoryService = CoreDataCategoryService(context: context)
-        if let categoryId = categoryId, let categoryEntity = categoryService.fetchCategory(id: categoryId) {
-            story.addToCategories(categoryEntity)
-            print("✅ [故事编辑器] 关联分类: \(categoryEntity.name ?? "Unknown") -> 故事: \(story.title ?? "Untitled")")
+        var targetIds = selectedCategoryIds
+        if targetIds.isEmpty {
+            if let defaultEntity = fetchDefaultCategory(), let did = defaultEntity.id {
+                targetIds = [did]
+            }
         }
+        // 移除未选择的分类
+        if let current = story.categories as? Set<CategoryEntity> {
+            let toRemove = current.filter { cat in
+                guard let cid = cat.id else { return false }
+                return !targetIds.contains(cid)
+            }
+            if !toRemove.isEmpty {
+                story.removeFromCategories(NSSet(array: Array(toRemove)))
+            }
+        }
+        // 添加选择的分类
+        for id in targetIds {
+            if let entity = categoryService.fetchCategory(id: id) {
+                story.addToCategories(entity)
+            }
+        }
+        print("✅ [故事编辑器] 更新分类关联: \(targetIds.count) 个分类 -> 故事: \(story.title ?? "Untitled")")
+    }
+        
+    /// 获取或创建默认分类（Default）
+    /// 返回第三级分类供故事关联
+    private func fetchDefaultCategory() -> CategoryEntity? {
+        let now = Date()
+        
+        // 1. 查找或创建一级分类 (L1 Default)
+        let l1Request = CategoryEntity.fetchRequest()
+        l1Request.predicate = NSPredicate(format: "name == %@ AND level == %d", "Default", 1)
+        l1Request.fetchLimit = 1
+        
+        var level1: CategoryEntity?
+        do {
+            level1 = try context.fetch(l1Request).first
+        } catch {
+            print("⚠️ [故事编辑器] 查询一级默认分类失败: \(error)")
+        }
+        
+        if level1 == nil {
+            level1 = CategoryEntity(context: context)
+            level1?.id = UUID()
+            level1?.name = "Default"
+            level1?.iconName = "folder.fill"
+            level1?.colorHex = "#007AFF"
+            level1?.level = 1
+            level1?.sortOrder = 0
+            level1?.createdAt = now
+            print("✅ [故事编辑器] 创建一级默认分类 (L1 Default)")
+        }
+        
+        guard let l1 = level1 else { return nil }
+        
+        // 2. 查找或创建二级分类 (L2 Default)
+        let l2Request = CategoryEntity.fetchRequest()
+        l2Request.predicate = NSPredicate(format: "name == %@ AND level == %d AND parent == %@", "Default", 2, l1)
+        l2Request.fetchLimit = 1
+        
+        var level2: CategoryEntity?
+        do {
+            level2 = try context.fetch(l2Request).first
+        } catch {
+            print("⚠️ [故事编辑器] 查询二级默认分类失败: \(error)")
+        }
+        
+        if level2 == nil {
+            level2 = CategoryEntity(context: context)
+            level2?.id = UUID()
+            level2?.name = "Default"
+            level2?.iconName = "folder.fill"
+            level2?.colorHex = "#007AFF"
+            level2?.level = 2
+            level2?.sortOrder = 0
+            level2?.createdAt = now
+            level2?.parent = l1
+            print("✅ [故事编辑器] 创建二级默认分类 (L2 Default)")
+        }
+        
+        guard let l2 = level2 else { return nil }
+        
+        // 3. 查找或创建三级分类 (L3 Default)
+        let l3Request = CategoryEntity.fetchRequest()
+        l3Request.predicate = NSPredicate(format: "name == %@ AND level == %d AND parent == %@", "Default", 3, l2)
+        l3Request.fetchLimit = 1
+        
+        var level3: CategoryEntity?
+        do {
+            level3 = try context.fetch(l3Request).first
+        } catch {
+            print("⚠️ [故事编辑器] 查询三级默认分类失败: \(error)")
+        }
+        
+        if level3 == nil {
+            level3 = CategoryEntity(context: context)
+            level3?.id = UUID()
+            level3?.name = "Default"
+            level3?.iconName = "folder.fill"
+            level3?.colorHex = "#007AFF"
+            level3?.level = 3
+            level3?.sortOrder = 0
+            level3?.createdAt = now
+            level3?.parent = l2
+            print("✅ [故事编辑器] 创建三级默认分类 (L3 Default)")
+        }
+        
+        // 保存所有变更
+        do {
+            try context.save()
+            print("✅ [故事编辑器] 默认三级分类结构已就绪")
+        } catch {
+            print("⚠️ [故事编辑器] 保存默认分类失败: \(error)")
+            return nil
+        }
+        
+        // 返回三级分类供故事关联
+        return level3
     }
     
     private func saveMediaToStory(_ story: StoryEntity) {

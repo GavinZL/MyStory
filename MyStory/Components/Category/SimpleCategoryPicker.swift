@@ -230,11 +230,12 @@ private struct CategoryPickerItem: View {
         selectedCategories.contains(node.id)
     }
     
-    /// 切换选中状态
+    /// 切换选中状态（单选模式：只保留当前选择）
     private func toggleSelection() {
         if isSelected {
             selectedCategories.remove(node.id)
         } else {
+            selectedCategories.removeAll()
             selectedCategories.insert(node.id)
         }
     }
