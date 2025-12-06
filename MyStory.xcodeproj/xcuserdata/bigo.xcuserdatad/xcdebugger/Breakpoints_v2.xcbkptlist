@@ -62,9 +62,9 @@
             filePath = "MyStory/Views/Timeline/TimelineView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "132"
-            endingLineNumber = "132"
-            landmarkName = "fullScreenDestination(for:)"
+            startingLineNumber = "133"
+            endingLineNumber = "133"
+            landmarkName = "categoryNode(from:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -78,9 +78,9 @@
             filePath = "MyStory/Views/Timeline/TimelineView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "131"
-            endingLineNumber = "131"
-            landmarkName = "fullScreenDestination(for:)"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
+            landmarkName = "categoryNode(from:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -94,9 +94,9 @@
             filePath = "MyStory/Views/Timeline/TimelineView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
-            landmarkName = "deleteStory(_:)"
+            startingLineNumber = "188"
+            endingLineNumber = "188"
+            landmarkName = "fullScreenDestination(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -110,9 +110,9 @@
             filePath = "MyStory/Views/Timeline/TimelineView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "191"
-            endingLineNumber = "191"
-            landmarkName = "deleteStory(_:)"
+            startingLineNumber = "192"
+            endingLineNumber = "192"
+            landmarkName = "fullScreenDestination(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
