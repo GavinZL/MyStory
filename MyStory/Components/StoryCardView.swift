@@ -9,6 +9,10 @@ struct StoryCardView: View {
     // MARK: - Services
     @State private var mediaService = MediaStorageService()
     
+    // MARK: - Image Viewer State
+    @State private var showImageViewer = false
+    @State private var selectedImageIndex = 0
+    
     // MARK: - Computed Properties
     private var allMediaItems: [MediaEntity] {
         guard let mediaSet = story.media as? Set<MediaEntity> else { return [] }
@@ -39,13 +43,13 @@ struct StoryCardView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.m) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xl) {
             // 内容摘要（隐藏标题，只显示content）
             if let content = story.content, !content.isEmpty {
                 Text(content)
                     .font(AppTheme.Typography.body)
                     .foregroundColor(AppTheme.Colors.textPrimary)
-                    .lineLimit(3)
+                    .lineLimit(5)
             }
             
             // 图片网格展示
@@ -53,39 +57,50 @@ struct StoryCardView: View {
                 mediaGridView
             }
             
-            // 分类信息
-            if !hideCategoryDisplay, let categoryNamesText = categoryNamesText {
-                HStack(spacing: AppTheme.Spacing.xs) {
-                    Image(systemName: "folder.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(AppTheme.Colors.primary)
+            // 分类信息 + 位置信息（同一行）
+            if !hideCategoryDisplay || locationText != nil {
+                HStack(spacing: AppTheme.Spacing.s) {
+                    if !hideCategoryDisplay, let categoryNamesText = categoryNamesText {
+                        HStack(spacing: AppTheme.Spacing.xs) {
+                            Image(systemName: "folder.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(AppTheme.Colors.primary)
+                            
+                            Text(categoryNamesText)
+                                .font(AppTheme.Typography.subheadline)
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .lineLimit(1)
+                        }
+                        .onTapGesture {
+                            onCategoryTap?()
+                        }
+                    }
                     
-                    Text(categoryNamesText)
-                        .font(AppTheme.Typography.subheadline)
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .lineLimit(1)
-                }
-                .onTapGesture {
-                    onCategoryTap?()
-                }
-            }
-            
-            // 位置信息（仅当有位置数据时显示）
-            if let locationText = locationText {
-                HStack(spacing: AppTheme.Spacing.xs) {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(AppTheme.Colors.primary)
-                    
-                    Text(locationText)
-                        .font(AppTheme.Typography.caption)
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .lineLimit(1)
+                    if let locationText = locationText {
+                        HStack(spacing: AppTheme.Spacing.xs) {
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(AppTheme.Colors.primary)
+                                .padding(.leading, AppTheme.Spacing.l)
+                            
+                            Text(locationText)
+                                .font(AppTheme.Typography.caption)
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .lineLimit(1)
+                        }
+                    }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppTheme.Spacing.l)
+        .fullScreenCover(isPresented: $showImageViewer) {
+            ImageGalleryViewer(
+                images: loadAllImages(),
+                initialIndex: selectedImageIndex,
+                isPresented: $showImageViewer
+            )
+        }
         .background(
             RoundedRectangle(cornerRadius: AppTheme.Radius.m)
                 .fill(AppTheme.Colors.surface)
@@ -98,15 +113,23 @@ struct StoryCardView: View {
         )
     }
     
-    // MARK: - Media Grid View
+    // MARK: - Media Grid / Video View
     @ViewBuilder
     private var mediaGridView: some View {
-        let displayCount = min(allMediaItems.count, 4)
-        let columns = displayCount == 1 ? 1 : 2
+        let images = imageItems()
+        let videos = videoItems()
         
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.s), count: columns), spacing: AppTheme.Spacing.s) {
-            ForEach(Array(allMediaItems.prefix(displayCount).enumerated()), id: \.offset) { index, media in
-                mediaItemView(media: media, index: index, totalCount: displayCount)
+        if let firstVideo = videos.first {
+            // 存在视频时，仅展示视频缩略图
+            videoItemView(media: firstVideo)
+        } else if !images.isEmpty {
+            // 仅图片时，按 3x3 九宫格展示
+            let columns = Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.s), count: 3)
+            
+            LazyVGrid(columns: columns, spacing: AppTheme.Spacing.s) {
+                ForEach(Array(images.prefix(9).enumerated()), id: \.offset) { index, media in
+                    mediaItemView(media: media, index: index, totalCount: min(images.count, 9))
+                }
             }
         }
     }
@@ -118,28 +141,52 @@ struct StoryCardView: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(height: totalCount == 1 ? 200 : 120)
+                    .frame(height: 90)
                     .clipped()
                     .cornerRadius(AppTheme.Radius.s)
-                
-                if media.type == "video" {
-                    Circle()
-                        .fill(Color.black.opacity(0.6))
-                        .frame(width: 40, height: 40)
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                }
             } else {
                 RoundedRectangle(cornerRadius: AppTheme.Radius.s)
                     .fill(AppTheme.Colors.surface.opacity(0.15))
-                    .frame(height: totalCount == 1 ? 200 : 120)
+                    .frame(height: 90)
                     .overlay(
-                        Image(systemName: media.type == "video" ? "video" : "photo")
+                        Image(systemName: "photo")
                             .font(.system(size: 24))
                             .foregroundColor(AppTheme.Colors.border)
                     )
             }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            openImageViewer(media: media)
+        }
+    }
+    
+    @ViewBuilder
+    private func videoItemView(media: MediaEntity) -> some View {
+        ZStack(alignment: .center) {
+            if let image = loadMediaImage(media: media) {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity, maxHeight: 180)
+                    .clipped()
+                    .cornerRadius(AppTheme.Radius.s)
+            } else {
+                RoundedRectangle(cornerRadius: AppTheme.Radius.s)
+                    .fill(AppTheme.Colors.surface.opacity(0.15))
+                    .frame(height: 180)
+            }
+            
+            Circle()
+                .fill(Color.black.opacity(0.6))
+                .frame(width: 40, height: 40)
+            Image(systemName: "play.fill")
+                .font(.system(size: 22))
+                .foregroundColor(.white)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            openVideoFullscreen(media: media)
         }
     }
     
@@ -153,6 +200,47 @@ struct StoryCardView: View {
         } else {
             let fileName = (media.thumbnailFileName ?? media.fileName) ?? ""
             return mediaService.loadImage(fileName: fileName)
+        }
+    }
+    
+    private func imageItems() -> [MediaEntity] {
+        allMediaItems.filter { $0.type == "image" }
+    }
+    
+    private func videoItems() -> [MediaEntity] {
+        allMediaItems.filter { $0.type == "video" }
+    }
+    
+    private func loadAllImages() -> [UIImage] {
+        imageItems().compactMap { media in
+            let fileName = (media.thumbnailFileName ?? media.fileName) ?? ""
+            return mediaService.loadImage(fileName: fileName)
+        }
+    }
+    
+    private func openImageViewer(media: MediaEntity) {
+        let items = imageItems()
+        if let mediaId = media.id, let idx = items.firstIndex(where: { $0.id == mediaId }) {
+            selectedImageIndex = idx
+        } else {
+            selectedImageIndex = 0
+        }
+        showImageViewer = true
+    }
+    
+    private func openVideoFullscreen(media: MediaEntity) {
+        guard let fileName = media.fileName,
+            let url = mediaService.loadVideoURL(fileName: fileName) else {
+            print("无法加载视频文件: fileName 为空或 URL 加载失败")
+            return
+        }
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+        let window = windowScene.windows.first,
+        let rootVC = window.rootViewController {
+            let hosting = UIHostingController(rootView: VideoPlayerView(videoURL: url))
+            hosting.modalPresentationStyle = .fullScreen
+            rootVC.present(hosting, animated: true, completion: nil)
         }
     }
 
