@@ -182,7 +182,7 @@ struct FullScreenStoryView: View {
 
 // MARK: - Page Coordinator
 class PageCoordinator: NSObject, ObservableObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-    let controllers: [UIViewController]
+    var controllers: [UIViewController]
     @Published var currentIndex: Int
     var onReachBoundary: ((BoundaryType) -> Void)?
     var onCategoryTap: ((CategoryTreeNode) -> Void)?
@@ -282,6 +282,7 @@ struct StoryDetailView: View {
     @State private var selectedImageIndex = 0
     @State private var playingVideoIndex: Int?
     @State private var videoPlayers: [Int: AVPlayer] = [:]
+    @State private var showContentSheet = false
     
     // MARK: - Services
     private let mediaService = MediaStorageService()
@@ -331,13 +332,41 @@ struct StoryDetailView: View {
     // MARK: - Body
     var body: some View {
         GeometryReader { geometry in
-            ScrollView {
-                contentContainer(geometry: geometry)
+            ZStack {
+                // 全屏媒体显示
+                mediaDisplaySection
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .ignoresSafeArea()
+                
+                // 顶部信息栏（使用 VStack）
+                VStack {
+                    topInfoBar
+                    Spacer()
+                }
+                
+                // 左下角文本预览
+                VStack {
+                    Spacer()
+                    contentSection(geometry: geometry)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .scrollDisabled(true)
         }
         .fullScreenCover(isPresented: $showImageViewer) {
             imageGalleryViewer
+        }
+        .sheet(isPresented: $showContentSheet) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.m) {
+                    Text(story.content ?? "")
+                        .font(AppTheme.Typography.body)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppTheme.Spacing.l)
+            }
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
         }
         .onDisappear {
             cleanupResources()
@@ -351,68 +380,103 @@ struct StoryDetailView: View {
             if !mediaList.isEmpty {
                 mediaDisplaySection
             }
-            titleSection
-            categorySection
             contentSection(geometry: geometry)
-            locationSection
-            Spacer()
         }
         .padding(.vertical)
         .frame(minHeight: geometry.size.height)
     }
     
-    private var titleSection: some View {
-        Text(story.title ?? "无标题")
-            .font(.title)
-            .bold()
-            .padding(.horizontal)
-    }
+
     
-    @ViewBuilder
-    private var categorySection: some View {
-        if let text = categoryNamesText {
-            HStack(spacing: 8) {
-                Image(systemName: "folder.fill")
-                    .foregroundColor(AppTheme.Colors.primary)
-                Text(text)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
+    // 顶部信息栏
+    private var topInfoBar: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
+            HStack(alignment: .center, spacing: AppTheme.Spacing.s) {
+                // 左侧：大号日期数字
+                Text(formatDayNumber(story.timestamp))
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(.white)
+                
+                // 中间：年月/星期 + 时间
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(formatYearMonthWeekday(story.timestamp))
+                        .font(AppTheme.Typography.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                    Text(formatTime(story.timestamp))
+                        .font(AppTheme.Typography.caption)
+                        .foregroundColor(.white.opacity(0.85))
+                }
             }
-            .padding(.horizontal)
-            .onTapGesture {
-                if let node = categoryNode() {
-                    onCategoryTap?(node)
+            
+            // 右侧：分类 + 位置
+            HStack(spacing: 0) {
+                // 分类
+                if let text = categoryNamesText {
+                    HStack(spacing: 4) {
+                        Image(systemName: "folder.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.Colors.primary)
+                        Text(text)
+                            .font(AppTheme.Typography.caption)
+                            .foregroundColor(.white.opacity(0.9))
+                            .lineLimit(1)
+                    }
+                    .onTapGesture {
+                        if let node = categoryNode() {
+                            onCategoryTap?(node)
+                        }
+                    }
+                }
+                
+                // 位置（紧接分类后）
+                if let city = story.locationCity, !city.isEmpty {
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.Colors.primary)
+                        Text(city)
+                            .font(AppTheme.Typography.caption)
+                            .foregroundColor(.white.opacity(0.9))
+                            .lineLimit(1)
+                    }
+                    .offset(x: AppTheme.Spacing.s)
                 }
             }
         }
+        .padding(.horizontal, AppTheme.Spacing.m)
+        .padding(.top, AppTheme.Spacing.l)
+        .background(Color.black.opacity(0.15))
     }
     
     @ViewBuilder
     private func contentSection(geometry: GeometryProxy) -> some View {
         if let content = story.content, !content.isEmpty {
-            ScrollView {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
                 Text(content)
-                    .font(.body)
-                    .padding(.horizontal)
+                    .font(AppTheme.Typography.body)
+                    .foregroundColor(.white)
+                    .lineLimit(3)
+                Button {
+                    showContentSheet = true
+                } label: {
+                    Text("查看全部")
+                        .font(AppTheme.Typography.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, AppTheme.Spacing.s)
+                        .padding(.vertical, 6)
+                        .background(Color.black.opacity(0.35))
+                        .cornerRadius(AppTheme.Radius.s)
+                }
             }
-            .frame(maxHeight: geometry.size.height * 0.3)
+            .padding(AppTheme.Spacing.l)
+            .background(Color.black.opacity(0.25))
+            .cornerRadius(AppTheme.Radius.m)
+            .padding(.leading, AppTheme.Spacing.l)
+            .padding(.bottom, AppTheme.Spacing.l)
         }
     }
     
-    @ViewBuilder
-    private var locationSection: some View {
-        if let city = story.locationCity, !city.isEmpty {
-            HStack(spacing: 8) {
-                Image(systemName: "mappin.circle.fill")
-                    .foregroundColor(AppTheme.Colors.primary)
-                Text(city)
-            }
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-            .padding(.horizontal)
-        }
-    }
+
     
     private var imageGalleryViewer: some View {
         ImageGalleryViewer(
@@ -425,17 +489,59 @@ struct StoryDetailView: View {
     // MARK: - Media Display Section
     @ViewBuilder
     private var mediaDisplaySection: some View {
-        VStack(spacing: 0) {
-            if !imageMediaList.isEmpty {
-                imageGallerySection
-            }
-            
-            if !videoMediaList.isEmpty {
-                videoSection
-                    .padding(.top, imageMediaList.isEmpty ? 0 : 16)
+        GeometryReader { geo in
+            ZStack {
+                if let firstVideo = videoMediaList.first {
+                    if playingVideoIndex == 0, let player = videoPlayers[0] {
+                        VideoPlayer(player: player)
+                            .scaledToFill()
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .clipped()
+                    } else if let thumbFileName = firstVideo.thumbnailFileName,
+                              let img = mediaService.loadVideoThumbnail(fileName: thumbFileName) {
+                        Button {
+                            playVideo(fileName: firstVideo.fileName ?? "", at: 0)
+                        } label: {
+                            Image(uiImage: img)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: geo.size.width, height: geo.size.height)
+                                .clipped()
+                                .overlay(playButtonOverlay)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                } else if imageMediaList.count > 1 {
+                    TabView(selection: $selectedImageIndex) {
+                        ForEach(Array(imageMediaList.enumerated()), id: \.element.id) { index, media in
+                            if let uiimg = mediaService.loadImage(fileName: media.fileName ?? "") {
+                                Image(uiImage: uiimg)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: geo.size.width, height: geo.size.height)
+                                    .clipped()
+                                    .tag(index)
+                                    .onTapGesture {
+                                        openImageViewer(at: index)
+                                    }
+                            }
+                        }
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .automatic))
+                    .indexViewStyle(.page(backgroundDisplayMode: .automatic))
+                } else if let firstImage = imageMediaList.first,
+                          let uiimg = mediaService.loadImage(fileName: firstImage.fileName ?? "") {
+                    Image(uiImage: uiimg)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .clipped()
+                        .onTapGesture { openImageViewer(at: 0) }
+                } else {
+                    Color.black
+                }
             }
         }
-        .frame(height: UIScreen.main.bounds.height / 2)
     }
     
     // MARK: - Image Gallery Section
@@ -576,6 +682,38 @@ struct StoryDetailView: View {
     
     private func cleanupResources() {
         stopAllVideos()
+    }
+    
+    // MARK: - Date Formatting
+    
+    /// 格式化日期数字（日）
+    private func formatDayNumber(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd"
+        return formatter.string(from: date)
+    }
+    
+    /// 格式化年月和星期
+    private func formatYearMonthWeekday(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        
+        let isChineseLocale = LocalizationManager.shared.currentLanguage == .chinese
+        formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
+        
+        if isChineseLocale {
+            formatter.dateFormat = "MM月 / E"
+        } else {
+            formatter.dateFormat = "MMM / EEE"
+        }
+        
+        return formatter.string(from: date)
+    }
+    
+    /// 格式化时间
+    private func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
     }
 }
 
