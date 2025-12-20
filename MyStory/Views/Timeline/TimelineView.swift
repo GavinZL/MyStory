@@ -168,12 +168,12 @@ struct TimelineView: View {
     @ViewBuilder
     private var editorSheet: some View {
         if let story = selectedStory {
-            StoryEditorView(existingStory: story) {
+            NewStoryEditorView(existingStory: story, category: nil) {
                 reloadStories()
             }
         } else {
-            StoryEditorView { 
-                reloadStories() 
+            NewStoryEditorView(existingStory: nil, category: nil) {
+                reloadStories()
             }
         }
     }

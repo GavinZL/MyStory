@@ -309,12 +309,12 @@ private struct CategoryStoryNavigationView<Content: View>: View {
             // 从 node 中查询分类实体
             let categoryService = CoreDataCategoryService(context: context)
             if let categoryEntity = categoryService.fetchCategory(id: node.id) {
-                StoryEditorView(category: categoryEntity) {
+                NewStoryEditorView(existingStory: nil, category: categoryEntity) {
                     // 创建完成后的回调，刷新分类树
                     viewModel.load()
                 }
             } else {
-                StoryEditorView {
+                NewStoryEditorView(existingStory: nil, category: nil) {
                     // 如果查询失败，不传入分类
                     viewModel.load()
                 }

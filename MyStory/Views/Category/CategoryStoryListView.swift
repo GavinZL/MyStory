@@ -219,18 +219,18 @@ struct CategoryStoryListView: View {
     @ViewBuilder
     private var editorSheet: some View {
         if let story = selectedStory {
-            StoryEditorView(existingStory: story) {
+            NewStoryEditorView(existingStory: story, category: nil) {
                 loadStories()
             }
         } else {
             // 传入分类实体（从 CategoryModel 的 ID 查询）
             let categoryService = CoreDataCategoryService(context: context)
             if let categoryEntity = categoryService.fetchCategory(id: category.id) {
-                StoryEditorView(category: categoryEntity) {
+                NewStoryEditorView(existingStory: nil, category: categoryEntity) {
                     loadStories()
                 }
             } else {
-                StoryEditorView {
+                NewStoryEditorView(existingStory: nil, category: nil) {
                     loadStories()
                 }
             }
