@@ -87,32 +87,48 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "B4E9B676-67BF-4A3A-9A26-E5108BB85A9C"
+            uuid = "DF61F611-488B-4C31-849C-249A6C6072AD"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MyStory/Views/Timeline/TimelineView.swift"
+            filePath = "MyStory/Components/RichTextEditorView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "188"
-            endingLineNumber = "188"
-            landmarkName = "fullScreenDestination(for:)"
-            landmarkType = "7">
+            startingLineNumber = "64"
+            endingLineNumber = "64"
+            landmarkName = "RichTextEditorViewModel"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5878570B-D4E1-4C79-8C3F-3CA1D628D0D4"
+            uuid = "3153907F-414E-41BC-830A-95F12C05B9D0"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MyStory/Views/Timeline/TimelineView.swift"
+            filePath = "MyStory/Components/RichTextEditorView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "192"
-            endingLineNumber = "192"
-            landmarkName = "fullScreenDestination(for:)"
+            startingLineNumber = "177"
+            endingLineNumber = "177"
+            landmarkName = "RichTextEditorView"
+            landmarkType = "14">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BF3C61BB-0000-46E6-A9FD-2A70B42F6B7E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MyStory/Components/RichTextEditorView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "186"
+            endingLineNumber = "186"
+            landmarkName = "init(viewModel:config:onCategoryTap:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

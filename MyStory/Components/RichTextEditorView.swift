@@ -26,14 +26,6 @@ struct RichTextEditorConfig {
     var placeholder: String = "在这里输入文本..."
 }
 
-
-/// 工具栏按钮定义
-struct RichTextToolbarButton: Identifiable {
-    let id = UUID()
-    let icon: String
-    let action: () -> Void
-}
-
 // MARK: - 富文本编辑器 ViewModel
 
 /// 富文本编辑器 ViewModel
@@ -49,6 +41,9 @@ class RichTextEditorViewModel: ObservableObject {
     
     /// 当前是否为斜体
     @Published var isItalic = false
+    
+    /// UITextView 引用（用于程序化插入文本）
+    weak var textView: UITextView?
     
     /// 初始化
     /// - Parameter initialText: 初始文本内容
@@ -130,31 +125,26 @@ class RichTextEditorViewModel: ObservableObject {
     ///   - newlineBefore: 是否在前面添加换行
     ///   - newlineAfter: 是否在后面添加换行
     func insertText(_ text: String, newlineBefore: Bool = false, newlineAfter: Bool = false) {
-        let mutableAttributedString = NSMutableAttributedString(attributedString: attributedContent)
-        let selectedRange = context.selectedRange
-        
-        var textToInsert = text
-        
-        // 根据配置添加换行
-        if newlineBefore && selectedRange.location > 0 {
-            let previousChar = (attributedContent.string as NSString).substring(with: NSRange(location: selectedRange.location - 1, length: 1))
-            if previousChar != "\n" {
-                textToInsert = "\n" + textToInsert
+        // ✅ 关键修复：如果有 UITextView 引用，直接通过它插入文本
+        if let textView = textView {
+            var textToInsert = text
+            let selectedRange = textView.selectedRange
+            
+            // 根据配置添加换行
+            if newlineBefore && selectedRange.location > 0 {
+                let previousChar = (textView.text as NSString).substring(with: NSRange(location: selectedRange.location - 1, length: 1))
+                if previousChar != "\n" {
+                    textToInsert = "\n" + textToInsert
+                }
             }
+            
+            if newlineAfter {
+                textToInsert = textToInsert + "\n"
+            }
+            
+            // 直接在 UITextView 上插入文本
+            textView.insertText(textToInsert)
         }
-        
-        if newlineAfter {
-            textToInsert = textToInsert + "\n"
-        }
-        
-        // 创建要插入的富文本
-        let insertAttributedString = NSAttributedString(string: textToInsert)
-        
-        // 在光标位置插入
-        mutableAttributedString.replaceCharacters(in: selectedRange, with: insertAttributedString)
-        
-        // 更新内容
-        attributedContent = mutableAttributedString
     }
     
     /// 插入时间戳
@@ -212,8 +202,12 @@ struct RichTextEditorView: View {
                 RichTextEditor(
                     text: $viewModel.attributedContent,
                     context: viewModel.context
-                ) {
-                    $0.textContentInset = config.textInset
+                ) { textView in
+                    textView.textContentInset = config.textInset
+                    // ✅ 保存 UITextView 引用到 ViewModel，用于程序化插入文本
+                    DispatchQueue.main.async {
+                        viewModel.textView = textView as? UITextView
+                    }
                 }
             }
             .frame(minHeight: config.minHeight)
