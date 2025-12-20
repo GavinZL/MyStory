@@ -13,10 +13,6 @@ struct FullScreenStoryView: View {
     // MARK: - State
     @State private var currentIndex: Int
     @StateObject private var coordinator: PageCoordinator
-    @State private var showTopToast = false
-    @State private var showBottomToast = false
-    @State private var topToastMessage = ""
-    @State private var bottomToastMessage = ""
     @State private var navigateToCategoryList = false
     @State private var tappedCategoryNode: CategoryTreeNode?
     
@@ -42,16 +38,6 @@ struct FullScreenStoryView: View {
                 EmptyView()
             }
             .hidden()
-            
-            // 顶部提示
-            if showTopToast {
-                topToastView
-            }
-            
-            // 底部提示
-            if showBottomToast {
-                bottomToastView
-            }
         }
         .onAppear {
             coordinator.onCategoryTap = { node in
@@ -87,50 +73,14 @@ struct FullScreenStoryView: View {
         return "fullscreen.storyDetail".localized
     }
     
-    private var topToastView: some View {
-        VStack {
-            Text(topToastMessage)
-                .font(.subheadline)
-                .foregroundColor(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, AppTheme.Spacing.m)
-                .background(
-                    Capsule()
-                        .fill(Color.black.opacity(0.7))
-                )
-                .padding(.top, 10)
-            Spacer()
-        }
-        .transition(.move(edge: .top).combined(with: .opacity))
-        .animation(.easeInOut(duration: 0.3), value: showTopToast)
-    }
-    
-    private var bottomToastView: some View {
-        VStack {
-            Spacer()
-            Text(bottomToastMessage)
-                .font(.subheadline)
-                .foregroundColor(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, AppTheme.Spacing.m)
-                .background(
-                    Capsule()
-                        .fill(Color.black.opacity(0.7))
-                )
-                .padding(.bottom, 50)
-        }
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-        .animation(.easeInOut(duration: 0.3), value: showBottomToast)
-    }
-    
     // MARK: - Helper Methods
     private func handleBoundaryReached(_ boundaryType: PageCoordinator.BoundaryType) {
         switch boundaryType {
-        case .top:
-            // 第一个往上滑，加载更早的数据
+        case .left:
+            // 第一个往左滑，加载更早的数据
             handleLoadEarlierData()
-        case .bottom:
-            // 最后一个往下滑，加载更新的数据
+        case .right:
+            // 最后一个往右滑，加载更新的数据
             handleLoadNewerData()
         }
     }
@@ -138,44 +88,12 @@ struct FullScreenStoryView: View {
     private func handleLoadEarlierData() {
         if hasMoreData {
             onLoadMore?()
-            showTopToast("fullscreen.loadingEarlier".localized)
-        } else {
-            showTopToast("fullscreen.noMoreNewer".localized)
         }
     }
     
     private func handleLoadNewerData() {
         if hasMoreData {
             onLoadMore?()
-            showBottomToast("fullscreen.loadingNewer".localized)
-        } else {
-            showBottomToast("fullscreen.noMoreEarlier".localized)
-        }
-    }
-    
-    private func showTopToast(_ message: String) {
-        topToastMessage = message
-        withAnimation {
-            showTopToast = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            withAnimation {
-                showTopToast = false
-            }
-        }
-    }
-    
-    private func showBottomToast(_ message: String) {
-        bottomToastMessage = message
-        withAnimation {
-            showBottomToast = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            withAnimation {
-                showBottomToast = false
-            }
         }
     }
 }
@@ -188,8 +106,8 @@ class PageCoordinator: NSObject, ObservableObject, UIPageViewControllerDataSourc
     var onCategoryTap: ((CategoryTreeNode) -> Void)?
     
     enum BoundaryType {
-        case top    // 第一个往上滑，加载更早的数据
-        case bottom // 最后一个往下滑，加载更新的数据
+        case left   // 第一个往左滑，加载更早的数据
+        case right  // 最后一个往右滑，加载更新的数据
     }
     
     init(stories: [StoryEntity], initialIndex: Int, onCategoryTap: ((CategoryTreeNode) -> Void)? = nil) {
@@ -203,9 +121,9 @@ class PageCoordinator: NSObject, ObservableObject, UIPageViewControllerDataSourc
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard let idx = controllers.firstIndex(of: viewController), idx > 0 else {
-            // 已经是第一个，尝试向上滑动时触发加载更早的数据
+            // 已经是第一个，尝试向左滑动时触发加载更早的数据
             if let index = controllers.firstIndex(of: viewController), index == 0 {
-                onReachBoundary?(.top)
+                onReachBoundary?(.left)
             }
             return nil
         }
@@ -214,9 +132,9 @@ class PageCoordinator: NSObject, ObservableObject, UIPageViewControllerDataSourc
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         guard let idx = controllers.firstIndex(of: viewController), idx < controllers.count - 1 else {
-            // 已经是最后一个，尝试向下滑动时触发加载更新的数据
+            // 已经是最后一个，尝试向右滑动时触发加载更新的数据
             if let index = controllers.firstIndex(of: viewController), index == controllers.count - 1 {
-                onReachBoundary?(.bottom)
+                onReachBoundary?(.right)
             }
             return nil
         }
@@ -240,7 +158,7 @@ private struct PageViewControllerWrapper: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIPageViewController {
         let pageVC = UIPageViewController(
             transitionStyle: .scroll,
-            navigationOrientation: .vertical,
+            navigationOrientation: .horizontal,
             options: nil
         )
         pageVC.dataSource = coordinator
@@ -282,7 +200,6 @@ struct StoryDetailView: View {
     @State private var selectedImageIndex = 0
     @State private var playingVideoIndex: Int?
     @State private var videoPlayers: [Int: AVPlayer] = [:]
-    @State private var showContentSheet = false
     
     // MARK: - Services
     private let mediaService = MediaStorageService()
@@ -332,41 +249,25 @@ struct StoryDetailView: View {
     // MARK: - Body
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                // 全屏媒体显示
-                mediaDisplaySection
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .ignoresSafeArea()
-                
-                // 顶部信息栏（使用 VStack）
-                VStack {
-                    topInfoBar
-                    Spacer()
+            ScrollView {
+                VStack(spacing: 0) {
+                    // 1. 媒体内容区域
+                    if !mediaList.isEmpty {
+                        mediaDisplaySection
+                    }
+                    
+                    // 2. 文字内容区域
+                    if let content = story.content, !content.isEmpty {
+                        contentTextSection
+                    }
+                    
+                    // 3. 元数据区域（日期、分类、位置）
+                    metadataSection
                 }
-                
-                // 左下角文本预览
-                VStack {
-                    Spacer()
-                    contentSection(geometry: geometry)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .fullScreenCover(isPresented: $showImageViewer) {
             imageGalleryViewer
-        }
-        .sheet(isPresented: $showContentSheet) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.m) {
-                    Text(story.content ?? "")
-                        .font(AppTheme.Typography.body)
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(AppTheme.Spacing.l)
-            }
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
         }
         .onDisappear {
             cleanupResources()
@@ -374,107 +275,73 @@ struct StoryDetailView: View {
     }
     
     // MARK: - View Components
-    @ViewBuilder
-    private func contentContainer(geometry: GeometryProxy) -> some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.l) {
-            if !mediaList.isEmpty {
-                mediaDisplaySection
-            }
-            contentSection(geometry: geometry)
-        }
-        .padding(.vertical)
-        .frame(minHeight: geometry.size.height)
+    
+    // 文字内容区域
+    private var contentTextSection: some View {
+        Text(story.content ?? "")
+            .font(AppTheme.Typography.body)
+            .foregroundColor(AppTheme.Colors.textPrimary)
+            .lineSpacing(4)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, AppTheme.Spacing.l)
+            .padding(.top, AppTheme.Spacing.l)
+            .padding(.bottom, AppTheme.Spacing.m)
     }
     
 
     
-    // 顶部信息栏
-    private var topInfoBar: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
-            HStack(alignment: .center, spacing: AppTheme.Spacing.s) {
-                // 左侧：大号日期数字
-                Text(formatDayNumber(story.timestamp))
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(.white)
-                
-                // 中间：年月/星期 + 时间
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(formatYearMonthWeekday(story.timestamp))
+    // 元数据区域（日期、分类、位置）
+    private var metadataSection: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.m) {
+            // 日期时间
+            HStack(spacing: AppTheme.Spacing.s) {
+                Image(systemName: "clock")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                Text(formatFullDateTime(story.timestamp))
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+            }
+            
+            // 分类
+            if let text = categoryNamesText {
+                HStack(spacing: AppTheme.Spacing.s) {
+                    Image(systemName: "folder.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(AppTheme.Colors.primary)
+                    Text(text)
                         .font(AppTheme.Typography.caption)
-                        .foregroundColor(.white.opacity(0.9))
-                    Text(formatTime(story.timestamp))
-                        .font(AppTheme.Typography.caption)
-                        .foregroundColor(.white.opacity(0.85))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+                .onTapGesture {
+                    if let node = categoryNode() {
+                        onCategoryTap?(node)
+                    }
                 }
             }
             
-            // 右侧：分类 + 位置
-            HStack(spacing: 0) {
-                // 分类
-                if let text = categoryNamesText {
-                    HStack(spacing: 4) {
-                        Image(systemName: "folder.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.Colors.primary)
-                        Text(text)
-                            .font(AppTheme.Typography.caption)
-                            .foregroundColor(.white.opacity(0.9))
-                            .lineLimit(1)
-                    }
-                    .onTapGesture {
-                        if let node = categoryNode() {
-                            onCategoryTap?(node)
-                        }
-                    }
-                }
-                
-                // 位置（紧接分类后）
-                if let city = story.locationCity, !city.isEmpty {
-                    HStack(spacing: 4) {
-                        Image(systemName: "mappin.circle.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.Colors.primary)
-                        Text(city)
-                            .font(AppTheme.Typography.caption)
-                            .foregroundColor(.white.opacity(0.9))
-                            .lineLimit(1)
-                    }
-                    .offset(x: AppTheme.Spacing.s)
+            // 位置
+            if let city = story.locationCity, !city.isEmpty {
+                HStack(spacing: AppTheme.Spacing.s) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(AppTheme.Colors.primary)
+                    Text(city)
+                        .font(AppTheme.Typography.caption)
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
         }
-        .padding(.horizontal, AppTheme.Spacing.m)
-        .padding(.top, AppTheme.Spacing.l)
-        .background(Color.black.opacity(0.15))
+        .padding(.horizontal, AppTheme.Spacing.l)
+        .padding(.vertical, AppTheme.Spacing.m)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppTheme.Colors.surface.opacity(0.5))
+        .cornerRadius(AppTheme.Radius.m)
+        .padding(.horizontal, AppTheme.Spacing.l)
+        .padding(.bottom, AppTheme.Spacing.xl)
     }
     
-    @ViewBuilder
-    private func contentSection(geometry: GeometryProxy) -> some View {
-        if let content = story.content, !content.isEmpty {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
-                Text(content)
-                    .font(AppTheme.Typography.body)
-                    .foregroundColor(.white)
-                    .lineLimit(3)
-                Button {
-                    showContentSheet = true
-                } label: {
-                    Text("查看全部")
-                        .font(AppTheme.Typography.caption)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, AppTheme.Spacing.s)
-                        .padding(.vertical, 6)
-                        .background(Color.black.opacity(0.35))
-                        .cornerRadius(AppTheme.Radius.s)
-                }
-            }
-            .padding(AppTheme.Spacing.l)
-            .background(Color.black.opacity(0.25))
-            .cornerRadius(AppTheme.Radius.m)
-            .padding(.leading, AppTheme.Spacing.l)
-            .padding(.bottom, AppTheme.Spacing.l)
-        }
-    }
+
     
 
     
@@ -489,59 +356,19 @@ struct StoryDetailView: View {
     // MARK: - Media Display Section
     @ViewBuilder
     private var mediaDisplaySection: some View {
-        GeometryReader { geo in
-            ZStack {
-                if let firstVideo = videoMediaList.first {
-                    if playingVideoIndex == 0, let player = videoPlayers[0] {
-                        VideoPlayer(player: player)
-                            .scaledToFill()
-                            .frame(width: geo.size.width, height: geo.size.height)
-                            .clipped()
-                    } else if let thumbFileName = firstVideo.thumbnailFileName,
-                              let img = mediaService.loadVideoThumbnail(fileName: thumbFileName) {
-                        Button {
-                            playVideo(fileName: firstVideo.fileName ?? "", at: 0)
-                        } label: {
-                            Image(uiImage: img)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: geo.size.width, height: geo.size.height)
-                                .clipped()
-                                .overlay(playButtonOverlay)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                } else if imageMediaList.count > 1 {
-                    TabView(selection: $selectedImageIndex) {
-                        ForEach(Array(imageMediaList.enumerated()), id: \.element.id) { index, media in
-                            if let uiimg = mediaService.loadImage(fileName: media.fileName ?? "") {
-                                Image(uiImage: uiimg)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: geo.size.width, height: geo.size.height)
-                                    .clipped()
-                                    .tag(index)
-                                    .onTapGesture {
-                                        openImageViewer(at: index)
-                                    }
-                            }
-                        }
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .automatic))
-                    .indexViewStyle(.page(backgroundDisplayMode: .automatic))
-                } else if let firstImage = imageMediaList.first,
-                          let uiimg = mediaService.loadImage(fileName: firstImage.fileName ?? "") {
-                    Image(uiImage: uiimg)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .clipped()
-                        .onTapGesture { openImageViewer(at: 0) }
-                } else {
-                    Color.black
-                }
+        VStack(spacing: 0) {
+            if !imageMediaList.isEmpty {
+                imageGallerySection
+            }
+            
+            if !videoMediaList.isEmpty {
+                videoSection
+                    .padding(.top, imageMediaList.isEmpty ? 0 : 16)
             }
         }
+        .frame(height: UIScreen.main.bounds.height * 0.6)
+        .frame(maxWidth: .infinity)
+        .clipped()
     }
     
     // MARK: - Image Gallery Section
@@ -561,7 +388,6 @@ struct StoryDetailView: View {
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .always))
-        .frame(height: UIScreen.main.bounds.height * 0.5)
         .indexViewStyle(.page(backgroundDisplayMode: .always))
     }
     
@@ -571,10 +397,13 @@ struct StoryDetailView: View {
             Button {
                 openImageViewer(at: index)
             } label: {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
+                GeometryReader { geometry in
+                    Image(uiImage: img)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                }
             }
             .buttonStyle(PlainButtonStyle())
         }
@@ -588,7 +417,6 @@ struct StoryDetailView: View {
                 videoPlayerView(media: media, index: index)
             }
         }
-        .padding(.horizontal)
     }
     
     @ViewBuilder
@@ -604,7 +432,6 @@ struct StoryDetailView: View {
         VideoPlayer(player: player)
             .frame(maxWidth: .infinity)
             .aspectRatio(contentMode: .fit)
-            .cornerRadius(AppTheme.Radius.s)
     }
     
     @ViewBuilder
@@ -622,11 +449,13 @@ struct StoryDetailView: View {
     
     private func videoThumbnailContent(image: UIImage) -> some View {
         ZStack(alignment: .center) {
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxWidth: .infinity)
-                .cornerRadius(AppTheme.Radius.s)
+            GeometryReader { geometry in
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+            }
             
             playButtonOverlay
         }
@@ -713,6 +542,21 @@ struct StoryDetailView: View {
     private func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
+    }
+    
+    /// 格式化完整日期时间（小红书风格）
+    private func formatFullDateTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        let isChineseLocale = LocalizationManager.shared.currentLanguage == .chinese
+        formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
+        
+        if isChineseLocale {
+            formatter.dateFormat = "yyyy年MM月dd日 HH:mm"
+        } else {
+            formatter.dateFormat = "MMM dd, yyyy HH:mm"
+        }
+        
         return formatter.string(from: date)
     }
 }

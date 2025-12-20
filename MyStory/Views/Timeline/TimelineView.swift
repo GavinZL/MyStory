@@ -78,13 +78,14 @@ struct TimelineView: View {
             
             // 小号年月时分 + 星期
             VStack(alignment: .leading, spacing: 2) {
+                Text(formatTime(story.timestamp))
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+
                 Text(formatYearMonth(story.timestamp))
                     .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.textSecondary)
                 
-                Text(formatTime(story.timestamp))
-                    .font(AppTheme.Typography.caption)
-                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
             Spacer()
@@ -254,7 +255,7 @@ struct TimelineView: View {
     // MARK: - Date Formatting
     private func formatDayNumber(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd"
+        formatter.dateFormat = "MM-dd"
         return formatter.string(from: date)
     }
     
@@ -266,9 +267,9 @@ struct TimelineView: View {
         formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
         
         if isChineseLocale {
-            formatter.dateFormat = "YYYY年MM月 / E"
+            formatter.dateFormat = "YYYY年"
         } else {
-            formatter.dateFormat = "MMM / EEE"
+            formatter.dateFormat = "YYYY"
         }
         
         return formatter.string(from: date)
@@ -276,7 +277,16 @@ struct TimelineView: View {
     
     private func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+
+        let isChineseLocale = LocalizationManager.shared.currentLanguage == .chinese
+        // 根据配置的语言设置 locale
+        formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
+        
+        if isChineseLocale {
+            formatter.dateFormat = "HH:mm / E"
+        } else {
+            formatter.dateFormat = "HH:mm / EEE"
+        }
         return formatter.string(from: date)
     }
     
