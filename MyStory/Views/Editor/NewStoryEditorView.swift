@@ -111,23 +111,13 @@ struct NewStoryEditorView: View {
     }
     
     private var textEditorSection: some View {
-        ZStack(alignment: .topLeading) {
-            if viewModel.content.isEmpty {
-                Text("记录今日…")
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .padding(.top, AppTheme.Spacing.s + 2)
-                    .padding(.horizontal, AppTheme.Spacing.s)
-            }
-            
-            TextEditor(text: $viewModel.content)
-                .font(AppTheme.Typography.body)
-                .frame(minHeight: 160)
-                .padding(4)
-                .background(Color.clear)
-                .onChange(of: viewModel.content) { newValue in
-                    viewModel.handleContentChanged(newValue: newValue)
-                }
-        }
+        RichTextEditorView(
+            viewModel: viewModel.richTextEditorViewModel,
+            config: RichTextEditorConfig(
+                minHeight: 160,
+                backgroundColor: .clear
+            )
+        )
     }
     
     // MARK: - Media Section
@@ -397,35 +387,27 @@ struct NewStoryEditorView: View {
                 }
                 
                 Button {
-                    viewModel.undo()
-                } label: {
-                    Image(systemName: "arrow.uturn.left")
-                        .foregroundColor(viewModel.canUndo ? AppTheme.Colors.textPrimary : AppTheme.Colors.textSecondary)
-                }
-                .disabled(!viewModel.canUndo)
-                
-                Button {
-                    viewModel.redo()
-                } label: {
-                    Image(systemName: "arrow.uturn.right")
-                        .foregroundColor(viewModel.canRedo ? AppTheme.Colors.textPrimary : AppTheme.Colors.textSecondary)
-                }
-                .disabled(!viewModel.canRedo)
-                
-                Button {
-                    viewModel.insertTimestamp()
+                    viewModel.richTextEditorViewModel.insertTimestamp()
                 } label: {
                     Image(systemName: "calendar")
                 }
                 
                 Button {
-                    viewModel.showTextStyleOptions = true
+                    viewModel.richTextEditorViewModel.toggleBold()
                 } label: {
-                    Image(systemName: "textformat")
+                    Image(systemName: "bold")
+                        .foregroundColor(viewModel.richTextEditorViewModel.isBold ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
                 }
                 
                 Button {
-                    viewModel.insertTodoItem()
+                    viewModel.richTextEditorViewModel.toggleItalic()
+                } label: {
+                    Image(systemName: "italic")
+                        .foregroundColor(viewModel.richTextEditorViewModel.isItalic ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
+                }
+                
+                Button {
+                    viewModel.richTextEditorViewModel.insertTodoItem()
                 } label: {
                     Image(systemName: "list.bullet")
                 }
@@ -443,11 +425,6 @@ struct NewStoryEditorView: View {
                 viewModel.applySelectedCategory()
             }
         }
-        .confirmationDialog("文本样式", isPresented: $viewModel.showTextStyleOptions) {
-            Button("粗体") { viewModel.insertBoldTemplate() }
-            Button("斜体") { viewModel.insertItalicTemplate() }
-            Button("取消", role: .cancel) { }
-        }
     }
 }
 
@@ -455,7 +432,6 @@ struct NewStoryEditorView: View {
 
 final class NewStoryEditorViewModel: ObservableObject {
     @Published var title: String = ""
-    @Published var content: String = ""
     @Published var images: [UIImage] = []
     @Published var videoURLs: [URL] = []
     @Published var videoThumbnails: [UIImage] = []
@@ -466,12 +442,11 @@ final class NewStoryEditorViewModel: ObservableObject {
     @Published var isShowingVideoPlayer: Bool = false
     @Published var currentPlayingVideoURL: URL? = nil
     @Published var showCategoryPicker: Bool = false
-    @Published var showTextStyleOptions: Bool = false
     
     @Published var categorySelectionSet: Set<UUID> = []
     
-    private var undoStack: [String] = []
-    private var redoStack: [String] = []
+    // 使用通用富文本编辑器 ViewModel
+    let richTextEditorViewModel = RichTextEditorViewModel()
     
     private var context: NSManagedObjectContext?
     private var coreData: CoreDataStack?
@@ -481,9 +456,7 @@ final class NewStoryEditorViewModel: ObservableObject {
     private var initialCategory: CategoryEntity?
     private var isConfigured = false
     
-    var canSave: Bool { !title.isEmpty || !content.isEmpty }
-    var canUndo: Bool { !undoStack.isEmpty }
-    var canRedo: Bool { !redoStack.isEmpty }
+    var canSave: Bool { !title.isEmpty || !richTextEditorViewModel.isEmpty }
     var hasVideoThumbnail: Bool { !videoThumbnails.isEmpty || videoFileName != nil }
     
     var currentDateTitle: String {
@@ -494,8 +467,10 @@ final class NewStoryEditorViewModel: ObservableObject {
     
     var currentDateSubtitle: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEE HH:mm 今天"
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "EEE HH:mm"
+        
+        let isChineseLocale = LocalizationManager.shared.currentLanguage == .chinese
+        formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
         return formatter.string(from: Date())
     }
     
@@ -519,7 +494,8 @@ final class NewStoryEditorViewModel: ObservableObject {
         
         if let story = existingStory {
             title = story.title ?? ""
-            content = story.content ?? ""
+            let contentString = story.content ?? ""
+            richTextEditorViewModel.setText(contentString)
             
             if let city = story.locationCity {
                 locationInfo = LocationInfo(
@@ -566,38 +542,6 @@ final class NewStoryEditorViewModel: ObservableObject {
         if let cid = selectedCategoryId {
             categorySelectionSet = [cid]
         }
-    }
-    
-    // MARK: - Content Undo
-    
-    func handleContentChanged(newValue: String) {
-        // 使用一个临时变量存储旧值
-        if !undoStack.isEmpty {
-            let oldValue = undoStack.last ?? ""
-            if oldValue != newValue {
-                undoStack.append(newValue)
-                if undoStack.count > 20 {
-                    undoStack.removeFirst()
-                }
-                redoStack.removeAll()
-            }
-        } else {
-            // 第一次变更，直接追加
-            undoStack.append(newValue)
-            redoStack.removeAll()
-        }
-    }
-    
-    func undo() {
-        guard let last = undoStack.popLast() else { return }
-        redoStack.append(content)
-        content = last
-    }
-    
-    func redo() {
-        guard let last = redoStack.popLast() else { return }
-        undoStack.append(content)
-        content = last
     }
     
     // MARK: - Media Handling
@@ -720,45 +664,6 @@ final class NewStoryEditorViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Text Helpers
-    
-    func insertTimestamp() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        let stamp = "[" + formatter.string(from: Date()) + "]\n"
-        var text = content
-        if !text.isEmpty, !text.hasSuffix("\n") {
-            text.append("\n")
-        }
-        text.append(stamp)
-        undoStack.append(content)
-        redoStack.removeAll()
-        content = text
-    }
-    
-    func insertBoldTemplate() {
-        insertLine("**粗体文本**")
-    }
-    
-    func insertItalicTemplate() {
-        insertLine("_斜体文本_")
-    }
-    
-    func insertTodoItem() {
-        insertLine("- [ ] ")
-    }
-    
-    private func insertLine(_ line: String) {
-        var text = content
-        if !text.isEmpty, !text.hasSuffix("\n") {
-            text.append("\n")
-        }
-        text.append(line + "\n")
-        undoStack.append(content)
-        redoStack.removeAll()
-        content = text
-    }
-    
     // MARK: - Save
     
     func save(onSuccess: @escaping () -> Void) {
@@ -796,7 +701,8 @@ final class NewStoryEditorViewModel: ObservableObject {
     
     private func updateStoryBasicInfo(_ story: StoryEntity) {
         story.title = title
-        story.content = content.isEmpty ? nil : content
+        let contentString = richTextEditorViewModel.plainText
+        story.content = contentString.isEmpty ? nil : contentString
     }
     
     private func updateStoryLocation(_ story: StoryEntity) {
