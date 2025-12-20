@@ -145,6 +145,13 @@ class PageCoordinator: NSObject, ObservableObject, UIPageViewControllerDataSourc
         guard completed,
               let visibleViewController = pageViewController.viewControllers?.first,
               let index = controllers.firstIndex(of: visibleViewController) else { return }
+        
+        // 页面切换完成时，停止之前页面的视频播放
+        if let previousVC = previousViewControllers.first as? UIHostingController<StoryDetailView> {
+            // 通知之前的页面停止视频
+            NotificationCenter.default.post(name: NSNotification.Name("StopVideoPlayback"), object: nil)
+        }
+        
         currentIndex = index
     }
 }
@@ -271,6 +278,10 @@ struct StoryDetailView: View {
         }
         .onDisappear {
             cleanupResources()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StopVideoPlayback"))) { _ in
+            // 收到停止视频通知时，停止所有视频播放
+            stopAllVideos()
         }
     }
     
@@ -585,7 +596,7 @@ struct ImageGalleryViewer: View {
             
             TabView(selection: $currentIndex) {
                 ForEach(Array(images.enumerated()), id: \.offset) { index, image in
-                    zoomableImageView(image: image)
+                    zoomableImageView(image: image, index: index)
                         .tag(index)
                 }
             }
@@ -622,7 +633,27 @@ struct ImageGalleryViewer: View {
     }
     
     @ViewBuilder
-    private func zoomableImageView(image: UIImage) -> some View {
+    private func zoomableImageView(image: UIImage, index: Int) -> some View {
+        ZoomableImageView(
+            image: image,
+            isCurrentImage: index == currentIndex,
+            onDismiss: { isPresented = false }
+        )
+    }
+}
+
+// MARK: - Zoomable Image View Component
+struct ZoomableImageView: View {
+    let image: UIImage
+    let isCurrentImage: Bool
+    let onDismiss: () -> Void
+    
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+    
+    var body: some View {
         GeometryReader { geometry in
             Image(uiImage: image)
                 .resizable()
@@ -647,19 +678,18 @@ struct ImageGalleryViewer: View {
                             }
                         }
                 )
-                .simultaneousGesture(
-                    DragGesture()
+                .highPriorityGesture(
+                    // 只在放大时启用拖动手势，避免与 TabView 的滑动冲突
+                    scale > 1.0 ? DragGesture()
                         .onChanged { value in
-                            if scale > 1.0 {
-                                offset = CGSize(
-                                    width: lastOffset.width + value.translation.width,
-                                    height: lastOffset.height + value.translation.height
-                                )
-                            }
+                            offset = CGSize(
+                                width: lastOffset.width + value.translation.width,
+                                height: lastOffset.height + value.translation.height
+                            )
                         }
                         .onEnded { _ in
                             lastOffset = offset
-                        }
+                        } : nil
                 )
                 .onTapGesture(count: 2) {
                     withAnimation {
@@ -672,6 +702,18 @@ struct ImageGalleryViewer: View {
                         }
                     }
                 }
+                .onTapGesture(count: 1) {
+                    // 单击图片退出全屏预览
+                    onDismiss()
+                }
+        }
+        .onChange(of: isCurrentImage) { newValue in
+            // 切换图片时重置缩放状态
+            if !newValue {
+                scale = 1.0
+                offset = .zero
+                lastOffset = .zero
+            }
         }
     }
 }
