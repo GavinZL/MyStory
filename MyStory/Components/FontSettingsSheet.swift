@@ -18,6 +18,12 @@ struct FontSettingsSheet: View {
     /// 应用回调
     var onApply: (CGFloat, Color) -> Void
     
+    /// 本地状态：跟踪字体大小变化
+    @State private var localFontSize: CGFloat = 17
+    
+    /// 本地状态：跟踪颜色变化
+    @State private var localTextColor: Color = .black
+    
     /// 16 色预设调色板（2 行 x 8 列）
     private let colorGrid: [[Color]] = [
         [
@@ -58,7 +64,7 @@ struct FontSettingsSheet: View {
                         .font(.system(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                     
-                    Slider(value: $fontSize, in: 10...48, step: 2)
+                    Slider(value: $localFontSize, in: 10...48, step: 2)
                         .tint(AppTheme.Colors.primary)
                     
                     Text("A")
@@ -84,9 +90,9 @@ struct FontSettingsSheet: View {
                                 let color = colorGrid[row][col]
                                 ColorCircle(
                                     color: color,
-                                    isSelected: color.isApproximatelyEqual(to: textColor)
+                                    isSelected: color.isApproximatelyEqual(to: localTextColor)
                                 ) {
-                                    textColor = color
+                                    localTextColor = color
                                 }
                             }
                         }
@@ -98,12 +104,18 @@ struct FontSettingsSheet: View {
             Spacer(minLength: AppTheme.Spacing.m)
         }
         .padding(.vertical, AppTheme.Spacing.m)
-        .presentationDetents([.height(280)])
-        .onChange(of: fontSize) { newValue in
-            onApply(newValue, textColor)
+        .presentationDetents([.height(320)])
+        .onAppear {
+            localFontSize = fontSize
+            localTextColor = textColor
         }
-        .onChange(of: textColor) { newValue in
-            onApply(fontSize, newValue)
+        .onChange(of: localFontSize) { newValue in
+            fontSize = newValue
+            onApply(newValue, localTextColor)
+        }
+        .onChange(of: localTextColor) { newValue in
+            textColor = newValue
+            onApply(localFontSize, newValue)
         }
     }
 }
@@ -132,6 +144,7 @@ private struct ColorCircle: View {
                 }
             }
         }
+        .buttonStyle(.plain)
     }
     
     private var checkmarkColor: Color {

@@ -81,24 +81,47 @@ class RichTextEditorViewModel: ObservableObject {
     
     /// 更新格式状态
     func updateFormatState() {
-        // 获取当前选中位置的文本属性
+        // 从 textView 的 typingAttributes 读取格式状态（支持空文本场景）
+        if let textView = textView {
+            let attributes = textView.typingAttributes
+            
+            // 检查粗体
+            if let font = attributes[.font] as? UIFont {
+                isBold = font.fontDescriptor.symbolicTraits.contains(.traitBold)
+                isItalic = font.fontDescriptor.symbolicTraits.contains(.traitItalic)
+                fontSize = font.pointSize
+            } else {
+                isBold = false
+                isItalic = false
+                fontSize = UIFont.systemFontSize
+            }
+            
+            // 检查下划线
+            isUnderlined = (attributes[.underlineStyle] as? Int) != nil && (attributes[.underlineStyle] as? Int) != 0
+            
+            // 检查颜色
+            if let color = attributes[.foregroundColor] as? UIColor {
+                textColor = Color(color)
+            }
+            
+            return
+        }
+        
+        // 如果没有 textView，从选中文本读取属性
         let selectedRange = context.selectedRange
         guard selectedRange.location < attributedContent.length else {
-            isBold = false
-            isItalic = false
+            // 空文本或光标在末尾，保持当前状态不变
             return
         }
         
         let effectiveRange = selectedRange.length > 0 ? selectedRange : NSRange(location: max(0, selectedRange.location - 1), length: 1)
         guard effectiveRange.location < attributedContent.length else {
-            isBold = false
-            isItalic = false
             return
         }
         
         let attributes = attributedContent.attributes(at: effectiveRange.location, effectiveRange: nil)
         
-        // 检查字体样式
+        // 检查字体属性
         if let font = attributes[.font] as? UIFont {
             isBold = font.fontDescriptor.symbolicTraits.contains(.traitBold)
             isItalic = font.fontDescriptor.symbolicTraits.contains(.traitItalic)
@@ -109,34 +132,91 @@ class RichTextEditorViewModel: ObservableObject {
             fontSize = UIFont.systemFontSize
         }
         
-        // 检查是否为下划线
-        isUnderlined = attributes[.underlineStyle] != nil
+        // 检查下划线
+        isUnderlined = (attributes[.underlineStyle] as? Int) != nil && (attributes[.underlineStyle] as? Int) != 0
+        
+        // 检查颜色
+        if let color = attributes[.foregroundColor] as? UIColor {
+            textColor = Color(color)
+        }
     }
     
     /// 切换粗体
     func toggleBold() {
+        // 立即切换状态，确保 UI 响应
+        isBold.toggle()
+        
+        // 手动触发 objectWillChange 以确保视图更新
+        objectWillChange.send()
+        
+        // 应用到 RichTextContext
         context.toggleStyle(.bold)
-        // 延迟更新状态，等待 RichTextKit 应用样式
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.updateFormatState()
+        
+        // 同步更新 typingAttributes
+        if let textView = textView {
+            var attributes = textView.typingAttributes
+            if let font = attributes[.font] as? UIFont {
+                let descriptor = font.fontDescriptor
+                let newDescriptor: UIFontDescriptor
+                if isBold {
+                    newDescriptor = descriptor.withSymbolicTraits(descriptor.symbolicTraits.union(.traitBold)) ?? descriptor
+                } else {
+                    newDescriptor = descriptor.withSymbolicTraits(descriptor.symbolicTraits.subtracting(.traitBold)) ?? descriptor
+                }
+                attributes[.font] = UIFont(descriptor: newDescriptor, size: font.pointSize)
+                textView.typingAttributes = attributes
+            }
         }
     }
     
     /// 切换斜体
     func toggleItalic() {
+        // 立即切换状态，确保 UI 响应
+        isItalic.toggle()
+        
+        // 手动触发 objectWillChange 以确保视图更新
+        objectWillChange.send()
+        
+        // 应用到 RichTextContext
         context.toggleStyle(.italic)
-        // 延迟更新状态
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.updateFormatState()
+        
+        // 同步更新 typingAttributes
+        if let textView = textView {
+            var attributes = textView.typingAttributes
+            if let font = attributes[.font] as? UIFont {
+                let descriptor = font.fontDescriptor
+                let newDescriptor: UIFontDescriptor
+                if isItalic {
+                    newDescriptor = descriptor.withSymbolicTraits(descriptor.symbolicTraits.union(.traitItalic)) ?? descriptor
+                } else {
+                    newDescriptor = descriptor.withSymbolicTraits(descriptor.symbolicTraits.subtracting(.traitItalic)) ?? descriptor
+                }
+                attributes[.font] = UIFont(descriptor: newDescriptor, size: font.pointSize)
+                textView.typingAttributes = attributes
+            }
         }
     }
     
     /// 切换下划线
     func toggleUnderline() {
+        // 立即切换状态，确保 UI 响应
+        isUnderlined.toggle()
+        
+        // 手动触发 objectWillChange 以确保视图更新
+        objectWillChange.send()
+        
+        // 应用到 RichTextContext
         context.toggleStyle(.underlined)
-        // 延迟更新状态
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.updateFormatState()
+        
+        // 同步更新 typingAttributes
+        if let textView = textView {
+            var attributes = textView.typingAttributes
+            if isUnderlined {
+                attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
+            } else {
+                attributes.removeValue(forKey: .underlineStyle)
+            }
+            textView.typingAttributes = attributes
         }
     }
     

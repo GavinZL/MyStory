@@ -382,7 +382,7 @@ struct NewStoryEditorView: View {
             HStack(spacing: AppTheme.Spacing.l) {
                 // Aa 字体设置
                 Button {
-                    viewModel.richTextEditorViewModel.showFontSettings = true
+                    viewModel.showFontSettings = true
                 } label: {
                     Text("Aa")
                         .font(.system(size: 18, weight: .medium))
@@ -394,6 +394,12 @@ struct NewStoryEditorView: View {
                 } label: {
                     Image(systemName: "bold")
                         .foregroundColor(viewModel.richTextEditorViewModel.isBold ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
+                        .frame(width: 32, height: 32)
+                        .background(
+                            viewModel.richTextEditorViewModel.isBold ? 
+                            Color.black.opacity(0.08) : Color.clear
+                        )
+                        .cornerRadius(6)
                 }
                 
                 // 斜体
@@ -402,6 +408,12 @@ struct NewStoryEditorView: View {
                 } label: {
                     Image(systemName: "italic")
                         .foregroundColor(viewModel.richTextEditorViewModel.isItalic ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
+                        .frame(width: 32, height: 32)
+                        .background(
+                            viewModel.richTextEditorViewModel.isItalic ? 
+                            Color.black.opacity(0.08) : Color.clear
+                        )
+                        .cornerRadius(6)
                 }
                 
                 // 下划线
@@ -410,6 +422,12 @@ struct NewStoryEditorView: View {
                 } label: {
                     Image(systemName: "underline")
                         .foregroundColor(viewModel.richTextEditorViewModel.isUnderlined ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
+                        .frame(width: 32, height: 32)
+                        .background(
+                            viewModel.richTextEditorViewModel.isUnderlined ? 
+                            Color.black.opacity(0.08) : Color.clear
+                        )
+                        .cornerRadius(6)
                 }
                 
                 // Tab 缩进
@@ -444,15 +462,6 @@ struct NewStoryEditorView: View {
                         .fontWeight(.medium)
                 }
             }
-            .sheet(isPresented: $viewModel.richTextEditorViewModel.showFontSettings) {
-                FontSettingsSheet(
-                    fontSize: $viewModel.richTextEditorViewModel.fontSize,
-                    textColor: $viewModel.richTextEditorViewModel.textColor,
-                    onApply: { size, color in
-                        viewModel.richTextEditorViewModel.applyFontSettings(size: size, color: color)
-                    }
-                )
-            }
             .font(.system(size: 18))
             .foregroundColor(AppTheme.Colors.textPrimary)
             .padding(.horizontal, AppTheme.Spacing.l)
@@ -463,6 +472,15 @@ struct NewStoryEditorView: View {
             SimpleCategoryPicker(selectedCategories: $viewModel.categorySelectionSet) {
                 viewModel.applySelectedCategory()
             }
+        }
+        .sheet(isPresented: $viewModel.showFontSettings) {
+            FontSettingsSheet(
+                fontSize: $viewModel.richTextEditorViewModel.fontSize,
+                textColor: $viewModel.richTextEditorViewModel.textColor,
+                onApply: { size, color in
+                    viewModel.richTextEditorViewModel.applyFontSettings(size: size, color: color)
+                }
+            )
         }
     }
 }
@@ -481,11 +499,12 @@ final class NewStoryEditorViewModel: ObservableObject {
     @Published var isShowingVideoPlayer: Bool = false
     @Published var currentPlayingVideoURL: URL? = nil
     @Published var showCategoryPicker: Bool = false
+    @Published var showFontSettings: Bool = false
     
     @Published var categorySelectionSet: Set<UUID> = []
     
     // 使用通用富文本编辑器 ViewModel
-    var richTextEditorViewModel = RichTextEditorViewModel()
+    @Published var richTextEditorViewModel = RichTextEditorViewModel()
     
     private var context: NSManagedObjectContext?
     private var coreData: CoreDataStack?
