@@ -96,8 +96,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "64"
             endingLineNumber = "64"
-            landmarkName = "RichTextEditorViewModel"
-            landmarkType = "3">
+            landmarkName = "init(initialText:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -110,10 +110,10 @@
             filePath = "MyStory/Components/RichTextEditorView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
-            landmarkName = "RichTextEditorView"
-            landmarkType = "14">
+            startingLineNumber = "173"
+            endingLineNumber = "173"
+            landmarkName = "applyFontSettings(size:color:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -126,9 +126,9 @@
             filePath = "MyStory/Components/RichTextEditorView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "186"
-            endingLineNumber = "186"
-            landmarkName = "init(viewModel:config:onCategoryTap:)"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
+            landmarkName = "applyFontSettings(size:color:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

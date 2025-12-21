@@ -42,6 +42,18 @@ class RichTextEditorViewModel: ObservableObject {
     /// 当前是否为斜体
     @Published var isItalic = false
     
+    /// 当前是否为下划线
+    @Published var isUnderlined = false
+    
+    /// 当前字体大小
+    @Published var fontSize: CGFloat = UIFont.systemFontSize
+    
+    /// 当前字体颜色
+    @Published var textColor: Color = .black
+    
+    /// 是否展示字体设置面板
+    @Published var showFontSettings: Bool = false
+    
     /// UITextView 引用（用于程序化插入文本）
     weak var textView: UITextView?
     
@@ -86,14 +98,19 @@ class RichTextEditorViewModel: ObservableObject {
         
         let attributes = attributedContent.attributes(at: effectiveRange.location, effectiveRange: nil)
         
-        // 检查是否为粗体
+        // 检查字体样式
         if let font = attributes[.font] as? UIFont {
             isBold = font.fontDescriptor.symbolicTraits.contains(.traitBold)
             isItalic = font.fontDescriptor.symbolicTraits.contains(.traitItalic)
+            fontSize = font.pointSize
         } else {
             isBold = false
             isItalic = false
+            fontSize = UIFont.systemFontSize
         }
+        
+        // 检查是否为下划线
+        isUnderlined = attributes[.underlineStyle] != nil
     }
     
     /// 切换粗体
@@ -117,6 +134,65 @@ class RichTextEditorViewModel: ObservableObject {
     /// 切换下划线
     func toggleUnderline() {
         context.toggleStyle(.underlined)
+        // 延迟更新状态
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.updateFormatState()
+        }
+    }
+    
+    /// 缩进（Tab）
+    func insertTab() {
+        insertText("    ", newlineBefore: false, newlineAfter: false)
+    }
+    
+    /// 应用字体大小和颜色
+    func applyFontSettings(size: CGFloat, color: Color) {
+        guard let textView = textView else {
+            // 没有 textView 时，只更新默认值
+            fontSize = size
+            textColor = color
+            return
+        }
+        
+        let selectedRange = textView.selectedRange
+        
+        if selectedRange.length > 0 {
+            let mutableText = NSMutableAttributedString(attributedString: attributedContent)
+            
+            // 应用字体大小
+            mutableText.enumerateAttribute(.font, in: selectedRange) { value, range, _ in
+                let baseFont: UIFont
+                if let font = value as? UIFont {
+                    baseFont = font
+                } else {
+                    baseFont = UIFont.systemFont(ofSize: size)
+                }
+                let newFont = baseFont.withSize(size)
+                mutableText.addAttribute(.font, value: newFont, range: range)
+            }
+            
+            // 应用文字颜色
+            mutableText.addAttribute(.foregroundColor, value: UIColor(color), range: selectedRange)
+            
+            attributedContent = NSAttributedString(attributedString: mutableText)
+        } else {
+            // 修改当前插入点的默认样式
+            var attributes = textView.typingAttributes
+            
+            if let font = attributes[.font] as? UIFont {
+                attributes[.font] = font.withSize(size)
+            } else {
+                attributes[.font] = UIFont.systemFont(ofSize: size)
+            }
+            
+            attributes[.foregroundColor] = UIColor(color)
+            textView.typingAttributes = attributes
+            
+            fontSize = size
+            textColor = color
+        }
+        
+        updateFormatState()
     }
     
     /// 插入文本到光标位置
@@ -131,16 +207,12 @@ class RichTextEditorViewModel: ObservableObject {
             let selectedRange = textView.selectedRange
             
             // 根据配置添加换行
-            if newlineBefore && selectedRange.location > 0 {
-                let previousChar = (textView.text as NSString).substring(with: NSRange(location: selectedRange.location - 1, length: 1))
-                if previousChar != "\n" {
-                    textToInsert = "\n" + textToInsert
-                }
-            }
-            
-            if newlineAfter {
-                textToInsert = textToInsert + "\n"
-            }
+            // if newlineBefore && selectedRange.location > 0 {
+            //     let previousChar = (textView.text as NSString).substring(with: NSRange(location: selectedRange.location - 1, length: 1))
+            //     if previousChar != "\n" {
+            //         textToInsert = "\n" + textToInsert
+            //     }
+            // }
             
             // 直接在 UITextView 上插入文本
             textView.insertText(textToInsert)

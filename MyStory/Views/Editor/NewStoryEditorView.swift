@@ -380,18 +380,15 @@ struct NewStoryEditorView: View {
                 .frame(height: 0.5)
             
             HStack(spacing: AppTheme.Spacing.l) {
+                // Aa 字体设置
                 Button {
-                    viewModel.showCategoryPicker = true
+                    viewModel.richTextEditorViewModel.showFontSettings = true
                 } label: {
-                    Image(systemName: "folder.fill")
+                    Text("Aa")
+                        .font(.system(size: 18, weight: .medium))
                 }
                 
-                Button {
-                    viewModel.richTextEditorViewModel.insertTimestamp()
-                } label: {
-                    Image(systemName: "calendar")
-                }
-                
+                // 粗体
                 Button {
                     viewModel.richTextEditorViewModel.toggleBold()
                 } label: {
@@ -399,6 +396,7 @@ struct NewStoryEditorView: View {
                         .foregroundColor(viewModel.richTextEditorViewModel.isBold ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
                 }
                 
+                // 斜体
                 Button {
                     viewModel.richTextEditorViewModel.toggleItalic()
                 } label: {
@@ -406,13 +404,54 @@ struct NewStoryEditorView: View {
                         .foregroundColor(viewModel.richTextEditorViewModel.isItalic ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
                 }
                 
+                // 下划线
+                Button {
+                    viewModel.richTextEditorViewModel.toggleUnderline()
+                } label: {
+                    Image(systemName: "underline")
+                        .foregroundColor(viewModel.richTextEditorViewModel.isUnderlined ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
+                }
+                
+                // Tab 缩进
+                Button {
+                    viewModel.richTextEditorViewModel.insertTab()
+                } label: {
+                    Image(systemName: "arrow.right.to.line")
+                }
+                
+                // 日期
+                Button {
+                    viewModel.richTextEditorViewModel.insertTimestamp()
+                } label: {
+                    Image(systemName: "calendar")
+                }
+                
+                // TODO 待办
                 Button {
                     viewModel.richTextEditorViewModel.insertTodoItem()
                 } label: {
-                    Image(systemName: "list.bullet")
+                    Image(systemName: "checkmark.square")
                 }
                 
                 Spacer()
+                
+                // 完成按钮
+                Button {
+                    // 收起键盘
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                } label: {
+                    Text("完成")
+                        .fontWeight(.medium)
+                }
+            }
+            .sheet(isPresented: $viewModel.richTextEditorViewModel.showFontSettings) {
+                FontSettingsSheet(
+                    fontSize: $viewModel.richTextEditorViewModel.fontSize,
+                    textColor: $viewModel.richTextEditorViewModel.textColor,
+                    onApply: { size, color in
+                        viewModel.richTextEditorViewModel.applyFontSettings(size: size, color: color)
+                    }
+                )
             }
             .font(.system(size: 18))
             .foregroundColor(AppTheme.Colors.textPrimary)
@@ -446,7 +485,7 @@ final class NewStoryEditorViewModel: ObservableObject {
     @Published var categorySelectionSet: Set<UUID> = []
     
     // 使用通用富文本编辑器 ViewModel
-    let richTextEditorViewModel = RichTextEditorViewModel()
+    var richTextEditorViewModel = RichTextEditorViewModel()
     
     private var context: NSManagedObjectContext?
     private var coreData: CoreDataStack?
