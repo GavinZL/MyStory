@@ -28,7 +28,8 @@ struct NewStoryEditorView: View {
             VStack(spacing: 0) {
                 topBar
                 contentScrollView
-                bottomToolbar
+                // 暂时不用toolbar
+                // bottomToolbar
             }
         }
         .onAppear {
@@ -46,6 +47,8 @@ struct NewStoryEditorView: View {
         }
         .sheet(isPresented: $showMediaSourceSheet) {
             mediaSourceSheet
+                .presentationDetents([.height(200)])
+                .presentationDragIndicator(.visible)
         }
         .withLoadingIndicator()
     }
@@ -285,7 +288,7 @@ struct NewStoryEditorView: View {
     
     private var mediaSourceSheet: some View {
         VStack(spacing: AppTheme.Spacing.l) {
-            Spacer()
+            // Spacer()
             
             VStack(spacing: AppTheme.Spacing.l) {
                 HStack(spacing: AppTheme.Spacing.xl) {
@@ -334,12 +337,11 @@ struct NewStoryEditorView: View {
             }
             .padding(AppTheme.Spacing.xl)
             .frame(maxWidth: .infinity)
-            .background(AppTheme.Colors.surface)
+            .background(Color.clear)
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.l))
             .padding(.horizontal, AppTheme.Spacing.l)
             .padding(.bottom, AppTheme.Spacing.xl)
         }
-        .background(Color.black.opacity(0.4).ignoresSafeArea())
     }
     
     // MARK: - Location Section
