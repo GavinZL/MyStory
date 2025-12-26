@@ -73,6 +73,16 @@
 
 // Category Errors
 "category.error.selectParent" = "Please select a parent category";
+"category.error.invalidCategory" = "Invalid category";
+
+// Category Actions
+"category.edit" = "Edit";
+"category.delete" = "Delete";
+"category.editCategory" = "Edit Category";
+"category.deleteConfirm.title" = "Confirm Delete";
+"category.deleteConfirm.message" = "This will delete \"%@\" and its %d subcategories, %d stories, and related media files. This action cannot be undone. Are you sure you want to continue?";
+"category.deleteSuccess" = "Deleted successfully";
+"category.deleteFailed" = "Delete failed";
 
 // MARK: - Settings
 "settings.title" = "Settings";

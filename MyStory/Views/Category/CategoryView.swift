@@ -9,6 +9,14 @@ public struct CategoryView: View {
     @State private var expandedCategories: Set<UUID> = []  // 用于跟踪展开的分类
     @State private var selectedCategory: CategoryEntity?  // 用于搜索结果跳转
     @State private var navigateToStoryList = false  // 控制跳转到故事列表
+    @State private var editingCategory: CategoryEntity?  // 编辑的分类
+    @State private var categoryToDelete: CategoryTreeNode?  // 要删除的分类
+    @State private var showDeleteConfirm = false  // 显示删除确认对话框
+    @State private var deleteErrorMessage = ""  // 删除错误消息
+    @State private var showDeleteError = false  // 显示删除错误
+    
+    // MARK: - Services
+    @State private var mediaService = MediaStorageService()
 
     public init(viewModel: CategoryViewModel) {
         self.viewModel = viewModel
@@ -37,7 +45,13 @@ public struct CategoryView: View {
             toolbarContent
         }
         .sheet(isPresented: $showCategoryForm) {
-            CategoryFormView(viewModel: viewModel)
+            if let editing = editingCategory {
+                // 编辑模式
+                CategoryFormView(viewModel: viewModel, editingCategory: editing)
+            } else {
+                // 创建模式
+                CategoryFormView(viewModel: viewModel)
+            }
         }
         .sheet(isPresented: $showSearchView) {
             CategorySearchView(viewModel: viewModel) { category in
@@ -55,10 +69,53 @@ public struct CategoryView: View {
             }
             .hidden()
         )
+        .alert("category.deleteConfirm.title".localized, isPresented: $showDeleteConfirm) {
+            Button("common.cancel".localized, role: .cancel) {}
+            Button("common.delete".localized, role: .destructive) {
+                performDelete()
+            }
+        } message: {
+            if let category = categoryToDelete {
+                let stats = viewModel.getCategoryStatistics(id: category.id)
+                Text(String(format: "category.deleteConfirm.message".localized, category.category.name, stats.childrenCount, stats.storyCount))
+            }
+        }
+        .alert("category.deleteFailed".localized, isPresented: $showDeleteError) {
+            Button("common.confirm".localized, role: .cancel) {}
+        } message: {
+            Text(deleteErrorMessage)
+        }
         .onAppear {
             // 重新加载分类树以更新故事计数
             viewModel.load()
         }
+    }
+    
+    // MARK: - Actions
+    
+    /// 执行删除操作
+    private func performDelete() {
+        guard let category = categoryToDelete else { return }
+        
+        do {
+            try viewModel.deleteCategory(id: category.id, mediaService: mediaService)
+            categoryToDelete = nil
+        } catch {
+            deleteErrorMessage = error.localizedDescription
+            showDeleteError = true
+        }
+    }
+    
+    /// 编辑分类
+    private func editCategory(_ node: CategoryTreeNode) {
+        editingCategory = viewModel.getCategoryForEdit(id: node.id)
+        showCategoryForm = true
+    }
+    
+    /// 准备删除分类
+    private func prepareDeleteCategory(_ node: CategoryTreeNode) {
+        categoryToDelete = node
+        showDeleteConfirm = true
     }
 
     private var cardGrid: some View {
@@ -70,6 +127,19 @@ public struct CategoryView: View {
                         CategoryCardView(node: node, displayMode: .children)
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .contextMenu {
+                        Button {
+                            editCategory(node)
+                        } label: {
+                            Label("category.edit".localized, systemImage: "pencil")
+                        }
+                        
+                        Button(role: .destructive) {
+                            prepareDeleteCategory(node)
+                        } label: {
+                            Label("category.delete".localized, systemImage: "trash")
+                        }
+                    }
                 }
             }
             .padding(.horizontal)
@@ -83,7 +153,9 @@ public struct CategoryView: View {
                     node: level1Node,
                     level: 1,
                     expandedCategories: $expandedCategories,
-                    viewModel: viewModel  // 传递 viewModel
+                    viewModel: viewModel,  // 传递 viewModel
+                    onEdit: editCategory,  // 传递编辑回调
+                    onDelete: prepareDeleteCategory  // 传递删除回调
                 )
             }
         }
@@ -170,12 +242,19 @@ private struct CategoryListItem: View {
     let level: Int  // 1, 2, or 3
     @Binding var expandedCategories: Set<UUID>
     @ObservedObject var viewModel: CategoryViewModel  // 新增
+    let onEdit: (CategoryTreeNode) -> Void  // 编辑回调
+    let onDelete: (CategoryTreeNode) -> Void  // 删除回调
     
     var body: some View {
         Group {
             if level == 3 {
                 // 三级分类：根据是否有故事决定行为
-                CategoryStoryNavigationView(node: node, viewModel: viewModel) {
+                CategoryStoryNavigationView(
+                    node: node, 
+                    viewModel: viewModel,
+                    onEdit: onEdit,
+                    onDelete: onDelete
+                ) {
                     categoryRow
                 }
             } else {
@@ -184,6 +263,9 @@ private struct CategoryListItem: View {
                     categoryRow
                 }
                 .buttonStyle(PlainButtonStyle())
+                .contextMenu {
+                    contextMenuItems(for: node)
+                }
                 
                 // 如果展开，显示子分类
                 if isExpanded && !node.children.isEmpty {
@@ -192,12 +274,31 @@ private struct CategoryListItem: View {
                             node: childNode,
                             level: level + 1,
                             expandedCategories: $expandedCategories,
-                            viewModel: viewModel  // 传递 viewModel
+                            viewModel: viewModel,  // 传递 viewModel
+                            onEdit: onEdit,  // 传递编辑回调
+                            onDelete: onDelete  // 传递删除回调
                         )
                         .padding(.leading, 24)  // 缩进显示层级
                     }
                 }
             }
+        }
+    }
+    
+    // MARK: - Context Menu
+    
+    @ViewBuilder
+    private func contextMenuItems(for node: CategoryTreeNode) -> some View {
+        Button {
+            onEdit(node)
+        } label: {
+            Label("category.edit".localized, systemImage: "pencil")
+        }
+        
+        Button(role: .destructive) {
+            onDelete(node)
+        } label: {
+            Label("category.delete".localized, systemImage: "trash")
         }
     }
     
@@ -288,15 +389,25 @@ private struct CategoryListItem: View {
 private struct CategoryStoryNavigationView<Content: View>: View {
     let node: CategoryTreeNode
     let content: Content
-    @ObservedObject var viewModel: CategoryViewModel  // 新增
+    @ObservedObject var viewModel: CategoryViewModel
+    let onEdit: (CategoryTreeNode) -> Void
+    let onDelete: (CategoryTreeNode) -> Void
     
     @Environment(\.managedObjectContext) private var context
     @State private var showEditor = false
     @State private var navigateToStories = false
     
-    init(node: CategoryTreeNode, viewModel: CategoryViewModel, @ViewBuilder content: () -> Content) {
+    init(
+        node: CategoryTreeNode, 
+        viewModel: CategoryViewModel,
+        onEdit: @escaping (CategoryTreeNode) -> Void,
+        onDelete: @escaping (CategoryTreeNode) -> Void,
+        @ViewBuilder content: () -> Content
+    ) {
         self.node = node
         self.viewModel = viewModel
+        self.onEdit = onEdit
+        self.onDelete = onDelete
         self.content = content()
     }
     
@@ -305,6 +416,9 @@ private struct CategoryStoryNavigationView<Content: View>: View {
             content
         }
         .buttonStyle(PlainButtonStyle())
+        .contextMenu {
+            contextMenuItems(for: node)
+        }
         .sheet(isPresented: $showEditor) {
             // 从 node 中查询分类实体
             let categoryService = CoreDataCategoryService(context: context)
@@ -337,6 +451,23 @@ private struct CategoryStoryNavigationView<Content: View>: View {
     /// 是否有故事
     private var hasStories: Bool {
         return node.storyCount > 0
+    }
+    
+    // MARK: - Context Menu
+    
+    @ViewBuilder
+    private func contextMenuItems(for node: CategoryTreeNode) -> some View {
+        Button {
+            onEdit(node)
+        } label: {
+            Label("category.edit".localized, systemImage: "pencil")
+        }
+        
+        Button(role: .destructive) {
+            onDelete(node)
+        } label: {
+            Label("category.delete".localized, systemImage: "trash")
+        }
     }
     
     // MARK: - Actions

@@ -5,13 +5,13 @@ import Security
 import AVFoundation
 import ImageIO
 
-final class MediaStorageService: ObservableObject {
-    enum MediaType: String { case image, video }
+public final class MediaStorageService: ObservableObject {
+    public enum MediaType: String { case image, video }
 
-    static let baseDirName = "Media"
+    public static let baseDirName = "Media"
     private let keyManager = KeyManager()
 
-    func saveImage(_ image: UIImage) throws -> String {
+    public func saveImage(_ image: UIImage) throws -> String {
         let fileName = UUID().uuidString + ".heic"
         let keyId = (fileName as NSString).deletingPathExtension
         let url = try ensureImageDir().appendingPathComponent(fileName)
@@ -25,7 +25,7 @@ final class MediaStorageService: ObservableObject {
         return fileName
     }
 
-    func saveImageWithThumbnail(_ image: UIImage) throws -> (fileName: String, thumbFileName: String) {
+    public func saveImageWithThumbnail(_ image: UIImage) throws -> (fileName: String, thumbFileName: String) {
         let fileId = UUID().uuidString
         let fileName = fileId + ".heic"
         let thumbName = fileId + "_thumb.heic"
@@ -46,7 +46,7 @@ final class MediaStorageService: ObservableObject {
         return (fileName, thumbName)
     }
 
-    func url(for fileName: String, type: MediaType = .image) -> URL? {
+    public func url(for fileName: String, type: MediaType = .image) -> URL? {
         let mediaRoot = MediaStorageService.documentsDirectory().appendingPathComponent(MediaStorageService.baseDirName)
         switch type {
         case .image:
@@ -68,7 +68,7 @@ final class MediaStorageService: ObservableObject {
         }
     }
 
-    func loadImage(fileName: String) -> UIImage? {
+    public func loadImage(fileName: String) -> UIImage? {
         guard let url = url(for: fileName, type: .image) else { return nil }
         guard let enc = try? Data(contentsOf: url) else { return nil }
         let keyId = (fileName as NSString).deletingPathExtension
@@ -77,7 +77,7 @@ final class MediaStorageService: ObservableObject {
         return UIImage(data: dec)
     }
     
-    func loadVideoThumbnail(fileName: String) -> UIImage? {
+    public func loadVideoThumbnail(fileName: String) -> UIImage? {
         guard let url = url(for: fileName, type: .video) else { return nil }
         guard let enc = try? Data(contentsOf: url) else { return nil }
         let keyId = (fileName as NSString).deletingPathExtension
@@ -86,7 +86,7 @@ final class MediaStorageService: ObservableObject {
         return UIImage(data: dec)
     }
     
-    func saveVideo(from sourceURL: URL) throws -> (fileName: String, thumbFileName: String) {
+    public func saveVideo(from sourceURL: URL) throws -> (fileName: String, thumbFileName: String) {
         let fileId = UUID().uuidString
         let fileName = fileId + ".mov"
         let thumbName = fileId + "_thumb.jpg"
@@ -111,7 +111,7 @@ final class MediaStorageService: ObservableObject {
         return (fileName, thumbName)
     }
     
-    func loadVideoURL(fileName: String) -> URL? {
+    public func loadVideoURL(fileName: String) -> URL? {
         guard let encURL = url(for: fileName, type: .video) else { return nil }
         guard let enc = try? Data(contentsOf: encURL) else { return nil }
         let keyId = (fileName as NSString).deletingPathExtension

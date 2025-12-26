@@ -44,6 +44,26 @@ public final class CategoryViewModel: ObservableObject {
         load()
     }
     
+    public func updateCategory(id: UUID, name: String, iconName: String, colorHex: String) throws {
+        try service.updateCategory(id: id, name: name, iconName: iconName, colorHex: colorHex)
+        load()
+    }
+    
+    public func deleteCategory(id: UUID, mediaService: MediaStorageService) throws {
+        try service.deleteCategoryRecursively(id: id, mediaService: mediaService)
+        load()
+    }
+    
+    public func getCategoryForEdit(id: UUID) -> CategoryEntity? {
+        return service.fetchCategory(id: id)
+    }
+    
+    public func getCategoryStatistics(id: UUID) -> (childrenCount: Int, storyCount: Int) {
+        let children = service.childrenCount(for: id)
+        let stories = service.totalStoryCount(for: id)
+        return (children, stories)
+    }
+    
     // MARK: - Search
     
     public func performSearch() {

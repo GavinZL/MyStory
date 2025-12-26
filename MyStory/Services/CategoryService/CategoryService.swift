@@ -30,10 +30,12 @@ public protocol CategoryService {
     func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String) throws
     func updateCategory(id: UUID, name: String, iconName: String, colorHex: String) throws
     func deleteCategory(id: UUID) throws
+    func deleteCategoryRecursively(id: UUID, mediaService: MediaStorageService) throws
     
     // 统计
     func storyCount(for id: UUID) -> Int
     func totalStoryCount(for id: UUID) -> Int
+    func childrenCount(for id: UUID) -> Int
     
     // 搜索
     func searchStories(keyword: String) -> [CategorySearchResult]
@@ -143,6 +145,15 @@ public final class InMemoryCategoryService: CategoryService {
         childrenMap[id] = nil
         storyCounts[id] = nil
         categories[id] = nil
+    }
+    
+    public func deleteCategoryRecursively(id: UUID, mediaService: MediaStorageService) throws {
+        // InMemory 服务不支持此功能
+        throw CategoryError.notFound
+    }
+    
+    public func childrenCount(for id: UUID) -> Int {
+        return (childrenMap[id] ?? []).count
     }
 
     public func storyCount(for id: UUID) -> Int {
@@ -343,6 +354,46 @@ public final class CoreDataCategoryService: CategoryService {
         try context.save()
     }
     
+    /// 递归删除分类、所有子分类、关联故事及媒体文件
+    public func deleteCategoryRecursively(id: UUID, mediaService: MediaStorageService) throws {
+        guard let category = fetchCategory(id: id) else {
+            throw CategoryError.notFound
+        }
+        
+        // 1. 递归删除所有子分类
+        let children = fetchChildren(parentId: id)
+        for child in children {
+            if let childId = child.id {
+                try deleteCategoryRecursively(id: childId, mediaService: mediaService)
+            }
+        }
+        
+        // 2. 删除该分类下的所有故事及其媒体文件
+        if let stories = category.stories as? Set<StoryEntity> {
+            for story in stories {
+                // 删除故事的媒体文件
+                if let media = story.media as? Set<MediaEntity> {
+                    for mediaEntity in media {
+                        deleteMediaFiles(for: mediaEntity, using: mediaService)
+                    }
+                }
+                
+                // 删除故事实体
+                context.delete(story)
+            }
+        }
+        
+        // 3. 删除分类本身
+        context.delete(category)
+        
+        // 4. 保存更改
+        try context.save()
+    }
+    
+    public func childrenCount(for id: UUID) -> Int {
+        return fetchChildren(parentId: id).count
+    }
+    
     public func storyCount(for id: UUID) -> Int {
         guard let category = fetchCategory(id: id) else {
             print("⚠️ [CategoryService] Category not found for id: \(id)")
@@ -541,6 +592,24 @@ public final class CoreDataCategoryService: CategoryService {
         }
         
         return pathComponents.joined(separator: " > ")
+    }
+    
+    /// 删除媒体实体对应的文件
+    private func deleteMediaFiles(for media: MediaEntity, using mediaService: MediaStorageService) {
+        // 删除主文件
+        if let fileName = media.fileName {
+            if let url = mediaService.url(for: fileName, type: media.type == "video" ? .video : .image) {
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
+        
+        // 删除缩略图文件
+        if let thumbFileName = media.thumbnailFileName {
+            let type: MediaStorageService.MediaType = media.type == "video" ? .video : .image
+            if let url = mediaService.url(for: thumbFileName, type: type) {
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
     }
     
     /// 提取包含关键字的文本片段

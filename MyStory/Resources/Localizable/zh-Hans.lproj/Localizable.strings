@@ -73,6 +73,16 @@
 
 // Category Errors
 "category.error.selectParent" = "请选择父分类";
+"category.error.invalidCategory" = "无效的分类";
+
+// Category Actions
+"category.edit" = "编辑";
+"category.delete" = "删除";
+"category.editCategory" = "编辑分类";
+"category.deleteConfirm.title" = "确认删除";
+"category.deleteConfirm.message" = "将删除 \"%@\" 及其 %d 个子分类、%d 个故事和相关媒体文件。此操作不可恢复，确定要继续吗？";
+"category.deleteSuccess" = "删除成功";
+"category.deleteFailed" = "删除失败";
 
 // MARK: - Settings
 "settings.title" = "设置";

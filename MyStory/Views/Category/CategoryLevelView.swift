@@ -17,6 +17,14 @@ struct CategoryLevelView: View {
     // MARK: - State
     
     @State private var showCategoryForm = false
+    @State private var editingCategory: CategoryEntity?  // 编辑的分类
+    @State private var categoryToDelete: CategoryTreeNode?  // 要删除的分类
+    @State private var showDeleteConfirm = false  // 显示删除确认对话框
+    @State private var deleteErrorMessage = ""  // 删除错误消息
+    @State private var showDeleteError = false  // 显示删除错误
+    
+    // MARK: - Services
+    @State private var mediaService = MediaStorageService()
     
     // MARK: - Initialization
     
@@ -43,12 +51,61 @@ struct CategoryLevelView: View {
             toolbarContent
         }
         .sheet(isPresented: $showCategoryForm) {
-            CategoryFormView(
-                viewModel: viewModel,
-                parentNode: parentNode,
-                presetLevel: currentLevel
-            )
+            if let editing = editingCategory {
+                // 编辑模式
+                CategoryFormView(viewModel: viewModel, editingCategory: editing)
+            } else {
+                // 创建模式
+                CategoryFormView(
+                    viewModel: viewModel,
+                    parentNode: parentNode,
+                    presetLevel: currentLevel
+                )
+            }
         }
+        .alert("category.deleteConfirm.title".localized, isPresented: $showDeleteConfirm) {
+            Button("common.cancel".localized, role: .cancel) {}
+            Button("common.delete".localized, role: .destructive) {
+                performDelete()
+            }
+        } message: {
+            if let category = categoryToDelete {
+                let stats = viewModel.getCategoryStatistics(id: category.id)
+                Text(String(format: "category.deleteConfirm.message".localized, category.category.name, stats.childrenCount, stats.storyCount))
+            }
+        }
+        .alert("category.deleteFailed".localized, isPresented: $showDeleteError) {
+            Button("common.confirm".localized, role: .cancel) {}
+        } message: {
+            Text(deleteErrorMessage)
+        }
+    }
+    
+    // MARK: - Actions
+    
+    /// 执行删除操作
+    private func performDelete() {
+        guard let category = categoryToDelete else { return }
+        
+        do {
+            try viewModel.deleteCategory(id: category.id, mediaService: mediaService)
+            categoryToDelete = nil
+        } catch {
+            deleteErrorMessage = error.localizedDescription
+            showDeleteError = true
+        }
+    }
+    
+    /// 编辑分类
+    private func editCategory(_ node: CategoryTreeNode) {
+        editingCategory = viewModel.getCategoryForEdit(id: node.id)
+        showCategoryForm = true
+    }
+    
+    /// 准备删除分类
+    private func prepareDeleteCategory(_ node: CategoryTreeNode) {
+        categoryToDelete = node
+        showDeleteConfirm = true
     }
     
     // MARK: - View Components
@@ -62,12 +119,34 @@ struct CategoryLevelView: View {
                 CategoryCardView(node: node, displayMode: .children)
             }
             .buttonStyle(PlainButtonStyle())
+            .contextMenu {
+                contextMenuItems(for: node)
+            }
         } else {
             // 第三级：点击进入故事列表
             NavigationLink(destination: CategoryStoryListView(category: node)) {
                 CategoryCardView(node: node, displayMode: .stories)
             }
             .buttonStyle(PlainButtonStyle())
+            .contextMenu {
+                contextMenuItems(for: node)
+            }
+        }
+    }
+    
+    /// 上下文菜单项
+    @ViewBuilder
+    private func contextMenuItems(for node: CategoryTreeNode) -> some View {
+        Button {
+            editCategory(node)
+        } label: {
+            Label("category.edit".localized, systemImage: "pencil")
+        }
+        
+        Button(role: .destructive) {
+            prepareDeleteCategory(node)
+        } label: {
+            Label("category.delete".localized, systemImage: "trash")
         }
     }
     

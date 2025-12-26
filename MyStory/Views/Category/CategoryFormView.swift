@@ -4,9 +4,13 @@ import SwiftUI
 struct CategoryFormView: View {
     // MARK: - Environment
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var context
     
     // MARK: - Properties
     @ObservedObject var viewModel: CategoryViewModel
+    
+    /// 编辑模式：要编辑的分类实体（可选）
+    let editingCategory: CategoryEntity?
     
     /// 父级分类节点（可选）
     let parentNode: CategoryTreeNode?
@@ -39,10 +43,12 @@ struct CategoryFormView: View {
     
     init(
         viewModel: CategoryViewModel,
+        editingCategory: CategoryEntity? = nil,
         parentNode: CategoryTreeNode? = nil,
         presetLevel: Int? = nil
     ) {
         self.viewModel = viewModel
+        self.editingCategory = editingCategory
         self.parentNode = parentNode
         self.presetLevel = presetLevel
     }
@@ -234,7 +240,7 @@ struct CategoryFormView: View {
         
         if effectiveLevelValue > 1 {
             // 如果有预设父节点，使用它；否则检查是否选择了父分类
-            if parentNode == nil && selectedParent == nil {
+            if parentNode == nil && selectedParent == nil && editingCategory == nil {
                 errorMessage = "category.error.selectParent".localized
                 showError = true
                 return
@@ -242,14 +248,30 @@ struct CategoryFormView: View {
         }
         
         do {
-            let parentId = parentNode?.id ?? selectedParent?.id
-            try viewModel.createCategory(
-                name: categoryName,
-                level: effectiveLevelValue,
-                parentId: parentId,
-                iconName: selectedIcon,
-                colorHex: selectedColor
-            )
+            if let editing = editingCategory {
+                // 编辑模式：更新现有分类
+                guard let categoryId = editing.id else {
+                    errorMessage = "category.error.invalidCategory".localized
+                    showError = true
+                    return
+                }
+                try viewModel.updateCategory(
+                    id: categoryId,
+                    name: categoryName,
+                    iconName: selectedIcon,
+                    colorHex: selectedColor
+                )
+            } else {
+                // 创建模式：添加新分类
+                let parentId = parentNode?.id ?? selectedParent?.id
+                try viewModel.createCategory(
+                    name: categoryName,
+                    level: effectiveLevelValue,
+                    parentId: parentId,
+                    iconName: selectedIcon,
+                    colorHex: selectedColor
+                )
+            }
             dismiss()
         } catch {
             errorMessage = error.localizedDescription
@@ -261,6 +283,16 @@ struct CategoryFormView: View {
     
     /// 设置初始值
     private func setupInitialValues() {
+        // 如果是编辑模式，预填充数据
+        if let editing = editingCategory {
+            categoryName = editing.name ?? ""
+            selectedIcon = editing.iconName ?? "folder.fill"
+            selectedColor = editing.colorHex ?? "#007AFF"
+            selectedLevel = Int(editing.level)
+            return
+        }
+        
+        // 创建模式
         if let presetLevel = presetLevel {
             selectedLevel = presetLevel
         }
@@ -277,6 +309,9 @@ struct CategoryFormView: View {
     
     /// 获取导航栏标题
     private var navigationTitle: String {
+        if editingCategory != nil {
+            return "category.editCategory".localized
+        }
         if let level = presetLevel {
             let levelName = levelDisplayName(for: level)
             return String(format: "category.newLevel".localized, levelName)
