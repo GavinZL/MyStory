@@ -9,6 +9,8 @@ public struct CategoryModel: Identifiable, Hashable {
     public var parentId: UUID?
     public var sortOrder: Int
     public var createdAt: Date
+    public var iconType: String? // "system" or "custom"
+    public var customIconData: Data?
 }
 
 public struct CategoryTreeNode: Identifiable, Hashable {

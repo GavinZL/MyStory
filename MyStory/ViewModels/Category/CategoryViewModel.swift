@@ -39,13 +39,28 @@ public final class CategoryViewModel: ObservableObject {
     
     // MARK: - Category Management
     
-    public func createCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String) throws {
-        try service.addCategory(name: name, level: level, parentId: parentId, iconName: iconName, colorHex: colorHex)
+    public func createCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String, customIconData: Data? = nil, isCustomIcon: Bool = false) throws {
+        try service.addCategory(
+            name: name,
+            level: level,
+            parentId: parentId,
+            iconName: iconName,
+            colorHex: colorHex,
+            customIconData: customIconData,
+            isCustomIcon: isCustomIcon
+        )
         load()
     }
     
-    public func updateCategory(id: UUID, name: String, iconName: String, colorHex: String) throws {
-        try service.updateCategory(id: id, name: name, iconName: iconName, colorHex: colorHex)
+    public func updateCategory(id: UUID, name: String, iconName: String, colorHex: String, customIconData: Data? = nil, isCustomIcon: Bool = false) throws {
+        try service.updateCategory(
+            id: id,
+            name: name,
+            iconName: iconName,
+            colorHex: colorHex,
+            customIconData: customIconData,
+            isCustomIcon: isCustomIcon
+        )
         load()
     }
     

@@ -27,8 +27,8 @@ public protocol CategoryService {
     func fetchChildren(parentId: UUID) -> [CategoryEntity]
     
     // 增删改
-    func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String) throws
-    func updateCategory(id: UUID, name: String, iconName: String, colorHex: String) throws
+    func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String, customIconData: Data?, isCustomIcon: Bool) throws
+    func updateCategory(id: UUID, name: String, iconName: String, colorHex: String, customIconData: Data?, isCustomIcon: Bool) throws
     func deleteCategory(id: UUID) throws
     func deleteCategoryRecursively(id: UUID, mediaService: MediaStorageService) throws
     
@@ -89,7 +89,7 @@ public final class InMemoryCategoryService: CategoryService {
         return []
     }
 
-    public func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String) throws {
+    public func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String, customIconData: Data? = nil, isCustomIcon: Bool = false) throws {
         guard (1...3).contains(level) else { throw CategoryError.levelOutOfRange }
         let id = UUID()
         let new = CategoryModel(id: id, name: name, iconName: iconName, colorHex: colorHex, level: level, parentId: parentId, sortOrder: 0, createdAt: Date())
@@ -121,7 +121,7 @@ public final class InMemoryCategoryService: CategoryService {
         storyCounts[id] = 0
     }
     
-    public func updateCategory(id: UUID, name: String, iconName: String, colorHex: String) throws {
+    public func updateCategory(id: UUID, name: String, iconName: String, colorHex: String, customIconData: Data? = nil, isCustomIcon: Bool = false) throws {
         guard var category = categories[id] else {
             throw CategoryError.notFound
         }
@@ -263,7 +263,7 @@ public final class CoreDataCategoryService: CategoryService {
         }
     }
     
-    public func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String) throws {
+    public func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String, customIconData: Data? = nil, isCustomIcon: Bool = false) throws {
         // 验证层级
         guard (1...3).contains(level) else {
             throw CategoryError.levelOutOfRange
@@ -316,11 +316,20 @@ public final class CoreDataCategoryService: CategoryService {
         category.createdAt = Date()
         category.parent = parentEntity
         
+        // 设置自定义图标
+        if isCustomIcon {
+            category.iconType = "custom"
+            category.customIconData = customIconData
+        } else {
+            category.iconType = "system"
+            category.customIconData = nil
+        }
+        
         // 保存
         try context.save()
     }
     
-    public func updateCategory(id: UUID, name: String, iconName: String, colorHex: String) throws {
+    public func updateCategory(id: UUID, name: String, iconName: String, colorHex: String, customIconData: Data? = nil, isCustomIcon: Bool = false) throws {
         guard let category = fetchCategory(id: id) else {
             throw CategoryError.notFound
         }
@@ -328,6 +337,15 @@ public final class CoreDataCategoryService: CategoryService {
         category.name = name
         category.iconName = iconName
         category.colorHex = colorHex
+        
+        // 更新自定义图标
+        if isCustomIcon {
+            category.iconType = "custom"
+            category.customIconData = customIconData
+        } else {
+            category.iconType = "system"
+            category.customIconData = nil
+        }
         
         try context.save()
     }
@@ -544,7 +562,9 @@ public final class CoreDataCategoryService: CategoryService {
             level: Int(entity.level),
             parentId: entity.parent?.id,
             sortOrder: Int(entity.sortOrder),
-            createdAt: entity.createdAt
+            createdAt: entity.createdAt,
+            iconType: entity.iconType,
+            customIconData: entity.customIconData
         )
         
         // 递归构建子节点

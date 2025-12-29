@@ -165,8 +165,11 @@ public struct CategoryView: View {
     private func row(_ node: CategoryTreeNode) -> some View {
         NavigationLink(destination: CategoryStoryListView(category: node)) {
             HStack {
-                Image(systemName: node.category.iconName)
-                    .frame(width: 24)
+                CategoryIconView(
+                    model: node.category,
+                    size: 20
+                )
+                .frame(width: 24)
                 Text(node.category.name)
                 Spacer()
                 Text(String(format: "category.storyCount".localized, node.storyCount))
@@ -222,7 +225,9 @@ public struct CategoryView: View {
                     level: Int(category.level),
                     parentId: category.parent?.id,
                     sortOrder: Int(category.sortOrder),
-                    createdAt: category.createdAt
+                    createdAt: category.createdAt,
+                    iconType: category.iconType,
+                    customIconData: category.customIconData
                 ),
                 children: [],
                 isExpanded: false,
@@ -318,9 +323,12 @@ private struct CategoryListItem: View {
             }
             
             // 分类图标
-            Image(systemName: node.category.iconName)
-                .foregroundColor(Color(hex: node.category.colorHex))
-                .frame(width: 24)
+            CategoryIconView(
+                model: node.category,
+                size: 20,
+                color: Color(hex: node.category.colorHex)
+            )
+            .frame(width: 24)
             
             // 分类名称
             Text(node.category.name)

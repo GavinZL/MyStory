@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 // MARK: - Category Form View
 struct CategoryFormView: View {
@@ -26,6 +27,13 @@ struct CategoryFormView: View {
     @State private var selectedColor: String = "#007AFF"
     @State private var showError: Bool = false
     @State private var errorMessage: String = ""
+    
+    // 自定义图标相关
+    @State private var customIconData: Data?
+    @State private var isCustomIcon: Bool = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var showImageCropper: Bool = false
+    @State private var selectedImageForCrop: UIImage?
     
     // MARK: - Icon Options
     private let iconOptions = [
@@ -111,8 +119,11 @@ struct CategoryFormView: View {
     private func parentInfoSection(parent: CategoryTreeNode) -> some View {
         Section(header: Text("category.parent".localized)) {
             HStack {
-                Image(systemName: parent.category.iconName)
-                    .foregroundColor(Color(hex: parent.category.colorHex))
+                CategoryIconView(
+                    model: parent.category,
+                    size: 20,
+                    color: Color(hex: parent.category.colorHex)
+                )
                 Text(breadcrumbPath(for: parent))
                     .foregroundColor(.secondary)
             }
@@ -164,9 +175,13 @@ struct CategoryFormView: View {
     private var iconSection: some View {
         Section(header: Text("category.icon".localized)) {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: AppTheme.Spacing.l) {
+                // 系统图标
                 ForEach(iconOptions, id: \.self) { icon in
                     iconButton(icon: icon)
                 }
+                
+                // 自定义图标按钮
+                customIconButton
             }
             .padding(.vertical, AppTheme.Spacing.s)
         }
@@ -186,15 +201,17 @@ struct CategoryFormView: View {
     private func iconButton(icon: String) -> some View {
         Button {
             selectedIcon = icon
+            isCustomIcon = false  // 切换到系统图标
+            customIconData = nil
         } label: {
             ZStack {
                 Circle()
-                    .fill(selectedIcon == icon ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
+                    .fill(!isCustomIcon && selectedIcon == icon ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
                     .frame(width: 50, height: 50)
                 
                 Image(systemName: icon)
                     .font(.system(size: 24))
-                    .foregroundColor(selectedIcon == icon ? AppTheme.Colors.primary : .primary)
+                    .foregroundColor(!isCustomIcon && selectedIcon == icon ? AppTheme.Colors.primary : .primary)
             }
         }
     }
@@ -233,6 +250,51 @@ struct CategoryFormView: View {
         }
     }
     
+    // MARK: - Custom Icon Button
+    
+    /// 自定义图标按钮
+    private var customIconButton: some View {
+        PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+            ZStack {
+                Circle()
+                    .fill(isCustomIcon ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
+                    .frame(width: 50, height: 50)
+                
+                if isCustomIcon, let iconData = customIconData, let uiImage = UIImage(data: iconData) {
+                    // 显示自定义图标
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 50, height: 50)
+                        .clipShape(Circle())
+                } else {
+                    // 显示“+”号
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .onChange(of: selectedPhotoItem) { newItem in
+            Task {
+                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    selectedImageForCrop = image
+                    showImageCropper = true
+                }
+            }
+        }
+        .sheet(isPresented: $showImageCropper) {
+            if let image = selectedImageForCrop {
+                ImageCropperView(image: image) { iconData in
+                    customIconData = iconData
+                    isCustomIcon = true
+                    selectedIcon = "custom" // 标记为自定义
+                }
+            }
+        }
+    }
+    
     // MARK: - Actions
     private func saveCategory() {
         // 验证输入
@@ -259,7 +321,9 @@ struct CategoryFormView: View {
                     id: categoryId,
                     name: categoryName,
                     iconName: selectedIcon,
-                    colorHex: selectedColor
+                    colorHex: selectedColor,
+                    customIconData: customIconData,
+                    isCustomIcon: isCustomIcon
                 )
             } else {
                 // 创建模式：添加新分类
@@ -269,7 +333,9 @@ struct CategoryFormView: View {
                     level: effectiveLevelValue,
                     parentId: parentId,
                     iconName: selectedIcon,
-                    colorHex: selectedColor
+                    colorHex: selectedColor,
+                    customIconData: customIconData,
+                    isCustomIcon: isCustomIcon
                 )
             }
             dismiss()
@@ -289,6 +355,12 @@ struct CategoryFormView: View {
             selectedIcon = editing.iconName ?? "folder.fill"
             selectedColor = editing.colorHex ?? "#007AFF"
             selectedLevel = Int(editing.level)
+            
+            // 加载自定义图标
+            if let iconType = editing.iconType, iconType == "custom" {
+                isCustomIcon = true
+                customIconData = editing.customIconData
+            }
             return
         }
         

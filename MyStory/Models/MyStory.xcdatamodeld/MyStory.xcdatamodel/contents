@@ -3,7 +3,9 @@
     <entity name="CategoryEntity" representedClassName="CategoryEntity" syncable="YES">
         <attribute name="colorHex" optional="YES" attributeType="String" defaultValueString="#007AFF"/>
         <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="customIconData" optional="YES" attributeType="Binary"/>
         <attribute name="iconName" optional="NO" attributeType="String"/>
+        <attribute name="iconType" optional="NO" attributeType="String" defaultValueString="system"/>
         <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="level" optional="NO" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="name" optional="NO" attributeType="String"/>

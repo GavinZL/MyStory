@@ -18,6 +18,8 @@ extension CategoryEntity {
     @NSManaged public var name: String?
     @NSManaged public var nameEn: String?
     @NSManaged public var iconName: String?
+    @NSManaged public var iconType: String?
+    @NSManaged public var customIconData: Data?
     @NSManaged public var colorHex: String?
     @NSManaged public var level: Int16
     @NSManaged public var sortOrder: Int32

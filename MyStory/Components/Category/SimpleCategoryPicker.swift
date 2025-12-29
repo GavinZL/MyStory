@@ -132,8 +132,11 @@ private struct CategoryPickerSection: View {
             }
         } label: {
             HStack {
-                Image(systemName: node.category.iconName)
-                    .foregroundColor(Color(hex: node.category.colorHex))
+                CategoryIconView(
+                    model: node.category,
+                    size: 20,
+                    color: Color(hex: node.category.colorHex)
+                )
                 
                 Text(node.category.name)
                     .font(.headline)
@@ -202,9 +205,12 @@ private struct CategoryPickerItem: View {
                 }
                 
                 // 分类图标
-                Image(systemName: node.category.iconName)
-                    .foregroundColor(Color(hex: node.category.colorHex))
-                    .frame(width: 24)
+                CategoryIconView(
+                    model: node.category,
+                    size: 20,
+                    color: Color(hex: node.category.colorHex)
+                )
+                .frame(width: 24)
                 
                 // 分类名称
                 Text(node.category.name)

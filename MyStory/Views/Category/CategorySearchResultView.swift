@@ -57,8 +57,11 @@ private struct CategorySearchResultItem: View {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
                 // 分类路径
                 HStack(spacing: AppTheme.Spacing.xs) {
-                    Image(systemName: result.category.iconName ?? "folder.fill")
-                        .foregroundColor(Color(hex: result.category.colorHex ?? "#007AFF"))
+                    CategoryIconView(
+                        entity: result.category,
+                        size: 20,
+                        color: Color(hex: result.category.colorHex ?? "#007AFF")
+                    )
                     
                     Text(result.categoryPath)
                         .font(AppTheme.Typography.headline)

@@ -21,9 +21,10 @@ public struct CategoryCardView: View {
                 RoundedRectangle(cornerRadius: AppTheme.Radius.m)
                     .fill(Color(UIColor.secondarySystemBackground))
                     .frame(height: 100)
-                Image(systemName: node.category.iconName)
-                    .font(.system(size: 42))
-                    .foregroundColor(AppTheme.Colors.primary)
+                CategoryIconView(
+                    model: node.category,
+                    size: 42
+                )
             }
             Text(node.category.name)
                 .font(.headline)

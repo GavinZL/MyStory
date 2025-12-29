@@ -31,6 +31,11 @@
 		1F9A66AC2EF66A1400DCE674 /* RichTextEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9A66AB2EF66A1400DCE674 /* RichTextEditorView.swift */; };
 		1F9A66AE2EF6F2A100DCE674 /* FontSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9A66AD2EF6F2A100DCE674 /* FontSettingsSheet.swift */; };
 		1FC731452EDC59D2005EF8DC /* CategoryEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC731442EDC59D2005EF8DC /* CategoryEntity+CoreDataClass.swift */; };
+		1FD7248D2F02B31900F46B20 /* ImageCropperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD7248C2F02B31900F46B20 /* ImageCropperView.swift */; };
+		1FD7248F2F02B34900F46B20 /* CategoryIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD7248E2F02B34900F46B20 /* CategoryIconView.swift */; };
+		1FD724912F02B3A200F46B20 /* ImageCropperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD724902F02B3A200F46B20 /* ImageCropperViewModel.swift */; };
+		1FD724932F02B3C500F46B20 /* CustomIconHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD724922F02B3C500F46B20 /* CustomIconHelper.swift */; };
+		1FD724952F02B3F700F46B20 /* CropShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD724942F02B3F700F46B20 /* CropShape.swift */; };
 		1FDA9BDE2EDF16A900818D62 /* CategoryLevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9BDD2EDF16A900818D62 /* CategoryLevelView.swift */; };
 		1FDA9BE02EDF22D700818D62 /* SimpleCategoryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9BDF2EDF22D700818D62 /* SimpleCategoryPicker.swift */; };
 		1FDA9BE22EDF23C500818D62 /* StoryEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FDA9BE12EDF23C500818D62 /* StoryEntity+CoreDataProperties.swift */; };
@@ -89,6 +94,11 @@
 		1F9A66AB2EF66A1400DCE674 /* RichTextEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextEditorView.swift; sourceTree = "<group>"; };
 		1F9A66AD2EF6F2A100DCE674 /* FontSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettingsSheet.swift; sourceTree = "<group>"; };
 		1FC731442EDC59D2005EF8DC /* CategoryEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CategoryEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		1FD7248C2F02B31900F46B20 /* ImageCropperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperView.swift; sourceTree = "<group>"; };
+		1FD7248E2F02B34900F46B20 /* CategoryIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconView.swift; sourceTree = "<group>"; };
+		1FD724902F02B3A200F46B20 /* ImageCropperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperViewModel.swift; sourceTree = "<group>"; };
+		1FD724922F02B3C500F46B20 /* CustomIconHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomIconHelper.swift; sourceTree = "<group>"; };
+		1FD724942F02B3F700F46B20 /* CropShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropShape.swift; sourceTree = "<group>"; };
 		1FDA9BDD2EDF16A900818D62 /* CategoryLevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryLevelView.swift; sourceTree = "<group>"; };
 		1FDA9BDF2EDF22D700818D62 /* SimpleCategoryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleCategoryPicker.swift; sourceTree = "<group>"; };
 		1FDA9BE12EDF23C500818D62 /* StoryEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StoryEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -187,6 +197,7 @@
 		1F7FA2C72ED33C9E004D91C4 /* Category */ = {
 			isa = PBXGroup;
 			children = (
+				1FD724942F02B3F700F46B20 /* CropShape.swift */,
 				1F7FA2C62ED33C9E004D91C4 /* CategoryModel.swift */,
 			);
 			path = Category;
@@ -206,6 +217,7 @@
 		1F7FA2D52ED33CEE004D91C4 /* Category */ = {
 			isa = PBXGroup;
 			children = (
+				1FD7248E2F02B34900F46B20 /* CategoryIconView.swift */,
 				1FDA9BDF2EDF22D700818D62 /* SimpleCategoryPicker.swift */,
 				1F7FA2D42ED33CEE004D91C4 /* CategoryCardView.swift */,
 			);
@@ -255,6 +267,7 @@
 		1F7FA2EC2ED34066004D91C4 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				1FD724902F02B3A200F46B20 /* ImageCropperViewModel.swift */,
 				1F7FA2EB2ED34066004D91C4 /* AIPolishViewModel.swift */,
 			);
 			path = Editor;
@@ -389,6 +402,7 @@
 		E600000008 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				1FD724922F02B3C500F46B20 /* CustomIconHelper.swift */,
 				1FDA9BEB2EE05D4000818D62 /* LocalizationManager.swift */,
 				1FDA9BEC2EE05D4000818D62 /* String+Localization.swift */,
 				1F7FA2D02ED33CD3004D91C4 /* MarkdownProcessor.swift */,
@@ -435,6 +449,7 @@
 		E700000006 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				1FD7248C2F02B31900F46B20 /* ImageCropperView.swift */,
 				1F9A66A62EF6554B00DCE674 /* NewStoryEditorView.swift */,
 				1F7FA2E72ED33D42004D91C4 /* AIPolishView.swift */,
 				E200000008 /* StoryEditorView.swift */,
@@ -538,6 +553,7 @@
 				E100000006 /* TimelineViewModel.swift in Sources */,
 				E100000007 /* FullScreenStoryView.swift in Sources */,
 				E100000008 /* StoryEditorView.swift in Sources */,
+				1FD724952F02B3F700F46B20 /* CropShape.swift in Sources */,
 				1F7FA2D82ED33CEE004D91C4 /* CategoryCardView.swift in Sources */,
 				1FDA9BE02EDF22D700818D62 /* SimpleCategoryPicker.swift in Sources */,
 				1F7FA2CC2ED33C9E004D91C4 /* SearchHistoryItem.swift in Sources */,
@@ -545,6 +561,7 @@
 				1F7FA2CD2ED33C9E004D91C4 /* LocationInfo.swift in Sources */,
 				1F9A66AE2EF6F2A100DCE674 /* FontSettingsSheet.swift in Sources */,
 				1F7FA2CE2ED33C9E004D91C4 /* CategoryModel.swift in Sources */,
+				1FD724932F02B3C500F46B20 /* CustomIconHelper.swift in Sources */,
 				1FDA9BFF2EE06D6900818D62 /* CategorySearchResultView.swift in Sources */,
 				1F7FA2E22ED33D23004D91C4 /* CategoryListView.swift in Sources */,
 				1FDA9BE22EDF23C500818D62 /* StoryEntity+CoreDataProperties.swift in Sources */,
@@ -552,16 +569,19 @@
 				1F7FA2EF2ED34066004D91C4 /* AIPolishViewModel.swift in Sources */,
 				1F7FA2E42ED33D23004D91C4 /* SettingsView.swift in Sources */,
 				1F7FA2E62ED33D23004D91C4 /* CategoryView.swift in Sources */,
+				1FD724912F02B3A200F46B20 /* ImageCropperViewModel.swift in Sources */,
 				1F7FA2CF2ED33C9E004D91C4 /* StoryModel.swift in Sources */,
 				E100000009 /* StoryCardView.swift in Sources */,
 				1F7FA2A62ED33A99004D91C4 /* PersistenceController.swift in Sources */,
 				1FF01B202ED71AB400EDDEE4 /* CategoryStoryListView.swift in Sources */,
+				1FD7248D2F02B31900F46B20 /* ImageCropperView.swift in Sources */,
 				1FF01B212ED71AB400EDDEE4 /* CategoryFormView.swift in Sources */,
 				1F7FA2A72ED33A99004D91C4 /* KeychainStore.swift in Sources */,
 				1FDA9BE72EDF254B00818D62 /* StoryEntity+CoreDataClass.swift in Sources */,
 				1FDA9BE82EDF254B00818D62 /* MediaEntity+CoreDataProperties.swift in Sources */,
 				1FDA9BFB2EE063EA00818D62 /* AppTheme.swift in Sources */,
 				1FDA9BE92EDF254B00818D62 /* MediaEntity+CoreDataClass.swift in Sources */,
+				1FD7248F2F02B34900F46B20 /* CategoryIconView.swift in Sources */,
 				1FDA9BEA2EDF254B00818D62 /* CategoryEntity+CoreDataProperties.swift in Sources */,
 				E10000000E /* VideoPlayerView.swift in Sources */,
 				E10000000F /* VideoTransferable.swift in Sources */,
