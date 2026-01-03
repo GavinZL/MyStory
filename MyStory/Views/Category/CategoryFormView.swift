@@ -37,9 +37,9 @@ struct CategoryFormView: View {
     
     // MARK: - Icon Options
     private let iconOptions = [
-        "folder.fill", "folder", "star.fill", "heart.fill",
-        "house.fill", "briefcase.fill", "book.fill", "leaf.fill",
-        "tag.fill", "pencil", "camera.fill", "person.fill"
+        "bear", "duck", "flower", "light-bulb-on",
+        "thumb-up", "sparkles-alt", "biceps", "face",
+        "film-roll-alt", "groceries", "happy-beaming", "message-bubble-dots"
     ]
     
     private let colorOptions = [
@@ -209,8 +209,10 @@ struct CategoryFormView: View {
                     .fill(!isCustomIcon && selectedIcon == icon ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
                     .frame(width: 50, height: 50)
                 
-                Image(systemName: icon)
-                    .font(.system(size: 24))
+                Image(icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
                     .foregroundColor(!isCustomIcon && selectedIcon == icon ? AppTheme.Colors.primary : .primary)
             }
             .contentShape(Circle())
