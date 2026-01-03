@@ -213,7 +213,9 @@ struct CategoryFormView: View {
                     .font(.system(size: 24))
                     .foregroundColor(!isCustomIcon && selectedIcon == icon ? AppTheme.Colors.primary : .primary)
             }
+            .contentShape(Circle())
         }
+        .buttonStyle(.plain)
     }
     
     private func colorButton(color: String) -> some View {
@@ -231,7 +233,9 @@ struct CategoryFormView: View {
                         .foregroundColor(.white)
                 }
             }
+            .contentShape(Circle())
         }
+        .buttonStyle(.plain)
     }
     
     @ToolbarContentBuilder

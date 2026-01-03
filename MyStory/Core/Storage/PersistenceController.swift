@@ -52,13 +52,30 @@ class PersistenceController: ObservableObject {
             // 内存模式，用于测试和预览
             container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
         }
+
+
+//        #if DEBUG
+        // ⚠️ 临时：强制删除旧数据库
+        if let storeURL = container.persistentStoreDescriptions.first?.url {
+            try? FileManager.default.removeItem(at: storeURL)
+            try? FileManager.default.removeItem(at: URL(fileURLWithPath: storeURL.path + "-wal"))
+            try? FileManager.default.removeItem(at: URL(fileURLWithPath: storeURL.path + "-shm"))
+            print("🗑️ 已删除旧数据库")
+        }
+//        #endif
         
         // 配置持久化存储
         container.persistentStoreDescriptions.first?.setOption(true as NSNumber,
                                                                 forKey: NSPersistentHistoryTrackingKey)
         container.persistentStoreDescriptions.first?.setOption(true as NSNumber,
                                                                 forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
-        
+
+        // ✅ 新增：启用轻量级迁移
+        container.persistentStoreDescriptions.first?.setOption(true as NSNumber,
+                                                                forKey: NSMigratePersistentStoresAutomaticallyOption)
+        container.persistentStoreDescriptions.first?.setOption(true as NSNumber,
+                                                                forKey: NSInferMappingModelAutomaticallyOption)
+
         container.loadPersistentStores { description, error in
             if let error = error as NSError? {
                 fatalError("无法加载Core Data存储: \(error), \(error.userInfo)")

@@ -2,18 +2,16 @@
 //  CategoryEntity+CoreDataClass.swift
 //  MyStory
 //
-//  Category实体类
+//  Created by BIGO on 2026/1/3.
+//
 //
 
-import Foundation
-import CoreData
+public import Foundation
+public import CoreData
+
+public typealias CategoryEntityCoreDataClassSet = NSSet
 
 @objc(CategoryEntity)
-public class CategoryEntity: NSManagedObject, Identifiable {
-    
-    // 可以在这里添加自定义业务逻辑方法
-    // 例如：
-    // func toModel() -> CategoryModel { ... }
-    // func hasChildren() -> Bool { ... }
-    
+public class CategoryEntity: NSManagedObject {
+
 }

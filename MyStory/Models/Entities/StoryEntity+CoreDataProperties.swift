@@ -2,11 +2,15 @@
 //  StoryEntity+CoreDataProperties.swift
 //  MyStory
 //
-//  Story实体属性
+//  Created by BIGO on 2026/1/3.
+//
 //
 
-import Foundation
-import CoreData
+public import Foundation
+public import CoreData
+
+
+public typealias StoryEntityCoreDataPropertiesSet = NSSet
 
 extension StoryEntity {
 
@@ -14,21 +18,21 @@ extension StoryEntity {
         return NSFetchRequest<StoryEntity>(entityName: "StoryEntity")
     }
 
-    @NSManaged public var id: UUID?
-    @NSManaged public var title: String?
     @NSManaged public var content: String?
-    @NSManaged public var plainTextContent: String?
-    @NSManaged public var timestamp: Date
-    @NSManaged public var createdAt: Date
-    @NSManaged public var updatedAt: Date
-    @NSManaged public var locationName: String?
+    @NSManaged public var createdAt: Date?
+    @NSManaged public var id: UUID?
+    @NSManaged public override var isDeleted: Bool
+    @NSManaged public var latitude: Double
     @NSManaged public var locationAddress: String?
     @NSManaged public var locationCity: String?
-    @NSManaged public var latitude: Double
+    @NSManaged public var locationName: String?
     @NSManaged public var longitude: Double
     @NSManaged public var mood: String?
+    @NSManaged public var plainTextContent: String?
     @NSManaged public var syncStatus: Int16
-    @NSManaged public override var isDeleted: Bool
+    @NSManaged public var timestamp: Date?
+    @NSManaged public var title: String?
+    @NSManaged public var updatedAt: Date?
     @NSManaged public var categories: NSSet?
     @NSManaged public var media: NSSet?
 
@@ -67,4 +71,3 @@ extension StoryEntity {
     @NSManaged public func removeFromMedia(_ values: NSSet)
 
 }
-

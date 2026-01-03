@@ -128,7 +128,7 @@ struct CategoryStoryListView: View {
                 level: Int(categoryEntity.level),
                 parentId: categoryEntity.parent?.id,
                 sortOrder: Int(categoryEntity.sortOrder),
-                createdAt: categoryEntity.createdAt
+                createdAt: categoryEntity.createdAt ?? Date()
             ),
             children: [],
             isExpanded: false,
@@ -140,17 +140,17 @@ struct CategoryStoryListView: View {
     private func dateHeaderView(for story: StoryEntity) -> some View {
         HStack(alignment: .center, spacing: AppTheme.Spacing.s) {
             // 大号日期数字
-            Text(formatDayNumber(story.timestamp))
+            Text(formatDayNumber(story.timestamp!))
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
             // 小号年月时分 + 星期
             VStack(alignment: .leading, spacing: 2) {
-                Text(formatYearMonth(story.timestamp))
+                Text(formatYearMonth(story.timestamp!))
                     .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.textSecondary)
                 
-                Text(formatTime(story.timestamp))
+                Text(formatTime(story.timestamp!))
                     .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }

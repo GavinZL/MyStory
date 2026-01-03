@@ -523,7 +523,7 @@ public final class CoreDataCategoryService: CategoryService {
             // 如果分类名称匹配或有故事匹配，添加到结果
             if categoryNameMatch || !matchedStories.isEmpty {
                 // ⚠️ 异常处理：检查分类对象是否有效
-                guard let categoryId = category.id else {
+                guard category.id != nil else {
                     print("⚠️ [CategoryService] Skipping category with nil id")
                     continue
                 }
@@ -562,7 +562,7 @@ public final class CoreDataCategoryService: CategoryService {
             level: Int(entity.level),
             parentId: entity.parent?.id,
             sortOrder: Int(entity.sortOrder),
-            createdAt: entity.createdAt,
+            createdAt: entity.createdAt ?? Date(),
             iconType: entity.iconType,
             customIconData: entity.customIconData
         )

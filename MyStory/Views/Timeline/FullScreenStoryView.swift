@@ -231,7 +231,7 @@ struct StoryDetailView: View {
                 level: Int(categoryEntity.level),
                 parentId: categoryEntity.parent?.id,
                 sortOrder: Int(categoryEntity.sortOrder),
-                createdAt: categoryEntity.createdAt
+                createdAt: categoryEntity.createdAt ?? Date()
             ),
             children: [],
             isExpanded: false,
@@ -242,7 +242,7 @@ struct StoryDetailView: View {
     // MARK: - Media Properties
     private var mediaList: [MediaEntity] {
         guard let medias = story.media as? Set<MediaEntity> else { return [] }
-        return medias.sorted { $0.createdAt < $1.createdAt }
+        return medias.sorted { $0.createdAt! < $1.createdAt! }
     }
     
     private var imageMediaList: [MediaEntity] {
@@ -309,7 +309,7 @@ struct StoryDetailView: View {
                 Image(systemName: "clock")
                     .font(.system(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
-                Text(formatFullDateTime(story.timestamp))
+                Text(formatFullDateTime(story.timestamp!))
                     .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }

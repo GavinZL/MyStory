@@ -12,11 +12,23 @@ final class CoreDataStack: ObservableObject {
         description.type = NSSQLiteStoreType
         description.shouldAddStoreAsynchronously = false
         description.url = Self.defaultStoreURL()
+        
+        #if DEBUG
+        // ⚠️ 临时：强制删除旧数据库（模型结构变更时使用）
+        if let storeURL = description.url {
+            try? FileManager.default.removeItem(at: storeURL)
+            try? FileManager.default.removeItem(at: URL(fileURLWithPath: storeURL.path + "-wal"))
+            try? FileManager.default.removeItem(at: URL(fileURLWithPath: storeURL.path + "-shm"))
+            print("🗑️ [CoreDataStack] 已删除旧数据库: \(storeURL.lastPathComponent)")
+        }
+        #endif
+        
         persistentContainer.persistentStoreDescriptions = [description]
         persistentContainer.loadPersistentStores { _, error in
             if let error = error {
                 fatalError("Failed to load store: \(error)")
             }
+            print("✅ [CoreDataStack] 数据库加载成功")
             self.persistentContainer.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
         }
@@ -173,8 +185,21 @@ final class CoreDataStack: ObservableObject {
         c_createdAt.attributeType = .dateAttributeType
         c_createdAt.isOptional = false
         
+        // ✅ 新增：图标类型和自定义图标数据
+        let c_iconType = NSAttributeDescription()
+        c_iconType.name = "iconType"
+        c_iconType.attributeType = .stringAttributeType
+        c_iconType.isOptional = false
+        c_iconType.defaultValue = "system"
+        
+        let c_customIconData = NSAttributeDescription()
+        c_customIconData.name = "customIconData"
+        c_customIconData.attributeType = .binaryDataAttributeType
+        c_customIconData.isOptional = true
+        
         categoryEntity.properties = [
-            c_id, c_name, c_nameEn, c_iconName, c_colorHex, c_level, c_sortOrder, c_createdAt
+            c_id, c_name, c_nameEn, c_iconName, c_colorHex, c_level, c_sortOrder, c_createdAt,
+            c_iconType, c_customIconData  // ✅ 新增字段
         ]
 
         // MediaEntity

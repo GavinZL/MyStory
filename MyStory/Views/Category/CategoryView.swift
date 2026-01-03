@@ -225,7 +225,7 @@ public struct CategoryView: View {
                     level: Int(category.level),
                     parentId: category.parent?.id,
                     sortOrder: Int(category.sortOrder),
-                    createdAt: category.createdAt,
+                    createdAt: category.createdAt ?? Date(),
                     iconType: category.iconType,
                     customIconData: category.customIconData
                 ),

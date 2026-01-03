@@ -17,7 +17,7 @@ public class StoryEntity: NSManagedObject, Identifiable {
             id: id ?? UUID(),
             title: title ?? "",
             contentPreview: String((plainTextContent ?? "").prefix(100)),
-            displayTime: formatDisplayTime(timestamp),
+            displayTime: formatDisplayTime(timestamp!),
             locationDisplay: locationName ?? locationCity,
             thumbnails: [], // 需要从media关系加载
             categoryTags: [], // 需要从categories关系加载

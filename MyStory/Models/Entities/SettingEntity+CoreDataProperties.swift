@@ -2,11 +2,15 @@
 //  SettingEntity+CoreDataProperties.swift
 //  MyStory
 //
-//  Setting实体属性
+//  Created by BIGO on 2026/1/3.
+//
 //
 
-import Foundation
-import CoreData
+public import Foundation
+public import CoreData
+
+
+public typealias SettingEntityCoreDataPropertiesSet = NSSet
 
 extension SettingEntity {
 
@@ -15,8 +19,12 @@ extension SettingEntity {
     }
 
     @NSManaged public var key: String?
-    @NSManaged public var value: String?
     @NSManaged public var type: String?
     @NSManaged public var updatedAt: Date?
+    @NSManaged public var value: String?
+
+}
+
+extension SettingEntity : Identifiable {
 
 }
