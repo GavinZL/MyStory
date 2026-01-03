@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1F7FA2A62ED33A99004D91C4 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2A52ED33A99004D91C4 /* PersistenceController.swift */; };
 		1F7FA2A72ED33A99004D91C4 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2A42ED33A99004D91C4 /* KeychainStore.swift */; };
 		1F7FA2BF2ED33AD2004D91C4 /* AIPolishService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2B82ED33AD2004D91C4 /* AIPolishService.swift */; };
 		1F7FA2C02ED33AD2004D91C4 /* CategoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2BA2ED33AD2004D91C4 /* CategoryService.swift */; };
@@ -75,7 +74,6 @@
 
 /* Begin PBXFileReference section */
 		1F7FA2A42ED33A99004D91C4 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
-		1F7FA2A52ED33A99004D91C4 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		1F7FA2B82ED33AD2004D91C4 /* AIPolishService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPolishService.swift; sourceTree = "<group>"; };
 		1F7FA2BA2ED33AD2004D91C4 /* CategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryService.swift; sourceTree = "<group>"; };
 		1F7FA2C12ED33C57004D91C4 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -169,27 +167,6 @@
 				1F7FA2BA2ED33AD2004D91C4 /* CategoryService.swift */,
 			);
 			path = CategoryService;
-			sourceTree = "<group>";
-		};
-		1F7FA2BC2ED33AD2004D91C4 /* LocationService */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = LocationService;
-			sourceTree = "<group>";
-		};
-		1F7FA2BD2ED33AD2004D91C4 /* MediaService */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = MediaService;
-			sourceTree = "<group>";
-		};
-		1F7FA2BE2ED33AD2004D91C4 /* SearchService */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = SearchService;
 			sourceTree = "<group>";
 		};
 		1F7FA2C42ED33C6E004D91C4 /* Router */ = {
@@ -362,9 +339,6 @@
 			children = (
 				1F7FA2B92ED33AD2004D91C4 /* AIService */,
 				1F7FA2BB2ED33AD2004D91C4 /* CategoryService */,
-				1F7FA2BC2ED33AD2004D91C4 /* LocationService */,
-				1F7FA2BD2ED33AD2004D91C4 /* MediaService */,
-				1F7FA2BE2ED33AD2004D91C4 /* SearchService */,
 				E200000003 /* MediaStorageService.swift */,
 				E200000004 /* LocationService.swift */,
 			);
@@ -424,7 +398,6 @@
 			isa = PBXGroup;
 			children = (
 				1F7FA2A42ED33A99004D91C4 /* KeychainStore.swift */,
-				1F7FA2A52ED33A99004D91C4 /* PersistenceController.swift */,
 				E200000002 /* CoreDataStack.swift */,
 			);
 			path = Storage;
@@ -586,7 +559,6 @@
 				1F9BF5462F091270009E5A49 /* MyStory.xcdatamodeld in Sources */,
 				1F7FA2CF2ED33C9E004D91C4 /* StoryModel.swift in Sources */,
 				E100000009 /* StoryCardView.swift in Sources */,
-				1F7FA2A62ED33A99004D91C4 /* PersistenceController.swift in Sources */,
 				1FF01B202ED71AB400EDDEE4 /* CategoryStoryListView.swift in Sources */,
 				1FD7248D2F02B31900F46B20 /* ImageCropperView.swift in Sources */,
 				1FF01B212ED71AB400EDDEE4 /* CategoryFormView.swift in Sources */,

@@ -254,5 +254,5 @@ private struct CategoryPickerItem: View {
         selectedCategories: .constant([]),
         onDismiss: {}
     )
-    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    .environment(\.managedObjectContext, CoreDataStack.preview.viewContext)
 }

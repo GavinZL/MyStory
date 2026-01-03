@@ -34,6 +34,55 @@ final class CoreDataStack: ObservableObject {
         }
     }
 
+    /// 预览模式使用的临时实例
+    static var preview: CoreDataStack = {
+        let stack = CoreDataStack()
+        let viewContext = stack.viewContext
+        
+        // 创建示例分类数据用于预览
+        let category1 = CategoryEntity(context: viewContext)
+        category1.id = UUID()
+        category1.name = "生活"
+        category1.iconName = "house.fill"
+        category1.colorHex = "#007AFF"
+        category1.level = 1
+        category1.sortOrder = 0
+        category1.createdAt = Date()
+        category1.iconType = "system"
+        
+        let category2 = CategoryEntity(context: viewContext)
+        category2.id = UUID()
+        category2.name = "工作"
+        category2.iconName = "briefcase.fill"
+        category2.colorHex = "#FF9500"
+        category2.level = 1
+        category2.sortOrder = 1
+        category2.createdAt = Date()
+        category2.iconType = "system"
+        
+        // 创建示例故事数据
+        for i in 0..<5 {
+            let story = StoryEntity(context: viewContext)
+            story.id = UUID()
+            story.title = "示例故事 \(i + 1)"
+            story.content = "这是一个示例故事的内容..."
+            story.timestamp = Date().addingTimeInterval(TimeInterval(-i * 86400))
+            story.createdAt = Date()
+            story.updatedAt = Date()
+            story.plainTextContent = story.content
+            story.syncStatus = 0
+            story.isDeleted = false
+        }
+        
+        do {
+            try viewContext.save()
+        } catch {
+            print("预览数据保存失败: \(error)")
+        }
+        
+        return stack
+    }()
+    
     func save() {
         let context = viewContext
         if context.hasChanges {

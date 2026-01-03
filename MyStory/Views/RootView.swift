@@ -36,5 +36,5 @@ struct RootView: View {
 #Preview {
     RootView()
         .environmentObject(AppRouter())
-        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        .environment(\.managedObjectContext, CoreDataStack.preview.viewContext)
 }
