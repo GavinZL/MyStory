@@ -127,6 +127,65 @@ class ImageCropperViewModel: ObservableObject {
         cropRect = newRect
     }
     
+    /// 根据角点拖拽更新裁剪框尺寸（以中心点为基准等比缩放）
+    /// - Parameters:
+    ///   - originalRect: 初始裁剪框
+    ///   - scale: 缩放比例
+    func scaleCropRect(from originalRect: CGRect, scale: CGFloat) {
+        let displayScale = getScale()
+        
+        // 1. 记住原始中心点
+        let centerX = originalRect.midX
+        let centerY = originalRect.midY
+        
+        // 2. 计算新尺寸（等比缩放）
+        var newSize = originalRect.width * scale
+        
+        // 3. 限制最小尺寸
+        let minSize = minCropSize / displayScale
+        newSize = max(newSize, minSize)
+        
+        // 4. 限制最大尺寸（不超过图片）
+        let maxSize = min(originalImage.size.width, originalImage.size.height)
+        newSize = min(newSize, maxSize)
+        
+        // 5. 以中心点为基准计算新的原点
+        var newOriginX = centerX - newSize / 2
+        var newOriginY = centerY - newSize / 2
+        
+        // 6. 边界检查（优先保持尺寸，调整中心点位置）
+        if newOriginX < 0 {
+            newOriginX = 0
+        }
+        if newOriginY < 0 {
+            newOriginY = 0
+        }
+        if newOriginX + newSize > originalImage.size.width {
+            newOriginX = originalImage.size.width - newSize
+        }
+        if newOriginY + newSize > originalImage.size.height {
+            newOriginY = originalImage.size.height - newSize
+        }
+        
+        // 7. 如果尺寸超出边界，需要缩小尺寸并重新居中
+        if newSize > originalImage.size.width {
+            newSize = originalImage.size.width
+            newOriginX = 0
+        }
+        if newSize > originalImage.size.height {
+            newSize = originalImage.size.height
+            newOriginY = 0
+        }
+        
+        // 8. 更新裁剪框
+        cropRect = CGRect(
+            x: newOriginX,
+            y: newOriginY,
+            width: newSize,
+            height: newSize
+        )
+    }
+    
     /// 切换裁剪形状
     /// - Parameter shape: 新的裁剪形状
     func changeShape(_ shape: CropShape) {

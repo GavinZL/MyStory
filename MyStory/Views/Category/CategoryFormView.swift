@@ -8,6 +8,7 @@ struct CategoryFormView: View {
     @Environment(\.managedObjectContext) private var context
     
     // MARK: - Properties
+    // 外部传入
     @ObservedObject var viewModel: CategoryViewModel
     
     /// 编辑模式：要编辑的分类实体（可选）
@@ -97,6 +98,15 @@ struct CategoryFormView: View {
             }
             .onAppear {
                 setupInitialValues()
+            }
+        }
+        .sheet(isPresented: $showImageCropper) {
+            if let image = selectedImageForCrop {
+                ImageCropperView(image: image) { iconData in
+                    customIconData = iconData
+                    isCustomIcon = true
+                    selectedIcon = "custom"
+                }
             }
         }
     }
@@ -285,17 +295,11 @@ struct CategoryFormView: View {
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
-                    selectedImageForCrop = image
-                    showImageCropper = true
-                }
-            }
-        }
-        .sheet(isPresented: $showImageCropper) {
-            if let image = selectedImageForCrop {
-                ImageCropperView(image: image) { iconData in
-                    customIconData = iconData
-                    isCustomIcon = true
-                    selectedIcon = "custom" // 标记为自定义
+                    // ✅ 将所有状态更新都放在 MainActor 中
+                    await MainActor.run {
+                        selectedImageForCrop = image
+                        showImageCropper = true
+                    }
                 }
             }
         }

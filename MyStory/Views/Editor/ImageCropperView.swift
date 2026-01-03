@@ -17,8 +17,9 @@ struct ImageCropperView: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @GestureState private var dragOffset: CGSize = .zero
-    @State private var currentScale: CGFloat = 1.0
-    @GestureState private var gestureScale: CGFloat = 1.0
+    @GestureState private var cornerDragOffset: CGSize = .zero
+    @State private var isDraggingCorner = false
+    @State private var initialCropRect: CGRect? = nil
     
     // MARK: - Initialization
     init(image: UIImage, onComplete: @escaping (Data) -> Void) {
@@ -28,7 +29,7 @@ struct ImageCropperView: View {
     
     // MARK: - Body
     var body: some View {
-        NavigationView {
+       NavigationView {
             VStack(spacing: 0) {
                 // 图片裁剪区域
                 imageEditorSection
@@ -62,7 +63,7 @@ struct ImageCropperView: View {
             } message: {
                 Text(errorMessage)
             }
-        }
+       }
     }
     
     // MARK: - View Components
@@ -86,7 +87,6 @@ struct ImageCropperView: View {
                 // 裁剪框
                 cropFrameView
                     .gesture(dragGesture)
-                    .gesture(magnificationGesture)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -119,8 +119,20 @@ struct ImageCropperView: View {
     private var cropFrameView: some View {
         GeometryReader { geometry in
             let cropRect = viewModel.getDisplayCropRect()
+            let effectiveOffset = isDraggingCorner ? .zero : dragOffset
             
             ZStack {
+                // 透明交互层（用于捕获框内拖拽手势）
+                if viewModel.selectedShape == .rectangle {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.001))
+                        .contentShape(Rectangle())
+                } else {
+                    Circle()
+                        .fill(Color.white.opacity(0.001))
+                        .contentShape(Circle())
+                }
+                
                 // 裁剪框边框
                 if viewModel.selectedShape == .rectangle {
                     Rectangle()
@@ -135,8 +147,8 @@ struct ImageCropperView: View {
             }
             .frame(width: cropRect.width, height: cropRect.height)
             .position(
-                x: cropRect.midX + dragOffset.width,
-                y: cropRect.midY + dragOffset.height
+                x: cropRect.midX + effectiveOffset.width,
+                y: cropRect.midY + effectiveOffset.height
             )
         }
     }
@@ -148,30 +160,23 @@ struct ImageCropperView: View {
             
             Group {
                 // 左上角
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: size, height: size)
+                cornerIndicator(size: size)
                     .position(x: 0, y: 0)
-                
-                // 右上角
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: size, height: size)
-                    .position(x: geo.size.width, y: 0)
-                
-                // 左下角
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: size, height: size)
-                    .position(x: 0, y: geo.size.height)
+                    .highPriorityGesture(cornerDragGesture)
                 
                 // 右下角
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: size, height: size)
+                cornerIndicator(size: size)
                     .position(x: geo.size.width, y: geo.size.height)
+                    .highPriorityGesture(cornerDragGesture)
             }
         }
+    }
+    
+    /// 单个角落指示器
+    private func cornerIndicator(size: CGFloat) -> some View {
+        Circle()
+            .fill(Color.white)
+            .frame(width: size, height: size)
     }
     
     /// 形状选择器
@@ -224,27 +229,43 @@ struct ImageCropperView: View {
     
     // MARK: - Gestures
     
-    /// 拖拽手势
+    /// 拖拽手势（移动裁剪框）
     private var dragGesture: some Gesture {
         DragGesture()
             .updating($dragOffset) { value, state, _ in
-                state = value.translation
+                if !isDraggingCorner {
+                    state = value.translation
+                }
             }
             .onEnded { value in
-                viewModel.updateCropPosition(translation: value.translation)
+                if !isDraggingCorner {
+                    viewModel.updateCropPosition(translation: value.translation)
+                }
             }
     }
     
-    /// 缩放手势
-    private var magnificationGesture: some Gesture {
-        MagnificationGesture()
-            .updating($gestureScale) { value, state, _ in
-                state = value
+    /// 角点拖拽手势（缩放裁剪框）
+    private var cornerDragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                isDraggingCorner = true
+                
+                // 记录初始状态
+                if initialCropRect == nil {
+                    initialCropRect = viewModel.cropRect
+                }
+                
+                // 计算缩放比例
+                let displayScale = viewModel.displayImageSize.width / viewModel.originalImage.size.width
+                let dragDistance = (value.translation.width + value.translation.height) / 2
+                let scale = 1.0 + (dragDistance / (initialCropRect!.width * displayScale))
+                
+                // 应用缩放
+                viewModel.scaleCropRect(from: initialCropRect!, scale: scale)
             }
-            .onEnded { value in
-                let newScale = currentScale * value
-                viewModel.updateCropSize(scale: newScale)
-                currentScale = newScale
+            .onEnded { _ in
+                isDraggingCorner = false
+                initialCropRect = nil
             }
     }
     
