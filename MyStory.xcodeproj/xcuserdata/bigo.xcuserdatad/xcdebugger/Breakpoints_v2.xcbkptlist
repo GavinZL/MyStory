@@ -128,7 +128,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "448"
             endingLineNumber = "448"
-            landmarkName = "bottomToolbar"
+            landmarkName = "categorySection"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
@@ -144,7 +144,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "459"
             endingLineNumber = "459"
-            landmarkName = "bottomToolbar"
+            landmarkName = "categorySection"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
@@ -498,6 +498,36 @@
             endingLineNumber = "240"
             landmarkName = "ImageCropperView"
             landmarkType = "14">
+            <Locations>
+               <Location
+                  uuid = "0A2F2A7E-0120-4E09-8B31-7BD3AC5E119B - 920199947120ce31"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "MyStory.ImageCropperView.dragGesture.getter : some"
+                  moduleName = "MyStory.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/LiSSD/ProjectT/App/MyStory/MyStory/Views/Editor/ImageCropperView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "240"
+                  endingLineNumber = "240">
+               </Location>
+               <Location
+                  uuid = "0A2F2A7E-0120-4E09-8B31-7BD3AC5E119B - 184b559084c60d5d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (SwiftUI.DragGesture.Value) -&gt; () in MyStory.ImageCropperView.dragGesture.getter : some"
+                  moduleName = "MyStory.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/LiSSD/ProjectT/App/MyStory/MyStory/Views/Editor/ImageCropperView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "241"
+                  endingLineNumber = "241">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -560,8 +590,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "409"
             endingLineNumber = "409"
-            landmarkName = "accuracyIndicator(for:)"
-            landmarkType = "7">
+            landmarkName = "locationSection"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -576,8 +606,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "353"
             endingLineNumber = "353"
-            landmarkName = "locationSection"
-            landmarkType = "24">
+            landmarkName = "NewStoryEditorView"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -593,6 +623,38 @@
             startingLineNumber = "389"
             endingLineNumber = "389"
             landmarkName = "locationSection"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "366B079F-5C50-4FE8-A8DE-4E1EFF284E7F"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MyStory/Views/Editor/NewStoryEditorView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "436"
+            endingLineNumber = "436"
+            landmarkName = "NewStoryEditorView"
+            landmarkType = "14">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "05689036-399A-46F4-928E-D91EE885F280"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MyStory/Views/Editor/NewStoryEditorView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "568"
+            endingLineNumber = "568"
+            landmarkName = "bottomToolbar"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>

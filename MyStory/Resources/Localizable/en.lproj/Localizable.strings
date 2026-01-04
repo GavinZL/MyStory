@@ -50,6 +50,7 @@
 // MARK: - Category
 "category.title" = "Categories";
 "category.new" = "New Category";
+"category.default" = "Default";
 "category.level" = "Level";
 "category.parent" = "Parent Category";
 "category.selectParent" = "Select Parent";

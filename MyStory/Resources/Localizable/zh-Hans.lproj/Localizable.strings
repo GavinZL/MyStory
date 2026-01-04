@@ -50,6 +50,7 @@
 // MARK: - Category
 "category.title" = "分类";
 "category.new" = "新建分类";
+"category.default" = "默认分类";
 "category.level" = "层级";
 "category.parent" = "父分类";
 "category.selectParent" = "选择父分类";

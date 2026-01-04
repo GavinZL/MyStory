@@ -50,6 +50,11 @@ struct NewStoryEditorView: View {
                 .presentationDetents([.height(200)])
                 .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $viewModel.showCategoryPicker) {
+            SimpleCategoryPicker(selectedCategories: $viewModel.categorySelectionSet) {
+                viewModel.applySelectedCategory()
+            }
+        }
         .withLoadingIndicator()
     }
     
@@ -106,6 +111,7 @@ struct NewStoryEditorView: View {
                 textEditorSection
                 mediaSection
                 locationSection
+                categorySection
             }
             .padding(.horizontal, AppTheme.Spacing.l)
             .padding(.vertical, AppTheme.Spacing.xl)
@@ -427,6 +433,45 @@ struct NewStoryEditorView: View {
         }
     }
     
+    // MARK: - Category Section
+    
+    private var categorySection: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
+            Button {
+                viewModel.showCategoryPicker = true
+            } label: {
+                HStack(spacing: AppTheme.Spacing.m) {
+                    // 分类图标
+                    if let category = viewModel.selectedCategory {
+                        CategoryIconView(
+                            entity: category,
+                            size: 24,
+                            color: Color(hex: viewModel.categoryColorHex)
+                        )
+                    } else {
+                        Image(systemName: viewModel.categoryIconName)
+                            .font(.system(size: 24))
+                            .foregroundColor(Color(hex: viewModel.categoryColorHex))
+                    }
+                    
+                    // 分类名称
+                    Text(viewModel.categoryDisplayText)
+                        .font(AppTheme.Typography.subheadline)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    
+                    Spacer()
+                    
+                    // 右侧箭头
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+                .padding(.vertical, AppTheme.Spacing.s)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+    
     // MARK: - Bottom Toolbar
     
     private var bottomToolbar: some View {
@@ -523,11 +568,6 @@ struct NewStoryEditorView: View {
             .padding(.horizontal, AppTheme.Spacing.l)
             .padding(.vertical, AppTheme.Spacing.s)
             .background(AppTheme.Colors.surface.ignoresSafeArea(edges: .bottom))
-        }
-        .sheet(isPresented: $viewModel.showCategoryPicker) {
-            SimpleCategoryPicker(selectedCategories: $viewModel.categorySelectionSet) {
-                viewModel.applySelectedCategory()
-            }
         }
         .sheet(isPresented: $viewModel.showFontSettings) {
             FontSettingsSheet(
@@ -776,6 +816,31 @@ final class NewStoryEditorViewModel: ObservableObject {
     }
     
     // MARK: - Category
+    
+    /// 获取当前选中的分类实体
+    var selectedCategory: CategoryEntity? {
+        guard let context = context, let categoryId = selectedCategoryId else { return nil }
+        let service = CoreDataCategoryService(context: context)
+        return service.fetchCategory(id: categoryId)
+    }
+    
+    /// 分类显示文本
+    var categoryDisplayText: String {
+        if let category = selectedCategory {
+            return category.name ?? "category.default".localized
+        }
+        return "category.default".localized
+    }
+    
+    /// 分类图标名称
+    var categoryIconName: String {
+        selectedCategory?.iconName ?? "folder.fill"
+    }
+    
+    /// 分类颜色
+    var categoryColorHex: String {
+        selectedCategory?.colorHex ?? "#007AFF"
+    }
     
     func applySelectedCategory() {
         if let first = categorySelectionSet.first {
