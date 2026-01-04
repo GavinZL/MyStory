@@ -20,6 +20,7 @@ extension StoryEntity {
 
     @NSManaged public var content: String?
     @NSManaged public var createdAt: Date?
+    @NSManaged public var horizontalAccuracy: Double
     @NSManaged public var id: UUID?
     @NSManaged public override var isDeleted: Bool
     @NSManaged public var latitude: Double
@@ -33,6 +34,7 @@ extension StoryEntity {
     @NSManaged public var timestamp: Date?
     @NSManaged public var title: String?
     @NSManaged public var updatedAt: Date?
+    @NSManaged public var verticalAccuracy: Double
     @NSManaged public var categories: NSSet?
     @NSManaged public var media: NSSet?
 

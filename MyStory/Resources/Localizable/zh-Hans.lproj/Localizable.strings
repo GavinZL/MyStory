@@ -39,6 +39,14 @@
 "story.locationSelected" = "已选择位置";
 "story.videoLoading" = "正在加载视频...";
 
+// Location
+"location.accuracy" = "精度";
+"location.fetching" = "正在获取位置...";
+"location.failed" = "获取位置失败";
+"location.accuracy.high" = "高";
+"location.accuracy.medium" = "中";
+"location.accuracy.low" = "低";
+
 // MARK: - Category
 "category.title" = "分类";
 "category.new" = "新建分类";

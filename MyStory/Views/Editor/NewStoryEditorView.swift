@@ -108,8 +108,7 @@ struct NewStoryEditorView: View {
                 locationSection
             }
             .padding(.horizontal, AppTheme.Spacing.l)
-            .padding(.top, AppTheme.Spacing.l)
-            .padding(.bottom, AppTheme.Spacing.xl)
+            .padding(.vertical, AppTheme.Spacing.xl)
         }
     }
     
@@ -348,18 +347,48 @@ struct NewStoryEditorView: View {
     
     private var locationSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
-            if let _ = viewModel.locationInfo {
-                HStack {
-                    Label(viewModel.locationDisplayText, systemImage: "mappin.circle.fill")
-                        .foregroundColor(AppTheme.Colors.primary)
-                        .font(AppTheme.Typography.subheadline)
-                    Spacer()
-                    Button {
-                        viewModel.clearLocation()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.secondary)
+            if let locationInfo = viewModel.locationInfo {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                    // 主要位置信息
+                    HStack {
+                        HStack(alignment: .top, spacing: 2) {
+                            Label(viewModel.locationDisplayText, systemImage: "mappin.circle.fill")
+                                .foregroundColor(AppTheme.Colors.primary)
+                                .font(AppTheme.Typography.subheadline)
+                            
+                            // 次要地址信息（高精度时显示）
+                            if let secondary = viewModel.locationSecondaryText {
+                                Text(secondary)
+                                    .font(AppTheme.Typography.caption)
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                                    .lineLimit(1)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        Button {
+                            viewModel.clearLocation()
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
                     }
+                    
+                    // 精度信息
+                    HStack(spacing: AppTheme.Spacing.xs) {
+                        Image(systemName: "scope")
+                            .font(.caption2)
+                        Text("location.accuracy".localized)
+                            .font(AppTheme.Typography.caption)
+                        Text(String(format: "±%.0fm", locationInfo.horizontalAccuracy))
+                            .font(AppTheme.Typography.caption)
+                            .fontWeight(.medium)
+                        
+                        // 精度指示器
+                        accuracyIndicator(for: locationInfo.horizontalAccuracy)
+                    }
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             } else {
                 Button {
@@ -370,6 +399,31 @@ struct NewStoryEditorView: View {
                 }
                 .foregroundColor(AppTheme.Colors.primary)
             }
+        }
+    }
+    
+    // MARK: - Accuracy Indicator
+    
+    @ViewBuilder
+    private func accuracyIndicator(for accuracy: Double) -> some View {
+        if accuracy < 20 {
+            Text("·")
+                .foregroundColor(.green)
+            Text("location.accuracy.high".localized)
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(.green)
+        } else if accuracy < 100 {
+            Text("·")
+                .foregroundColor(.orange)
+            Text("location.accuracy.medium".localized)
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(.orange)
+        } else {
+            Text("·")
+                .foregroundColor(.red)
+            Text("location.accuracy.low".localized)
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(.red)
         }
     }
     
@@ -561,6 +615,8 @@ final class NewStoryEditorViewModel: ObservableObject {
                 locationInfo = LocationInfo(
                     latitude: story.latitude,
                     longitude: story.longitude,
+                    horizontalAccuracy: story.horizontalAccuracy,
+                    verticalAccuracy: story.verticalAccuracy,
                     name: story.locationName,
                     address: story.locationAddress,
                     city: city,
@@ -695,18 +751,23 @@ final class NewStoryEditorViewModel: ObservableObject {
     // MARK: - Location
     
     var locationDisplayText: String {
-        if let city = locationInfo?.city {
-            return city
-        }
-        if let name = locationInfo?.name {
-            return name
-        }
-        return "story.locationSelected".localized
+        locationInfo?.displayTextByAccuracy ?? "story.locationSelected".localized
+    }
+    
+    var locationSecondaryText: String? {
+        locationInfo?.secondaryAddressText
     }
     
     func fetchCurrentLocation() {
+        // 显示加载提示
+        LoadingIndicatorManager.shared.show(message: "location.fetching".localized)
+        
         locationService.requestCurrentLocation { [weak self] info in
-            self?.locationInfo = info
+            // 隐藏加载提示
+            DispatchQueue.main.async {
+                LoadingIndicatorManager.shared.hide()
+                self?.locationInfo = info
+            }
         }
     }
     
@@ -771,6 +832,8 @@ final class NewStoryEditorViewModel: ObservableObject {
         story.locationCity = info.city
         story.latitude = info.latitude
         story.longitude = info.longitude
+        story.horizontalAccuracy = info.horizontalAccuracy
+        story.verticalAccuracy = info.verticalAccuracy
     }
     
     private func updateStoryCategories(_ story: StoryEntity, in context: NSManagedObjectContext) {

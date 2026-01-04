@@ -64,7 +64,6 @@
 		E100000005 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000005 /* TimelineView.swift */; };
 		E100000006 /* TimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000006 /* TimelineViewModel.swift */; };
 		E100000007 /* FullScreenStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000007 /* FullScreenStoryView.swift */; };
-		E100000008 /* StoryEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000008 /* StoryEditorView.swift */; };
 		E100000009 /* StoryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000009 /* StoryCardView.swift */; };
 		E10000000C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E20000000C /* Assets.xcassets */; };
 		E10000000E /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000E /* VideoPlayerView.swift */; };
@@ -131,7 +130,6 @@
 		E200000005 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		E200000006 /* TimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModel.swift; sourceTree = "<group>"; };
 		E200000007 /* FullScreenStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenStoryView.swift; sourceTree = "<group>"; };
-		E200000008 /* StoryEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryEditorView.swift; sourceTree = "<group>"; };
 		E200000009 /* StoryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCardView.swift; sourceTree = "<group>"; };
 		E20000000C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E20000000D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -434,7 +432,6 @@
 				1FD7248C2F02B31900F46B20 /* ImageCropperView.swift */,
 				1F9A66A62EF6554B00DCE674 /* NewStoryEditorView.swift */,
 				1F7FA2E72ED33D42004D91C4 /* AIPolishView.swift */,
-				E200000008 /* StoryEditorView.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -533,7 +530,6 @@
 				1FDA9BEE2EE05D4000818D62 /* LocalizationManager.swift in Sources */,
 				E100000006 /* TimelineViewModel.swift in Sources */,
 				E100000007 /* FullScreenStoryView.swift in Sources */,
-				E100000008 /* StoryEditorView.swift in Sources */,
 				1FD724952F02B3F700F46B20 /* CropShape.swift in Sources */,
 				1F7FA2D82ED33CEE004D91C4 /* CategoryCardView.swift in Sources */,
 				1F9BF5592F09140B009E5A49 /* CategoryEntity+CoreDataClass.swift in Sources */,

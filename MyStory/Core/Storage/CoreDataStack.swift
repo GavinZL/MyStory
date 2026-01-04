@@ -163,6 +163,18 @@ final class CoreDataStack: ObservableObject {
         s_longitude.attributeType = .doubleAttributeType
         s_longitude.isOptional = true
         
+        let s_horizontalAccuracy = NSAttributeDescription()
+        s_horizontalAccuracy.name = "horizontalAccuracy"
+        s_horizontalAccuracy.attributeType = .doubleAttributeType
+        s_horizontalAccuracy.isOptional = true
+        s_horizontalAccuracy.defaultValue = -1.0
+        
+        let s_verticalAccuracy = NSAttributeDescription()
+        s_verticalAccuracy.name = "verticalAccuracy"
+        s_verticalAccuracy.attributeType = .doubleAttributeType
+        s_verticalAccuracy.isOptional = true
+        s_verticalAccuracy.defaultValue = -1.0
+        
         let s_mood = NSAttributeDescription()
         s_mood.name = "mood"
         s_mood.attributeType = .stringAttributeType
@@ -183,6 +195,7 @@ final class CoreDataStack: ObservableObject {
         storyEntity.properties = [
             s_id, s_title, s_content, s_plainTextContent, s_timestamp, s_createdAt, s_updatedAt,
             s_locationName, s_locationCity, s_locationAddress, s_latitude, s_longitude,
+            s_horizontalAccuracy, s_verticalAccuracy,
             s_mood, s_syncStatus, s_isDeleted
         ]
 

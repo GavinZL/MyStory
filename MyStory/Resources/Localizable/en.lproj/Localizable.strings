@@ -39,6 +39,14 @@
 "story.locationSelected" = "Location Selected";
 "story.videoLoading" = "Loading video...";
 
+// Location
+"location.accuracy" = "Accuracy";
+"location.fetching" = "Fetching location...";
+"location.failed" = "Failed to get location";
+"location.accuracy.high" = "High";
+"location.accuracy.medium" = "Medium";
+"location.accuracy.low" = "Low";
+
 // MARK: - Category
 "category.title" = "Categories";
 "category.new" = "New Category";

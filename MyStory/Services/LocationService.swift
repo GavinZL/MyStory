@@ -16,7 +16,7 @@ final class LocationService: NSObject, ObservableObject {
         if CLLocationManager.authorizationStatus() == .notDetermined {
             manager.requestWhenInUseAuthorization()
         }
-        manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.requestLocation()
     }
 
@@ -26,6 +26,8 @@ final class LocationService: NSObject, ObservableObject {
             let info = LocationInfo(
                 latitude: location.coordinate.latitude,
                 longitude: location.coordinate.longitude,
+                horizontalAccuracy: location.horizontalAccuracy,
+                verticalAccuracy: location.verticalAccuracy,
                 name: placemark?.name,
                 address: [placemark?.administrativeArea, placemark?.locality, placemark?.subLocality, placemark?.thoroughfare].compactMap { $0 }.joined(),
                 city: placemark?.locality,

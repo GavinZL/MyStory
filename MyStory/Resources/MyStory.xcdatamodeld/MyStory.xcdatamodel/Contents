@@ -53,6 +53,7 @@
     <entity name="StoryEntity" representedClassName="StoryEntity" syncable="YES">
         <attribute name="content" optional="YES" attributeType="String"/>
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="horizontalAccuracy" optional="YES" attributeType="Double" defaultValueString="-1" usesScalarValueType="YES"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isDeleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -66,6 +67,7 @@
         <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="verticalAccuracy" optional="YES" attributeType="Double" defaultValueString="-1" usesScalarValueType="YES"/>
         <relationship name="categories" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CategoryEntity" inverseName="stories" inverseEntity="CategoryEntity"/>
         <relationship name="media" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MediaEntity" inverseName="story" inverseEntity="MediaEntity"/>
         <uniquenessConstraints>
