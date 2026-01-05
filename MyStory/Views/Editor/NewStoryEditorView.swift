@@ -357,7 +357,7 @@ struct NewStoryEditorView: View {
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                     // 主要位置信息
                     HStack {
-                        HStack(alignment: .top, spacing: 2) {
+                        HStack(alignment: .bottom, spacing: 2) {
                             Label(viewModel.locationDisplayText, systemImage: "mappin.circle.fill")
                                 .foregroundColor(AppTheme.Colors.primary)
                                 .font(AppTheme.Typography.subheadline)
@@ -365,7 +365,7 @@ struct NewStoryEditorView: View {
                             // 次要地址信息（高精度时显示）
                             if let secondary = viewModel.locationSecondaryText {
                                 Text(secondary)
-                                    .font(AppTheme.Typography.caption)
+                                    .font(AppTheme.Typography.subheadline)
                                     .foregroundColor(AppTheme.Colors.textSecondary)
                                     .lineLimit(1)
                             }
@@ -402,6 +402,14 @@ struct NewStoryEditorView: View {
                 } label: {
                     Label("story.addLocation".localized, systemImage: "mappin.circle")
                         .font(AppTheme.Typography.subheadline)
+                    
+                    
+                    Spacer()
+                    
+                    // 右侧箭头
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
                 .foregroundColor(AppTheme.Colors.primary)
             }
@@ -848,6 +856,7 @@ final class NewStoryEditorViewModel: ObservableObject {
         } else {
             selectedCategoryId = nil
         }
+        showCategoryPicker = false
     }
     
     // MARK: - Save

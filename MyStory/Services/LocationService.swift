@@ -52,4 +52,3 @@ extension LocationService: CLLocationManagerDelegate {
         locationHandler = nil
     }
 }
-
