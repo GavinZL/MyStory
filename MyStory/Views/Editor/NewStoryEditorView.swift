@@ -652,7 +652,7 @@ final class NewStoryEditorViewModel: ObservableObject {
     }
     
     private func loadInitialData() {
-        guard let context = context else { return }
+        guard context != nil else { return }
         
         if let story = existingStory {
             title = story.title ?? ""
@@ -904,6 +904,7 @@ final class NewStoryEditorViewModel: ObservableObject {
         guard let info = locationInfo else { return }
         story.locationName = info.name
         story.locationCity = info.city
+        story.locationAddress = info.address
         story.latitude = info.latitude
         story.longitude = info.longitude
         story.horizontalAccuracy = info.horizontalAccuracy

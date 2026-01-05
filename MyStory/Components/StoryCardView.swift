@@ -57,9 +57,9 @@ struct StoryCardView: View {
                 mediaGridView
             }
             
-            // 分类信息 + 位置信息（同一行）
+            // 分类信息 + 位置信息（分为两行显示）
             if !hideCategoryDisplay || locationText != nil {
-                HStack(spacing: AppTheme.Spacing.s) {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                     if !hideCategoryDisplay, let categoryNamesText = categoryNamesText {
                         HStack(spacing: AppTheme.Spacing.xs) {
                             Image(systemName: "folder.fill")
@@ -81,19 +81,18 @@ struct StoryCardView: View {
                             Image(systemName: "mappin.circle.fill")
                                 .font(.system(size: 16))
                                 .foregroundColor(AppTheme.Colors.primary)
-                                .padding(.leading, AppTheme.Spacing.l)
                             
                             Text(locationText)
                                 .font(AppTheme.Typography.caption)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .lineLimit(1)
-                        }
+                        }.padding(.vertical, AppTheme.Spacing.s)
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppTheme.Spacing.l)
+        .padding(AppTheme.Spacing.s)
         .fullScreenCover(isPresented: $showImageViewer) {
             ImageGalleryViewer(
                 images: loadAllImages(),

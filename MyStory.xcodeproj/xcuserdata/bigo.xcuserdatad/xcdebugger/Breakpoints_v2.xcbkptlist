@@ -450,36 +450,6 @@
             endingLineNumber = "240"
             landmarkName = "ImageCropperView"
             landmarkType = "14">
-            <Locations>
-               <Location
-                  uuid = "0A2F2A7E-0120-4E09-8B31-7BD3AC5E119B - 920199947120ce31"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "MyStory.ImageCropperView.dragGesture.getter : some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/LiSSD/ProjectT/App/MyStory/MyStory/Views/Editor/ImageCropperView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "240"
-                  endingLineNumber = "240">
-               </Location>
-               <Location
-                  uuid = "0A2F2A7E-0120-4E09-8B31-7BD3AC5E119B - 184b559084c60d5d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (SwiftUI.DragGesture.Value) -&gt; () in MyStory.ImageCropperView.dragGesture.getter : some"
-                  moduleName = "MyStory.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/LiSSD/ProjectT/App/MyStory/MyStory/Views/Editor/ImageCropperView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "241"
-                  endingLineNumber = "241">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
