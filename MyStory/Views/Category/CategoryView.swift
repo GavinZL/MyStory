@@ -41,6 +41,7 @@ public struct CategoryView: View {
             }
         }
         .navigationTitle("category.title".localized)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             toolbarContent
         }

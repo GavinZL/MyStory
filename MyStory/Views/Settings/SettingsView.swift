@@ -59,6 +59,7 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("settings.title".localized)
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showLanguageSettings) {
                 LanguageSettingsView()
             }

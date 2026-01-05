@@ -55,7 +55,32 @@ class RichTextEditorViewModel: ObservableObject {
     @Published var showFontSettings: Bool = false
     
     /// UITextView 引用（用于程序化插入文本）
-    weak var textView: UITextView?
+    weak var textView: UITextView? {
+        didSet {
+            // 当 textView 设置完成后，如果有待设置的初始文本，立即设置
+            if let pending = pendingInitialText, !pending.isEmpty, !hasSetInitialText {
+                // ✅ 确保在主线程更新
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self, let textView = self.textView else { return }
+                    
+                    // ✅ 直接设置 UITextView 的 attributedText
+                    let attributedString = self.createAttributedString(from: pending)
+                    textView.attributedText = attributedString
+                    
+                    // 同步更新 ViewModel 的状态
+                    self.attributedContent = attributedString
+                    self.hasSetInitialText = true
+                    self.pendingInitialText = nil
+                }
+            }
+        }
+    }
+    
+    /// 待设置的初始文本（在 textView 准备好之前暂存）
+    private var pendingInitialText: String?
+    
+    /// 标记是否已设置过初始文本
+    private var hasSetInitialText = false
     
     /// 初始化
     /// - Parameter initialText: 初始文本内容
@@ -73,10 +98,32 @@ class RichTextEditorViewModel: ObservableObject {
         plainText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
+    /// 创建带默认字体的富文本
+    /// - Parameter text: 纯文本内容
+    /// - Returns: 带默认字体属性的富文本
+    private func createAttributedString(from text: String) -> NSAttributedString {
+        let font = UIFont.preferredFont(forTextStyle: .headline)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font
+        ]
+        return NSAttributedString(string: text, attributes: attributes)
+    }
+    
     /// 设置文本内容
     /// - Parameter text: 文本内容
     func setText(_ text: String) {
-        attributedContent = NSAttributedString(string: text)
+        // ✅ 同步执行，避免时序问题
+        if textView != nil && !hasSetInitialText {
+            // textView 已准备好，直接设置
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.attributedContent = self.createAttributedString(from: text)
+                self.hasSetInitialText = true
+            }
+        } else if textView == nil {
+            // textView 还未准备好，暂存文本
+            self.pendingInitialText = text
+        }
     }
     
     /// 更新格式状态
@@ -330,11 +377,17 @@ struct RichTextEditorView: View {
     init(
         viewModel: RichTextEditorViewModel,
         config: RichTextEditorConfig = RichTextEditorConfig(),
-        onCategoryTap: (() -> Void)? = nil
+        onCategoryTap: (() -> Void)? = nil,
+        initialText: String? = nil
     ) {
         self.viewModel = viewModel
         self.config = config
         self.onCategoryTap = onCategoryTap
+        
+        // 如果有初始文本，设置到 ViewModel
+        if let text = initialText, !text.isEmpty {
+            viewModel.setText(text)
+        }
     }
     
     var body: some View {
@@ -356,7 +409,8 @@ struct RichTextEditorView: View {
                     context: viewModel.context
                 ) { textView in
                     textView.textContentInset = config.textInset
-                    // ✅ 保存 UITextView 引用到 ViewModel，用于程序化插入文本
+                    // ✅ 保存 UITextView 引用到 ViewModel
+                    // didSet 会自动处理待设置的初始文本
                     DispatchQueue.main.async {
                         viewModel.textView = textView as? UITextView
                     }
@@ -364,12 +418,13 @@ struct RichTextEditorView: View {
             }
             .frame(minHeight: config.minHeight)
             .background(config.backgroundColor)
-            .onChange(of: viewModel.context.selectedRange) { _ in
-                viewModel.updateFormatState()
-            }
-            .onChange(of: viewModel.attributedContent) { _ in
-                viewModel.updateFormatState()
-            }
+//          富文本的更新，先注释掉
+//            .onChange(of: viewModel.context.selectedRange) { _ in
+//                viewModel.updateFormatState()
+//            }
+//            .onChange(of: viewModel.attributedContent) { _ in
+//                viewModel.updateFormatState()
+//            }
         }
     }
 }

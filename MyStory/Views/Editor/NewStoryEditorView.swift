@@ -124,7 +124,8 @@ struct NewStoryEditorView: View {
             config: RichTextEditorConfig(
                 minHeight: 160,
                 backgroundColor: .clear
-            )
+            ),
+            initialText: viewModel.initialContentText
         )
     }
     
@@ -577,15 +578,15 @@ struct NewStoryEditorView: View {
             .padding(.vertical, AppTheme.Spacing.s)
             .background(AppTheme.Colors.surface.ignoresSafeArea(edges: .bottom))
         }
-        .sheet(isPresented: $viewModel.showFontSettings) {
-            FontSettingsSheet(
-                fontSize: $viewModel.richTextEditorViewModel.fontSize,
-                textColor: $viewModel.richTextEditorViewModel.textColor,
-                onApply: { size, color in
-                    viewModel.richTextEditorViewModel.applyFontSettings(size: size, color: color)
-                }
-            )
-        }
+//        .sheet(isPresented: $viewModel.showFontSettings) {
+//            FontSettingsSheet(
+//                fontSize: $viewModel.richTextEditorViewModel.fontSize,
+//                textColor: $viewModel.richTextEditorViewModel.textColor,
+//                onApply: { size, color in
+//                    viewModel.richTextEditorViewModel.applyFontSettings(size: size, color: color)
+//                }
+//            )
+//        }
     }
 }
 
@@ -604,6 +605,7 @@ final class NewStoryEditorViewModel: ObservableObject {
     @Published var currentPlayingVideoURL: URL? = nil
     @Published var showCategoryPicker: Bool = false
     @Published var showFontSettings: Bool = false
+    @Published var initialContentText: String? = nil
     
     @Published var categorySelectionSet: Set<UUID> = []
     
@@ -657,7 +659,7 @@ final class NewStoryEditorViewModel: ObservableObject {
         if let story = existingStory {
             title = story.title ?? ""
             let contentString = story.content ?? ""
-            richTextEditorViewModel.setText(contentString)
+            initialContentText = contentString
             
             if let city = story.locationCity {
                 locationInfo = LocationInfo(

@@ -11,7 +11,7 @@ struct TimelineView: View {
     // MARK: - State
     @StateObject private var vm = TimelineViewModel()
     @State private var selectedStory: StoryEntity?
-    @State private var showEditor = false
+    @State private var showNewStoryEditor = false
     @State private var navigateToCategoryList = false
     @State private var tappedCategoryNode: CategoryTreeNode?
     
@@ -35,8 +35,16 @@ struct TimelineView: View {
             .toolbar {
                 toolbarContent
             }
-            .sheet(isPresented: $showEditor) {
-                editorSheet
+            .sheet(item: $selectedStory) { story in
+                NewStoryEditorView(existingStory: story, category: nil) {
+                    reloadStories()
+                    selectedStory = nil
+                }
+            }
+            .sheet(isPresented: $showNewStoryEditor) {
+                NewStoryEditorView(existingStory: nil, category: nil) {
+                    reloadStories()
+                }
             }
             .onAppear {
                 setupViewModel()
@@ -165,18 +173,7 @@ struct TimelineView: View {
         }
     }
     
-    @ViewBuilder
-    private var editorSheet: some View {
-        if let story = selectedStory {
-            NewStoryEditorView(existingStory: story, category: nil) {
-                reloadStories()
-            }
-        } else {
-            NewStoryEditorView(existingStory: nil, category: nil) {
-                reloadStories()
-            }
-        }
-    }
+
     
     @ViewBuilder
     private func fullScreenDestination(for story: StoryEntity) -> some View {
@@ -233,13 +230,11 @@ struct TimelineView: View {
     
     // MARK: - Actions
     private func createNewStory() {
-        selectedStory = nil
-        showEditor = true
+        showNewStoryEditor = true
     }
     
     private func editStory(_ story: StoryEntity) {
         selectedStory = story
-        showEditor = true
     }
     
     private func deleteStory(_ story: StoryEntity) {
