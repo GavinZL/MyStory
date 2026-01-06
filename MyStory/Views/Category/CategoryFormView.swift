@@ -1,6 +1,13 @@
 import SwiftUI
 import PhotosUI
 
+// MARK: - Identifiable UIImage Wrapper
+/// 用于 sheet(item:) 的可识别图片包装类型
+private struct IdentifiableImage: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+
 // MARK: - Category Form View
 struct CategoryFormView: View {
     // MARK: - Environment
@@ -33,8 +40,7 @@ struct CategoryFormView: View {
     @State private var customIconData: Data?
     @State private var isCustomIcon: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem?
-    @State private var showImageCropper: Bool = false
-    @State private var selectedImageForCrop: UIImage?
+    @State private var selectedImageForCrop: IdentifiableImage?
     
     // MARK: - Icon Options
     private let iconOptions = [
@@ -100,13 +106,11 @@ struct CategoryFormView: View {
                 setupInitialValues()
             }
         }
-        .sheet(isPresented: $showImageCropper) {
-            if let image = selectedImageForCrop {
-                ImageCropperView(image: image) { iconData in
-                    customIconData = iconData
-                    isCustomIcon = true
-                    selectedIcon = "custom"
-                }
+        .sheet(item: $selectedImageForCrop) { identifiableImage in
+            ImageCropperView(image: identifiableImage.image) { iconData in
+                customIconData = iconData
+                isCustomIcon = true
+                selectedIcon = "custom"
             }
         }
     }
@@ -295,10 +299,8 @@ struct CategoryFormView: View {
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
-                    // ✅ 将所有状态更新都放在 MainActor 中
                     await MainActor.run {
-                        selectedImageForCrop = image
-                        showImageCropper = true
+                        selectedImageForCrop = IdentifiableImage(image: image)
                     }
                 }
             }
