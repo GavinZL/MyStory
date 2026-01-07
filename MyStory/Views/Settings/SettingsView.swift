@@ -16,6 +16,11 @@ struct SettingsView: View {
     @State private var showThemeSettings = false
     @State private var showFontSettings = false
     @State private var showDataSync = false
+    @State private var showCacheCleanupConfirm = false
+    @State private var isCleaningCache = false
+    @State private var showCleanupResult = false
+    @State private var cleanupResultTitle = ""
+    @State private var cleanupResultMessage = ""
     
     var body: some View {
         NavigationStack {
@@ -81,6 +86,26 @@ struct SettingsView: View {
                         }
                     }
                     .foregroundColor(.primary)
+                    
+                    // 缓存清理
+                    Button {
+                        showCacheCleanupConfirm = true
+                    } label: {
+                        HStack {
+                            Label("settings.cacheCleanup".localized, systemImage: "trash")
+                            Spacer()
+                            if isCleaningCache {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                            } else {
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    .foregroundColor(.primary)
+                    .disabled(isCleaningCache)
                 }
                 
                 Section("settings.about".localized) {
@@ -105,6 +130,80 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showDataSync) {
                 DataSyncView()
+            }
+            .alert("settings.cacheCleanup.confirm.title".localized, isPresented: $showCacheCleanupConfirm) {
+                Button("common.cancel".localized, role: .cancel) { }
+                Button("common.confirm".localized) {
+                    performCacheCleanup()
+                }
+            } message: {
+                Text("settings.cacheCleanup.confirm.message".localized)
+            }
+            .alert(cleanupResultTitle, isPresented: $showCleanupResult) {
+                Button("common.confirm".localized) { }
+            } message: {
+                Text(cleanupResultMessage)
+            }
+            .overlay {
+                if isCleaningCache {
+                    ZStack {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: AppTheme.Spacing.l) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            
+                            Text("settings.cacheCleanup.inProgress".localized)
+                                .font(AppTheme.Typography.body)
+                                .foregroundColor(.white)
+                        }
+                        .padding(AppTheme.Spacing.xxl)
+                        .background(
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                                .fill(Color.black.opacity(0.8))
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    /// 执行缓存清理
+    private func performCacheCleanup() {
+        isCleaningCache = true
+        
+        // 在后台线程执行清理
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = CacheCleanupService.cleanupCache()
+            
+            // 回到主线程更新 UI
+            DispatchQueue.main.async {
+                isCleaningCache = false
+                
+                if result.deletedFilesCount == 0 && result.errors.isEmpty {
+                    // 没有可清理的文件
+                    cleanupResultTitle = "settings.cacheCleanup.empty.title".localized
+                    cleanupResultMessage = "settings.cacheCleanup.empty.message".localized
+                } else if !result.errors.isEmpty {
+                    // 清理过程中有错误
+                    cleanupResultTitle = "settings.cacheCleanup.error.title".localized
+                    let errorMessage = result.errors.joined(separator: "\n")
+                    cleanupResultMessage = String(format: "settings.cacheCleanup.error.message".localized, errorMessage)
+                } else {
+                    // 清理成功
+                    cleanupResultTitle = "settings.cacheCleanup.success.title".localized
+                    cleanupResultMessage = String(
+                        format: "settings.cacheCleanup.success.message".localized,
+                        result.deletedFilesCount,
+                        result.freedSpaceMB
+                    )
+                }
+                
+                showCleanupResult = true
             }
         }
     }

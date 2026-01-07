@@ -64,6 +64,7 @@
 		AF2752832F0E9FF2003293D9 /* DataSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF2752822F0E9FF2003293D9 /* DataSyncView.swift */; };
 		AF2752852F0EABAE003293D9 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF2752842F0EABAE003293D9 /* ToastView.swift */; };
 		AF2752872F0EB23B003293D9 /* FontSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF2752862F0EB23B003293D9 /* FontSettingsView.swift */; };
+		AF2752892F0EB765003293D9 /* CacheCleanupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF2752882F0EB765003293D9 /* CacheCleanupService.swift */; };
 		E100000001 /* MyStoryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000001 /* MyStoryApp.swift */; };
 		E100000002 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000002 /* CoreDataStack.swift */; };
 		E100000003 /* MediaStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E200000003 /* MediaStorageService.swift */; };
@@ -137,6 +138,7 @@
 		AF2752822F0E9FF2003293D9 /* DataSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSyncView.swift; sourceTree = "<group>"; };
 		AF2752842F0EABAE003293D9 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		AF2752862F0EB23B003293D9 /* FontSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettingsView.swift; sourceTree = "<group>"; };
+		AF2752882F0EB765003293D9 /* CacheCleanupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheCleanupService.swift; sourceTree = "<group>"; };
 		E200000001 /* MyStoryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStoryApp.swift; sourceTree = "<group>"; };
 		E200000002 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		E200000003 /* MediaStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaStorageService.swift; sourceTree = "<group>"; };
@@ -351,6 +353,7 @@
 		E600000004 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				AF2752882F0EB765003293D9 /* CacheCleanupService.swift */,
 				1FCB03F92F0E4178000E5BC2 /* MigrationBackupService.swift */,
 				1FCB03FA2F0E4178000E5BC2 /* MigrationCryptoService.swift */,
 				1FCB03FB2F0E4178000E5BC2 /* MigrationRestoreService.swift */,
@@ -590,6 +593,7 @@
 				1FDA9BE72EDF254B00818D62 /* StoryEntity+CoreDataClass.swift in Sources */,
 				1FDA9BFB2EE063EA00818D62 /* AppTheme.swift in Sources */,
 				1FDA9BE92EDF254B00818D62 /* MediaEntity+CoreDataClass.swift in Sources */,
+				AF2752892F0EB765003293D9 /* CacheCleanupService.swift in Sources */,
 				1FD7248F2F02B34900F46B20 /* CategoryIconView.swift in Sources */,
 				E10000000E /* VideoPlayerView.swift in Sources */,
 				E10000000F /* VideoTransferable.swift in Sources */,

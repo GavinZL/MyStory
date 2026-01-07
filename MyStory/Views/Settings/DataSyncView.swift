@@ -127,7 +127,7 @@ struct DataSyncView: View {
                     startP2PSenderAndSendBackup()
                 } label: {
                     HStack {
-                        Label("dataSync.sender.startConnection".localized, systemImage: "wifi")
+                        Label("dataSync.sender.startConnection".localized, systemImage: "Øwifi")
                         Spacer()
                     }
                 }
@@ -330,12 +330,19 @@ struct DataSyncView: View {
     private func handleStateChange(_ newState: MigrationSessionManager.State) {
         switch newState {
         case .completed:
-            // 传输完成，使用Toast提示
+            // 传输完成
             toastMessage = ToastMessage(
                 type: .success,
                 message: "dataSync.alert.transferComplete".localized,
                 duration: 5.0
             )
+            
+            // 如果是发送端，传输完成后清理备份文件
+            if migrationSession.isCurrentRoleSender {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    cleanupMigrationBackups()
+                }
+            }
         case .failed(let msg):
             // 分析错误类型并显示友好的错误信息
             let errorMessage = parseErrorMessage(msg)
@@ -495,6 +502,10 @@ struct DataSyncView: View {
                         message: "dataSync.alert.restoreComplete".localized,
                         duration: 5.0
                     )
+                    
+                    // 恢复成功后清理备份文件
+                    cleanupMigrationBackups()
+                    
                     // 恢复完成后2秒重置会话
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         resetToInitialState()
@@ -515,6 +526,27 @@ struct DataSyncView: View {
                         resetToInitialState()
                     }
                 }
+            }
+        }
+    }
+    
+    /// 清理 MigrationBackups 目录下的所有备份文件
+    private func cleanupMigrationBackups() {
+        DispatchQueue.global(qos: .utility).async {
+            let fileManager = FileManager.default
+            let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let backupsRoot = docs.appendingPathComponent("MigrationBackups", isDirectory: true)
+            
+            guard fileManager.fileExists(atPath: backupsRoot.path) else {
+                return
+            }
+            
+            do {
+                // 删除整个 MigrationBackups 目录及其内容
+                try fileManager.removeItem(at: backupsRoot)
+                print("✅ 成功清理 MigrationBackups 目录")
+            } catch {
+                print("⚠️ 清理 MigrationBackups 失败: \(error.localizedDescription)")
             }
         }
     }

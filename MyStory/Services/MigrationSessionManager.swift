@@ -25,6 +25,11 @@ final class MigrationSessionManager: NSObject, ObservableObject {
     @Published private(set) var pin: String?
     /// 发生错误时的人类可读错误信息
     @Published private(set) var errorMessage: String?
+    
+    /// 判断当前角色是否为发送端
+    var isCurrentRoleSender: Bool {
+        return currentRole == .sender
+    }
 
     private let serviceType = "mystory-mig"
     private let peerID: MCPeerID

@@ -237,6 +237,16 @@
 
 // Settings
 "settings.dataSync" = "Data Sync";
+"settings.cacheCleanup" = "Cache Cleanup";
+"settings.cacheCleanup.confirm.title" = "Confirm Cache Cleanup";
+"settings.cacheCleanup.confirm.message" = "This will clean temporary files and archives without affecting your stories and media. Are you sure you want to continue?";
+"settings.cacheCleanup.success.title" = "Cleanup Complete";
+"settings.cacheCleanup.success.message" = "Successfully cleaned %d files and freed %.2f MB of space";
+"settings.cacheCleanup.empty.title" = "No Cleanup Needed";
+"settings.cacheCleanup.empty.message" = "There are no cache files to clean";
+"settings.cacheCleanup.error.title" = "Cleanup Failed";
+"settings.cacheCleanup.error.message" = "Errors occurred during cleanup: %@";
+"settings.cacheCleanup.inProgress" = "Cleaning cache...";
 
 // MARK: - Font Settings
 "settings.font.title" = "Font Style";

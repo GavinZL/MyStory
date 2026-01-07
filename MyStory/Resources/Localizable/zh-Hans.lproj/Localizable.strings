@@ -237,6 +237,16 @@
 
 // Settings
 "settings.dataSync" = "数据同步";
+"settings.cacheCleanup" = "缓存清理";
+"settings.cacheCleanup.confirm.title" = "确认清理缓存";
+"settings.cacheCleanup.confirm.message" = "将清理临时文件和压缩包，不会影响您的故事和媒体数据。确定要继续吗？";
+"settings.cacheCleanup.success.title" = "清理完成";
+"settings.cacheCleanup.success.message" = "成功清理 %d 个文件，释放了 %.2f MB 空间";
+"settings.cacheCleanup.empty.title" = "无需清理";
+"settings.cacheCleanup.empty.message" = "当前没有可清理的缓存文件";
+"settings.cacheCleanup.error.title" = "清理失败";
+"settings.cacheCleanup.error.message" = "清理过程中出现错误：%@";
+"settings.cacheCleanup.inProgress" = "正在清理缓存...";
 
 // MARK: - Font Settings
 "settings.font.title" = "字体样式";
