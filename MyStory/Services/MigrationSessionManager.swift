@@ -46,13 +46,12 @@ final class MigrationSessionManager: NSObject, ObservableObject {
 
     func reset() {
         stopSession()
-        DispatchQueue.main.async {
-            self.state = .idle
-            self.pin = nil
-            self.errorMessage = nil
-            self.expectedPIN = nil
-            self.pendingBackupURL = nil
-        }
+        // 立即清空状态，避免竞态条件
+        self.state = .idle
+        self.pin = nil
+        self.errorMessage = nil
+        self.expectedPIN = nil
+        self.pendingBackupURL = nil
     }
 
     /// 作为新手机，开始等待接收备份
@@ -71,10 +70,10 @@ final class MigrationSessionManager: NSObject, ObservableObject {
         self.advertiser = advertiser
 
         let pin = String(format: "%06d", Int.random(in: 0..<1_000_000))
-        expectedPIN = pin
         
-        // 确保在主线程更新 UI
+        // 确保在主线程同时设置 expectedPIN 和 pin，避免竞态条件
         DispatchQueue.main.async {
+            self.expectedPIN = pin
             self.pin = pin
             self.state = .waitingForPeer
         }
@@ -96,7 +95,9 @@ final class MigrationSessionManager: NSObject, ObservableObject {
         browser.startBrowsingForPeers()
         self.browser = browser
 
-        state = .waitingForPeer
+        DispatchQueue.main.async {
+            self.state = .waitingForPeer
+        }
     }
 
     /// 旧手机在连接建立后，发送用户输入的 PIN 进行验证
@@ -136,19 +137,26 @@ final class MigrationSessionManager: NSObject, ObservableObject {
     }
 
     private func sendBackupIfReady() {
+        print("📋 sendBackupIfReady called - role: \(String(describing: currentRole)), state: \(state)")
         guard case .sender = currentRole,
               case .readyToTransfer = state,
               let session = session,
               let peer = connectedPeer,
-              let url = pendingBackupURL else { return }
+              let url = pendingBackupURL else {
+            print("❌ sendBackupIfReady guard failed - role: \(String(describing: currentRole)), state: \(state), session: \(session != nil), peer: \(connectedPeer != nil), url: \(pendingBackupURL != nil)")
+            return
+        }
 
+        print("✅ Starting backup transfer: \(url.lastPathComponent)")
         state = .transferring(0)
         let progress = session.sendResource(at: url, withName: url.lastPathComponent, toPeer: peer) { [weak self] error in
             DispatchQueue.main.async {
                 if let error = error {
+                    print("❌ Backup send failed: \(error.localizedDescription)")
                     self?.state = .failed("发送失败：\(error.localizedDescription)")
                     self?.errorMessage = "发送失败：\(error.localizedDescription)"
                 } else {
+                    print("✅ Backup send completed")
                     self?.state = .completed
                 }
             }
@@ -191,10 +199,17 @@ final class MigrationSessionManager: NSObject, ObservableObject {
             }
         case "AuthPINSuccess":
             // 旧手机（sender）接收验证成功回复
-            guard case .sender = currentRole else { return }
+            guard case .sender = currentRole else {
+                print("❌ Received AuthPINSuccess but not in sender role")
+                return
+            }
+            print("✅ Received AuthPINSuccess, preparing to send backup")
             DispatchQueue.main.async {
                 self.state = .readyToTransfer
-                // 自动发送备份文件
+            }
+            // 确保状态更新后再调用发送
+            DispatchQueue.main.async {
+                print("📤 Calling sendBackupIfReady()")
                 self.sendBackupIfReady()
             }
         default:

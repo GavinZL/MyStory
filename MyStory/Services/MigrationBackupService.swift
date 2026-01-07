@@ -44,7 +44,6 @@ final class MigrationBackupService {
             var createdAt: Date
             var updatedAt: Date
             var timestamp: Date
-            var isDeleted: Bool
             var syncStatus: Int16
             var mood: String?
             var locationName: String?
@@ -134,6 +133,10 @@ final class MigrationBackupService {
                                                            password: password,
                                                            backupId: backupId)
 
+        // 4. 删除中间产物（未加密的 .bin 容器文件）
+        try? FileManager.default.removeItem(at: containerURL)
+        print("🗑️ [Backup] 已删除中间容器文件: \(containerURL.lastPathComponent)")
+
         progressHandler?(Progress(step: "finished", fractionCompleted: 1.0))
         return encryptedURL
     }
@@ -195,7 +198,6 @@ final class MigrationBackupService {
                     createdAt: createdAt,
                     updatedAt: updatedAt,
                     timestamp: timestamp,
-                    isDeleted: story.isDeleted,
                     syncStatus: story.syncStatus,
                     mood: story.mood,
                     locationName: story.locationName,
@@ -280,7 +282,9 @@ final class MigrationBackupService {
         let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let mediaRoot = docs.appendingPathComponent(MediaStorageService.baseDirName, isDirectory: true)
 
+        print("📁 [Backup] 扫描媒体目录: \(mediaRoot.path)")
         guard fileManager.fileExists(atPath: mediaRoot.path) else {
+            print("⚠️ [Backup] 媒体目录不存在")
             let stats = BackupPayload.MediaStats(totalFiles: 0, totalBytes: 0)
             return ([], stats, false, 0)
         }
@@ -293,16 +297,30 @@ final class MigrationBackupService {
                     let values = try fileURL.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
                     guard values.isRegularFile == true else { continue }
                     let fileSize = Int64(values.fileSize ?? 0)
-                    let relativePath = fileURL.path.replacingOccurrences(of: mediaRoot.path + "/", with: "")
+                    
+                    // 计算相对于 mediaRoot 的相对路径
+                    let relativePath: String
+                    if let range = fileURL.path.range(of: mediaRoot.path) {
+                        let afterRoot = fileURL.path[range.upperBound...]
+                        // 移除开头的 /（如果存在）
+                        relativePath = afterRoot.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+                    } else {
+                        // 降级方案：使用 lastPathComponent
+                        relativePath = fileURL.lastPathComponent
+                    }
+                    
                     descriptors.append(.init(relativePath: relativePath, fileSize: fileSize))
                     totalFiles += 1
                     totalBytes += fileSize
+                    print("📄 [Backup] 找到媒体文件: \(relativePath) (\(fileSize) bytes)")
                 } catch {
                     brokenCount += 1
+                    print("❌ [Backup] 无法读取文件信息: \(error)")
                 }
             }
         }
 
+        print("✅ [Backup] 媒体扫描完成: \(totalFiles) 个文件, 总大小 \(totalBytes) bytes")
         let stats = BackupPayload.MediaStats(totalFiles: totalFiles, totalBytes: totalBytes)
         let hasBroken = brokenCount > 0
         return (descriptors, stats, hasBroken, brokenCount)
@@ -375,9 +393,13 @@ final class MigrationBackupService {
         let totalFiles = max(payload.mediaFiles.count, 1)
         for (index, descriptor) in payload.mediaFiles.enumerated() {
             let fileURL = mediaRoot.appendingPathComponent(descriptor.relativePath)
+            print("📂 [Backup] 尝试读取媒体文件: \(fileURL.path)")
             if fileManager2.fileExists(atPath: fileURL.path) {
                 let data = try Data(contentsOf: fileURL)
                 handle.write(data)
+                print("✅ [Backup] 成功写入媒体文件: \(descriptor.relativePath) (\(data.count) bytes)")
+            } else {
+                print("❌ [Backup] 媒体文件不存在: \(fileURL.path)")
             }
             let fractionBase = 0.3
             let fractionRange = 0.5 // 从 0.3 到 0.8 之间用于写媒体

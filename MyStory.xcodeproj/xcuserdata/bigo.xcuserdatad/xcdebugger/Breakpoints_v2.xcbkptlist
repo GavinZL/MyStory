@@ -519,49 +519,65 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A8C4E9EB-CC5B-4063-8F5F-CE037D673193"
+            uuid = "CE877E40-71A3-4812-8E17-8FB6751B648F"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MyStory/Views/Settings/SettingsView.swift"
+            filePath = "MyStory/Services/MigrationSessionManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
-            landmarkName = "body"
-            landmarkType = "24">
+            startingLineNumber = "172"
+            endingLineNumber = "172"
+            landmarkName = "MigrationSessionManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "0C8646A5-3737-4CC5-ABA6-90ECE49523AC"
+            uuid = "3F0F84AD-20DB-4C12-8318-82EC458D587C"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MyStory/Views/Settings/SettingsView.swift"
+            filePath = "MyStory/Services/MigrationSessionManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
-            landmarkName = "body"
-            landmarkType = "24">
+            startingLineNumber = "206"
+            endingLineNumber = "206"
+            landmarkName = "handleReceivedControlMessage(_:from:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "21F71610-A6A1-4499-82A9-118E37B9DAF2"
+            uuid = "A8C5F313-F5C3-456A-B5CB-259FADEABC6B"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MyStory/Views/Settings/SettingsView.swift"
+            filePath = "MyStory/Services/MigrationSessionManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "103"
-            endingLineNumber = "103"
-            landmarkName = "body"
-            landmarkType = "24">
+            startingLineNumber = "141"
+            endingLineNumber = "141"
+            landmarkName = "sendBackupIfReady()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9428B3CB-3711-4E9E-818A-1F7E6DAB6B42"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MyStory/Services/MigrationSessionManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "150"
+            endingLineNumber = "150"
+            landmarkName = "sendBackupIfReady()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

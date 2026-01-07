@@ -66,5 +66,7 @@
 	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>$(PRODUCT_NAME) 需要使用蓝牙在设备间传输数据</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 </dict>
 </plist>

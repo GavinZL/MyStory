@@ -44,7 +44,6 @@ final class MigrationRestoreService {
             var createdAt: Date
             var updatedAt: Date
             var timestamp: Date
-            var isDeleted: Bool
             var syncStatus: Int16
             var mood: String?
             var locationName: String?
@@ -145,6 +144,10 @@ final class MigrationRestoreService {
         // 6. 恢复 Core Data 实体
         try restoreCoreData(from: payload)
 
+        // 7. 删除中间产物（解密后的 .bin 容器文件）
+        try? FileManager.default.removeItem(at: containerURL)
+        print("🗑️ [Restore] 已删除中间容器文件: \(containerURL.lastPathComponent)")
+
         progressHandler?(Progress(step: "finished", fractionCompleted: 1.0))
     }
 
@@ -231,11 +234,16 @@ final class MigrationRestoreService {
         let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let mediaRoot = docs.appendingPathComponent(MediaStorageService.baseDirName, isDirectory: true)
 
+        print("📁 [Restore] 目标媒体目录: \(mediaRoot.path)")
+        print("📊 [Restore] 待恢复媒体文件数量: \(payload.mediaFiles.count)")
+        
         // 清空旧媒体目录
         if fileManager.fileExists(atPath: mediaRoot.path) {
+            print("🗑️ [Restore] 删除旧媒体目录")
             try fileManager.removeItem(at: mediaRoot)
         }
         try fileManager.createDirectory(at: mediaRoot, withIntermediateDirectories: true)
+        print("✅ [Restore] 创建新媒体目录")
 
         let handle = try FileHandle(forReadingFrom: containerURL)
         defer { try? handle.close() }
@@ -259,12 +267,15 @@ final class MigrationRestoreService {
             let dir = targetURL.deletingLastPathComponent()
             try fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
             try data.write(to: targetURL, options: [.atomic])
+            print("✅ [Restore] 恢复媒体文件: \(descriptor.relativePath) (\(data.count) bytes)")
 
             let fractionBase = 0.45
             let fractionRange = 0.25
             let progressValue = fractionBase + fractionRange * Double(index + 1) / Double(totalFiles)
             progressHandler?(Progress(step: "restoring_media_files", fractionCompleted: progressValue))
         }
+        
+        print("✅ [Restore] 媒体文件恢复完成，共 \(payload.mediaFiles.count) 个文件")
     }
 
     // MARK: - Core Data 恢复
@@ -320,7 +331,6 @@ final class MigrationRestoreService {
                 entity.createdAt = dto.createdAt
                 entity.updatedAt = dto.updatedAt
                 entity.timestamp = dto.timestamp
-                entity.isDeleted = dto.isDeleted
                 entity.syncStatus = dto.syncStatus
                 entity.mood = dto.mood
                 entity.locationName = dto.locationName
