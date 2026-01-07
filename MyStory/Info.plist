@@ -57,5 +57,14 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>$(PRODUCT_NAME) 需要使用本地网络在设备间传输数据</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_mystory-mig._tcp</string>
+		<string>_mystory-mig._udp</string>
+	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>$(PRODUCT_NAME) 需要使用蓝牙在设备间传输数据</string>
 </dict>
 </plist>

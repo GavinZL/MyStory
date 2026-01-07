@@ -44,9 +44,9 @@ struct CategoryFormView: View {
     
     // MARK: - Icon Options
     private let iconOptions = [
-        "bear", "duck", "flower", "light-bulb-on",
-        "thumb-up", "sparkles-alt", "biceps", "face",
-        "film-roll-alt", "groceries", "happy-beaming", "message-bubble-dots"
+        "hand_up", "heart_balloon", "idea", "landscape",
+        "love", "people", "map", "present",
+        "running", "sales", "school", "shopping"
     ]
     
     private let colorOptions = [

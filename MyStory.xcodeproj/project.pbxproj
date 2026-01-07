@@ -36,6 +36,10 @@
 		1F9BF55B2F09140B009E5A49 /* MediaEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9BF5562F09140B009E5A49 /* MediaEntity+CoreDataProperties.swift */; };
 		1F9BF55C2F09140B009E5A49 /* SettingEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9BF5572F09140B009E5A49 /* SettingEntity+CoreDataProperties.swift */; };
 		1F9BF55D2F09140B009E5A49 /* StoryEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9BF5582F09140B009E5A49 /* StoryEntity+CoreDataProperties.swift */; };
+		1FCB03FD2F0E4178000E5BC2 /* MigrationBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB03F92F0E4178000E5BC2 /* MigrationBackupService.swift */; };
+		1FCB03FE2F0E4178000E5BC2 /* MigrationCryptoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB03FA2F0E4178000E5BC2 /* MigrationCryptoService.swift */; };
+		1FCB03FF2F0E4178000E5BC2 /* MigrationSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB03FC2F0E4178000E5BC2 /* MigrationSessionManager.swift */; };
+		1FCB04002F0E4178000E5BC2 /* MigrationRestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB03FB2F0E4178000E5BC2 /* MigrationRestoreService.swift */; };
 		1FD7248D2F02B31900F46B20 /* ImageCropperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD7248C2F02B31900F46B20 /* ImageCropperView.swift */; };
 		1FD7248F2F02B34900F46B20 /* CategoryIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD7248E2F02B34900F46B20 /* CategoryIconView.swift */; };
 		1FD724912F02B3A200F46B20 /* ImageCropperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD724902F02B3A200F46B20 /* ImageCropperViewModel.swift */; };
@@ -100,6 +104,10 @@
 		1F9BF5562F09140B009E5A49 /* MediaEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MediaEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		1F9BF5572F09140B009E5A49 /* SettingEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		1F9BF5582F09140B009E5A49 /* StoryEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StoryEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		1FCB03F92F0E4178000E5BC2 /* MigrationBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationBackupService.swift; sourceTree = "<group>"; };
+		1FCB03FA2F0E4178000E5BC2 /* MigrationCryptoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationCryptoService.swift; sourceTree = "<group>"; };
+		1FCB03FB2F0E4178000E5BC2 /* MigrationRestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationRestoreService.swift; sourceTree = "<group>"; };
+		1FCB03FC2F0E4178000E5BC2 /* MigrationSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationSessionManager.swift; sourceTree = "<group>"; };
 		1FD7248C2F02B31900F46B20 /* ImageCropperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperView.swift; sourceTree = "<group>"; };
 		1FD7248E2F02B34900F46B20 /* CategoryIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconView.swift; sourceTree = "<group>"; };
 		1FD724902F02B3A200F46B20 /* ImageCropperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperViewModel.swift; sourceTree = "<group>"; };
@@ -335,6 +343,10 @@
 		E600000004 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				1FCB03F92F0E4178000E5BC2 /* MigrationBackupService.swift */,
+				1FCB03FA2F0E4178000E5BC2 /* MigrationCryptoService.swift */,
+				1FCB03FB2F0E4178000E5BC2 /* MigrationRestoreService.swift */,
+				1FCB03FC2F0E4178000E5BC2 /* MigrationSessionManager.swift */,
 				1F7FA2B92ED33AD2004D91C4 /* AIService */,
 				1F7FA2BB2ED33AD2004D91C4 /* CategoryService */,
 				E200000003 /* MediaStorageService.swift */,
@@ -541,6 +553,10 @@
 				1F7FA2CC2ED33C9E004D91C4 /* SearchHistoryItem.swift in Sources */,
 				1FDA9BDE2EDF16A900818D62 /* CategoryLevelView.swift in Sources */,
 				1F7FA2CD2ED33C9E004D91C4 /* LocationInfo.swift in Sources */,
+				1FCB03FD2F0E4178000E5BC2 /* MigrationBackupService.swift in Sources */,
+				1FCB03FE2F0E4178000E5BC2 /* MigrationCryptoService.swift in Sources */,
+				1FCB03FF2F0E4178000E5BC2 /* MigrationSessionManager.swift in Sources */,
+				1FCB04002F0E4178000E5BC2 /* MigrationRestoreService.swift in Sources */,
 				1F9A66AE2EF6F2A100DCE674 /* FontSettingsSheet.swift in Sources */,
 				1F7FA2CE2ED33C9E004D91C4 /* CategoryModel.swift in Sources */,
 				1FD724932F02B3C500F46B20 /* CustomIconHelper.swift in Sources */,
