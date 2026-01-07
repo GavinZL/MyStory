@@ -5,6 +5,7 @@ struct RootView: View {
     @Environment(\.managedObjectContext) private var context
     @StateObject private var localizationManager = LocalizationManager.shared
     @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var fontScaleManager = FontScaleManager.shared
     
     var body: some View {
         TabView {
@@ -30,6 +31,7 @@ struct RootView: View {
         }
         .accentColor(AppTheme.Colors.primary)
         .id(themeManager.currentTheme) // 强制在主题变化时重新渲染
+        .id(fontScaleManager.currentScale) // 强制在字体缩放变化时重新渲染
     }
 }
 

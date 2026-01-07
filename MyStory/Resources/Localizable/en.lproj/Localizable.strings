@@ -100,6 +100,8 @@
 "settings.languageSetting" = "Language Settings";
 "settings.theme" = "Theme";
 "settings.themeSetting" = "Theme Settings";
+"settings.font" = "Font";
+"settings.fontSetting" = "Font Settings";
 "settings.about" = "About";
 "settings.version" = "Version";
 "settings.currentLanguage" = "Current Language";
@@ -235,3 +237,27 @@
 
 // Settings
 "settings.dataSync" = "Data Sync";
+
+// MARK: - Font Settings
+"settings.font.title" = "Font Style";
+"settings.font.label" = "Font";
+"settings.font.reset" = "Reset";
+"settings.font.hint" = "Font size will be applied to the entire app instantly";
+
+// Font Scale Options
+"settings.font.small" = "Small";
+"settings.font.standard" = "Standard";
+"settings.font.large" = "Large";
+"settings.font.extraLarge" = "Extra Large";
+
+// Font Preview Content
+"settings.font.preview.welcome" = "Welcome to MyStory, your personal diary.";
+"settings.font.preview.description1" = "In MyStory, you can conveniently record your daily life with images and text. No ads, no social features, secure cloud sync protects your data from loss.";
+"settings.font.preview.description2" = "Rich diary formats enrich every moment of your recording.";
+"settings.font.preview.featuresTitle" = "MyStory supports adding:";
+"settings.font.preview.feature1" = "1. Pure text diary;";
+"settings.font.preview.feature2" = "2. Multiple images;";
+"settings.font.preview.feature3" = "3. Record audio;";
+"settings.font.preview.feature4" = "4. Record mood;";
+"settings.font.preview.feature5" = "5. Auto-record weather/location;";
+"settings.font.preview.closing" = "Rich diary formats enrich every moment of your recording.";

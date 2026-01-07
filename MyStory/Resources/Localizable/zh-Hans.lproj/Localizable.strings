@@ -100,6 +100,8 @@
 "settings.languageSetting" = "语言设置";
 "settings.theme" = "主题";
 "settings.themeSetting" = "主题设置";
+"settings.font" = "字体";
+"settings.fontSetting" = "字体设置";
 "settings.about" = "关于";
 "settings.version" = "版本";
 "settings.currentLanguage" = "当前语言";
@@ -235,3 +237,27 @@
 
 // Settings
 "settings.dataSync" = "数据同步";
+
+// MARK: - Font Settings
+"settings.font.title" = "字体样式";
+"settings.font.label" = "字体";
+"settings.font.reset" = "重置";
+"settings.font.hint" = "字体大小会实时应用到整个应用";
+
+// Font Scale Options
+"settings.font.small" = "小";
+"settings.font.standard" = "标准";
+"settings.font.large" = "大";
+"settings.font.extraLarge" = "超大";
+
+// Font Preview Content
+"settings.font.preview.welcome" = "欢迎使用一本日记，您的专属日记本。";
+"settings.font.preview.description1" = "在一本日记中，您可以方便的图文记录每日日常。无广告无社交，安全的云同步保护您的数据不会丢失。";
+"settings.font.preview.description2" = "丰富的日记形式丰富您的每一次记录。";
+"settings.font.preview.featuresTitle" = "一本日记支持添加：";
+"settings.font.preview.feature1" = "1. 纯文字日记；";
+"settings.font.preview.feature2" = "2. 多张图片；";
+"settings.font.preview.feature3" = "3. 记录录音；";
+"settings.font.preview.feature4" = "4. 记录心情；";
+"settings.font.preview.feature5" = "5. 自动记录天气/位置；";
+"settings.font.preview.closing" = "丰富的日记形式丰富您的每一次记录。";

@@ -11,8 +11,10 @@ struct SettingsView: View {
     @EnvironmentObject var router: AppRouter
     @StateObject private var localizationManager = LocalizationManager.shared
     @ObservedObject private var themeManager = ThemeManager.shared
+    @ObservedObject private var fontScaleManager = FontScaleManager.shared
     @State private var showLanguageSettings = false
     @State private var showThemeSettings = false
+    @State private var showFontSettings = false
     @State private var showDataSync = false
     
     var body: some View {
@@ -41,6 +43,21 @@ struct SettingsView: View {
                             Label("settings.theme".localized, systemImage: "paintbrush")
                             Spacer()
                             Text(themeManager.currentTheme.displayName)
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .foregroundColor(.primary)
+                    
+                    Button {
+                        showFontSettings = true
+                    } label: {
+                        HStack {
+                            Label("settings.font".localized, systemImage: "textformat.size")
+                            Spacer()
+                            Text(fontScaleManager.currentScale.displayName)
                                 .foregroundColor(.secondary)
                             Image(systemName: "chevron.right")
                                 .font(.caption)
@@ -82,6 +99,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showThemeSettings) {
                 ThemeSettingsView()
+            }
+            .sheet(isPresented: $showFontSettings) {
+                FontSettingsView()
             }
             .sheet(isPresented: $showDataSync) {
                 DataSyncView()
