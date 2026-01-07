@@ -160,3 +160,78 @@
 "search.emptyState.message" = "Enter keywords to search categories, story titles or content";
 "search.noResults.title" = "No Results Found";
 "search.noResults.message" = "No content found related to \"%@\"";
+
+// MARK: - Data Sync
+"dataSync.title" = "Data Sync";
+"dataSync.sender.title" = "Sender (Old Phone)";
+"dataSync.receiver.title" = "Receiver (New Phone)";
+"dataSync.instructions.title" = "Instructions";
+
+// Sender (Old Phone)
+"dataSync.sender.createBackup" = "Create Local Backup";
+"dataSync.sender.startConnection" = "Start Connection";
+"dataSync.sender.inputPIN" = "Enter New Phone PIN";
+"dataSync.sender.sendPIN" = "Verify PIN & Transfer";
+"dataSync.sender.noBackup" = "Please create a backup first";
+
+// Receiver (New Phone)
+"dataSync.receiver.waitForData" = "Wait for Data";
+"dataSync.receiver.yourPIN" = "Your PIN: ";
+"dataSync.receiver.showPINHint" = "PIN will show after connection";
+"dataSync.receiver.restoreData" = "Restore Data";
+
+// Status
+"dataSync.status.title" = "Current Status: ";
+"dataSync.status.idle" = "Idle";
+"dataSync.status.waitingForPeer" = "Searching for devices...";
+"dataSync.status.connected" = "Connected";
+"dataSync.status.pinWaitingInput" = "Waiting for PIN input";
+"dataSync.status.pinVerifying" = "Verifying...";
+"dataSync.status.readyToTransfer" = "Ready to transfer";
+"dataSync.status.transferring" = "Transferring %d%%";
+"dataSync.status.completed" = "Completed";
+"dataSync.status.failed" = "Failed: %@";
+
+// Progress
+"dataSync.progress.creating" = "Creating backup...";
+"dataSync.progress.restoring" = "Restoring data...";
+
+// Instructions
+"dataSync.instructions.receiver.title" = "Receiver Steps:";
+"dataSync.instructions.receiver.step1" = "1. Tap 'Wait for Data' to start receiving mode";
+"dataSync.instructions.receiver.step2" = "2. Note down the 6-digit PIN code";
+"dataSync.instructions.receiver.step3" = "3. Wait for sender to connect";
+"dataSync.instructions.receiver.step4" = "4. Data will be received automatically after verification";
+"dataSync.instructions.receiver.step5" = "5. After transfer completes, tap 'Restore Data' button";
+
+"dataSync.instructions.sender.title" = "Sender Steps:";
+"dataSync.instructions.sender.step1" = "1. Tap 'Create Local Backup' button";
+"dataSync.instructions.sender.step2" = "2. Tap 'Start Connection' to search for receiver";
+"dataSync.instructions.sender.step3" = "3. Enter the PIN code shown on receiver";
+"dataSync.instructions.sender.step4" = "4. Tap 'Verify PIN & Transfer' to start data transfer";
+
+"dataSync.instructions.notes.title" = "Important Notes:";
+"dataSync.instructions.notes.note1" = "• Both devices need to be on the same WiFi network or have Bluetooth enabled";
+"dataSync.instructions.notes.note2" = "• Keep the app in foreground during transfer";
+"dataSync.instructions.notes.note3" = "• Restart the app after transfer completes for best results";
+"dataSync.instructions.notes.note4" = "• PIN code ensures secure data transfer between devices";
+
+// Alerts
+"dataSync.alert.backupComplete" = "Backup completed: %@";
+"dataSync.alert.backupFailed" = "Backup failed: %@";
+"dataSync.alert.transferComplete" = "Data transfer completed. Please tap 'Restore Data' button.";
+"dataSync.alert.restoreComplete" = "Restore completed. Please restart the app to ensure proper state refresh.";
+"dataSync.alert.restoreFailed" = "Restore failed: %@";
+"dataSync.alert.noBackupFound" = "No backup files found";
+"dataSync.alert.resetting" = "Resetting, please wait...";
+
+// Error Types
+"dataSync.error.networkIssue" = "Devices not on the same network. Please check WiFi or Bluetooth settings";
+"dataSync.error.connectionTimeout" = "Connection timeout. Please try again";
+"dataSync.error.pinVerificationFailed" = "PIN verification failed. Please re-enter";
+"dataSync.error.connectionLost" = "Connection lost. Please start over";
+"dataSync.error.transferFailed" = "Data transfer failed. Please try again";
+"dataSync.error.unknown" = "Unknown error. Please try again";
+
+// Settings
+"settings.dataSync" = "Data Sync";

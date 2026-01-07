@@ -17,6 +17,7 @@ enum AppRoute: Hashable {
     case categoryDetail(categoryId: UUID)
     case settings
     case aiPolish(text: String)
+    case dataSync
     
     // 实现Hashable协议
     func hash(into hasher: inout Hasher) {
@@ -44,6 +45,8 @@ enum AppRoute: Hashable {
         case .aiPolish(let text):
             hasher.combine("aiPolish")
             hasher.combine(text)
+        case .dataSync:
+            hasher.combine("dataSync")
         }
     }
     
@@ -67,6 +70,8 @@ enum AppRoute: Hashable {
             return true
         case (.aiPolish(let t1), .aiPolish(let t2)):
             return t1 == t2
+        case (.dataSync, .dataSync):
+            return true
         default:
             return false
         }

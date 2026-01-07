@@ -160,3 +160,78 @@
 "search.emptyState.message" = "输入关键词搜索分类、故事标题或内容";
 "search.noResults.title" = "没有找到结果";
 "search.noResults.message" = "没有找到与 \"%@\" 相关的内容";
+
+// MARK: - Data Sync
+"dataSync.title" = "数据同步";
+"dataSync.sender.title" = "发送端（旧手机）";
+"dataSync.receiver.title" = "接收端（新手机）";
+"dataSync.instructions.title" = "操作说明";
+
+// Sender (Old Phone)
+"dataSync.sender.createBackup" = "创建本地同步备份";
+"dataSync.sender.startConnection" = "开始连接";
+"dataSync.sender.inputPIN" = "输入新手机的 PIN";
+"dataSync.sender.sendPIN" = "发送 PIN 验证并传输";
+"dataSync.sender.noBackup" = "请先创建本地同步备份";
+
+// Receiver (New Phone)
+"dataSync.receiver.waitForData" = "等待接收";
+"dataSync.receiver.yourPIN" = "本机 PIN：";
+"dataSync.receiver.showPINHint" = "连接后会显示 PIN 码";
+"dataSync.receiver.restoreData" = "恢复数据";
+
+// Status
+"dataSync.status.title" = "当前状态：";
+"dataSync.status.idle" = "空闲";
+"dataSync.status.waitingForPeer" = "正在搜索设备...";
+"dataSync.status.connected" = "已连接";
+"dataSync.status.pinWaitingInput" = "等待输入 PIN";
+"dataSync.status.pinVerifying" = "验证中...";
+"dataSync.status.readyToTransfer" = "准备传输";
+"dataSync.status.transferring" = "传输中 %d%%";
+"dataSync.status.completed" = "完成";
+"dataSync.status.failed" = "失败：%@";
+
+// Progress
+"dataSync.progress.creating" = "正在创建备份...";
+"dataSync.progress.restoring" = "正在恢复数据...";
+
+// Instructions
+"dataSync.instructions.receiver.title" = "接收端操作步骤：";
+"dataSync.instructions.receiver.step1" = "1. 点击'等待接收'按钮，启动接收模式";
+"dataSync.instructions.receiver.step2" = "2. 记下显示的 6 位 PIN 码";
+"dataSync.instructions.receiver.step3" = "3. 等待发送端连接";
+"dataSync.instructions.receiver.step4" = "4. 连接成功后，将自动验证并接收数据";
+"dataSync.instructions.receiver.step5" = "5. 数据传输完成后，点击'恢复数据'按钮";
+
+"dataSync.instructions.sender.title" = "发送端操作步骤：";
+"dataSync.instructions.sender.step1" = "1. 点击'创建本地同步备份'按钮";
+"dataSync.instructions.sender.step2" = "2. 点击'开始连接'按钮，搜索接收端设备";
+"dataSync.instructions.sender.step3" = "3. 连接成功后，输入接收端显示的 PIN 码";
+"dataSync.instructions.sender.step4" = "4. 点击'发送 PIN 验证并传输'，开始数据传输";
+
+"dataSync.instructions.notes.title" = "注意事项：";
+"dataSync.instructions.notes.note1" = "• 两台设备需要在同一WiFi网络下，或开启蓝牙";
+"dataSync.instructions.notes.note2" = "• 传输过程中请保持应用在前台运行";
+"dataSync.instructions.notes.note3" = "• 传输完成后，建议重启应用以确保数据正常";
+"dataSync.instructions.notes.note4" = "• PIN 码用于验证设备，确保数据传输安全";
+
+// Alerts
+"dataSync.alert.backupComplete" = "备份完成：%@";
+"dataSync.alert.backupFailed" = "备份失败：%@";
+"dataSync.alert.transferComplete" = "数据传输完成，请点击'恢复数据'按钮。";
+"dataSync.alert.restoreComplete" = "恢复完成，请重启应用以确保状态刷新。";
+"dataSync.alert.restoreFailed" = "恢复失败：%@";
+"dataSync.alert.noBackupFound" = "未找到任何备份文件";
+"dataSync.alert.resetting" = "正在重置，请稍候...";
+
+// Error Types
+"dataSync.error.networkIssue" = "设备不在同一网络，请检查WiFi或蓝牙设置";
+"dataSync.error.connectionTimeout" = "连接超时，请重试";
+"dataSync.error.pinVerificationFailed" = "PIN码验证失败，请重新输入";
+"dataSync.error.connectionLost" = "连接已断开，请重新开始";
+"dataSync.error.transferFailed" = "数据传输失败，请重试";
+"dataSync.error.unknown" = "未知错误，请重试";
+
+// Settings
+"settings.dataSync" = "数据同步";
