@@ -491,7 +491,6 @@
 				TargetAttributes = {
 					E800000001 = {
 						CreatedOnToolsVersion = 15.0;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -630,12 +629,14 @@
 		EC00000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 893973NXS8;
 				INFOPLIST_FILE = MyStory/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lgogo.story;
 				PRODUCT_NAME = MyStory;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
@@ -646,12 +647,14 @@
 		EC00000002 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 893973NXS8;
 				INFOPLIST_FILE = MyStory/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.gogo.MyStory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lgogo.story;
 				PRODUCT_NAME = MyStory;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;

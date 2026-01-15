@@ -27,8 +27,17 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>$(PRODUCT_NAME) 需要使用蓝牙在设备间传输数据</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_mystory-mig._tcp</string>
+		<string>_mystory-mig._udp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your camera to take photos</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>$(PRODUCT_NAME) 需要使用本地网络在设备间传输数据</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your location to add location information to your stories</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -39,6 +48,8 @@
 		<true/>
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
@@ -57,16 +68,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>$(PRODUCT_NAME) 需要使用本地网络在设备间传输数据</string>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_mystory-mig._tcp</string>
-		<string>_mystory-mig._udp</string>
-	</array>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>$(PRODUCT_NAME) 需要使用蓝牙在设备间传输数据</string>
-	<key>UIFileSharingEnabled</key>
-	<true/>
 </dict>
 </plist>

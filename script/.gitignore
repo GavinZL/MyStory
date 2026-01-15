@@ -1,0 +1,13 @@
+# 忽略本地配置文件 (包含敏感信息)
+build_config.local.sh
+*.local.sh
+
+# 忽略构建输出
+*.ipa
+*.xcarchive
+*.dSYM.zip
+
+# 忽略日志文件
+*.log
+build_*.log
+export_*.log
