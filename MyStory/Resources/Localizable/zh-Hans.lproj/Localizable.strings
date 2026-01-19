@@ -271,3 +271,36 @@
 "settings.font.preview.feature4" = "4. 记录心情；";
 "settings.font.preview.feature5" = "5. 自动记录天气/位置；";
 "settings.font.preview.closing" = "丰富的日记形式丰富您的每一次记录。";
+
+// MARK: - Privacy Policy
+"settings.privacyPolicy" = "隐私政策";
+"privacyPolicy.title" = "隐私政策";
+"privacyPolicy.lastUpdated" = "最后更新日期：2025年1月";
+
+// Privacy Policy Sections
+"privacyPolicy.section.intro.title" = "引言";
+"privacyPolicy.section.intro.content" = "感谢您使用「我的故事」。我们非常重视您的隐私保护，本隐私政策将帮助您了解我们如何收集、使用和保护您的个人信息。";
+
+"privacyPolicy.section.dataCollection.title" = "数据收集";
+"privacyPolicy.section.dataCollection.content" = "我们仅收集您在使用应用时主动提供的信息，包括：\n• 故事内容（文字、图片、视频）\n• 位置信息（仅在您授权后获取）\n• 分类和设置偏好";
+
+"privacyPolicy.section.dataStorage.title" = "数据存储";
+"privacyPolicy.section.dataStorage.content" = "您的所有数据都存储在您的设备本地：\n• 文字内容存储在 Core Data 数据库中\n• 媒体文件使用 AES-256-GCM 加密存储\n• 敏感信息（如加密密钥）存储在 iOS 钥匙串中\n• 我们不会将您的数据上传到任何服务器";
+
+"privacyPolicy.section.permissions.title" = "权限使用";
+"privacyPolicy.section.permissions.content" = "应用可能请求以下权限：\n• 相机权限：用于拍摄照片或视频\n• 相册权限：用于选择已有的图片或视频\n• 位置权限：用于记录故事发生的地点\n• 本地网络权限：用于设备间数据同步\n\n所有权限均在您首次使用相关功能时请求，您可以随时在系统设置中关闭。";
+
+"privacyPolicy.section.aiService.title" = "AI 服务说明";
+"privacyPolicy.section.aiService.content" = "当您使用 AI 文本润色功能时：\n• 您的文本内容会被发送到通义千问 API 进行处理\n• 我们不会保存您发送的文本内容\n• AI 服务提供商可能会按照其隐私政策处理数据\n• 请勿在 AI 润色中输入敏感个人信息";
+
+"privacyPolicy.section.userRights.title" = "您的权利";
+"privacyPolicy.section.userRights.content" = "您对自己的数据拥有完全控制权：\n• 查看：您可以随时查看所有存储的故事和媒体\n• 编辑：您可以修改任何已保存的内容\n• 删除：您可以删除单个故事或清空所有数据\n• 导出：您可以通过数据同步功能导出所有数据";
+
+"privacyPolicy.section.security.title" = "数据安全";
+"privacyPolicy.section.security.content" = "我们采取多项措施保护您的数据安全：\n• 媒体文件采用 AES-256-GCM 加密\n• 加密密钥存储在 iOS 钥匙串中\n• 设备间数据传输使用端到端加密\n• 应用不包含任何第三方分析或广告SDK";
+
+"privacyPolicy.section.contact.title" = "联系我们";
+"privacyPolicy.section.contact.content" = "如果您对本隐私政策有任何疑问或建议，欢迎通过应用商店的开发者联系方式与我们取得联系。";
+
+"privacyPolicy.section.changes.title" = "政策变更";
+"privacyPolicy.section.changes.content" = "我们可能会不时更新本隐私政策。更新后的政策将在应用内公布，建议您定期查阅。继续使用本应用即表示您同意接受更新后的隐私政策。";

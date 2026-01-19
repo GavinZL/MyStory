@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var showThemeSettings = false
     @State private var showFontSettings = false
     @State private var showDataSync = false
+    @State private var showPrivacyPolicy = false
     @State private var showCacheCleanupConfirm = false
     @State private var isCleaningCache = false
     @State private var showCleanupResult = false
@@ -109,6 +110,19 @@ struct SettingsView: View {
                 }
                 
                 Section("settings.about".localized) {
+                    Button {
+                        showPrivacyPolicy = true
+                    } label: {
+                        HStack {
+                            Label("settings.privacyPolicy".localized, systemImage: "hand.raised")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .foregroundColor(.primary)
+                    
                     HStack {
                         Text("settings.version".localized)
                         Spacer()
@@ -130,6 +144,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showDataSync) {
                 DataSyncView()
+            }
+            .sheet(isPresented: $showPrivacyPolicy) {
+                PrivacyPolicyView()
             }
             .alert("settings.cacheCleanup.confirm.title".localized, isPresented: $showCacheCleanupConfirm) {
                 Button("common.cancel".localized, role: .cancel) { }
