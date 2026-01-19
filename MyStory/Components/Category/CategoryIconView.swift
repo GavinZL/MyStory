@@ -4,6 +4,15 @@ import SwiftUI
 /// 分类图标视图，支持系统图标和自定义图标
 struct CategoryIconView: View {
     
+    // MARK: - Constants
+    
+    /// Assets 中的预置图标列表
+    private static let assetIconNames: Set<String> = [
+        "hand_up", "heart_balloon", "idea", "landscape",
+        "love", "people", "map", "present",
+        "running", "sales", "school", "shopping"
+    ]
+    
     // MARK: - Properties
     
     /// 分类实体（可选）
@@ -41,7 +50,7 @@ struct CategoryIconView: View {
     var body: some View {
         Group {
             if isCustomIcon {
-                // 显示自定义图标
+                // 显示用户上传的自定义图标
                 if let iconData = customIconData,
                    let uiImage = UIImage(data: iconData) {
                     Image(uiImage: uiImage)
@@ -51,22 +60,33 @@ struct CategoryIconView: View {
                         .clipShape(Circle())
                 } else {
                     // 降级处理：显示默认系统图标
-                    systemIconView
+                    sfSymbolIconView(name: "folder.fill")
                 }
+            } else if Self.assetIconNames.contains(iconName) {
+                // 显示 Assets 中的预置图标
+                assetIconView
             } else {
-                // 显示系统图标
-                systemIconView
+                // 显示 SF Symbols 系统图标
+                sfSymbolIconView(name: iconName)
             }
         }
     }
     
     // MARK: - Private Views
     
-    /// 系统图标视图
-    private var systemIconView: some View {
-        Image(systemName: iconName)
+    /// SF Symbols 系统图标视图
+    private func sfSymbolIconView(name: String) -> some View {
+        Image(systemName: name)
             .font(.system(size: size))
             .foregroundColor(color)
+    }
+    
+    /// Assets 预置图标视图
+    private var assetIconView: some View {
+        Image(iconName)
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
     }
     
     // MARK: - Helper Properties
