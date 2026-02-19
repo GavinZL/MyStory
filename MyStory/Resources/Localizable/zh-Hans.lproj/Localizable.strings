@@ -71,10 +71,14 @@
 "category.newLevel" = "新建%@";
 
 // Category Statistics
-"category.storyCount" = "共 %d 个故事";
-"category.childrenCount" = "共 %d 个子目录";
-"category.secondLevelCount" = "共 %d 个二级分类";
-"category.thirdLevelCount" = "共 %d 个三级分类";
+"category.storyCount" = "%d个故事";
+"category.childrenCount" = "%d个目录";
+"category.secondLevelCount" = "%d个目录";
+"category.thirdLevelCount" = "%d个目录";
+"category.directStoriesTitle" = "本分类故事";
+"category.subcategoriesTitle" = "子分类";
+"category.viewAll" = "查看全部";
+"category.createStory" = "新建故事";
 
 // Category Display Modes
 "category.mode.card" = "卡片";
@@ -113,6 +117,14 @@
 "settings.theme.ocean.description" = "青蓝色系，清新自然";
 "settings.theme.sunset" = "晚霞";
 "settings.theme.sunset.description" = "暖橙色系，温暖柔和";
+"settings.theme.nightSky" = "夜空";
+"settings.theme.nightSky.description" = "深紫蓝色系，神秘星空";
+"settings.theme.forest" = "森林";
+"settings.theme.forest.description" = "清新绿色系，自然舒适";
+"settings.theme.lavender" = "薰衣草";
+"settings.theme.lavender.description" = "柔和紫色系，浪漫温馨";
+"settings.theme.dark" = "暗夜";
+"settings.theme.dark.description" = "深色模式，护眼舒适";
 "settings.theme.selectTheme" = "选择主题";
 "settings.theme.hint" = "主题会实时应用到所有页面";
 

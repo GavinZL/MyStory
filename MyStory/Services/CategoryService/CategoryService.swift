@@ -174,7 +174,7 @@ public final class InMemoryCategoryService: CategoryService {
         let childIds = childrenMap[id] ?? []
         let childNodes = childIds.map { buildNode(for: $0) }
         let total = aggregatedStoryCount(for: id)
-        return CategoryTreeNode(id: id, category: cat, children: childNodes, isExpanded: false, storyCount: total)
+        return CategoryTreeNode(id: id, category: cat, children: childNodes, isExpanded: false, storyCount: total, directStoryCount: storyCounts[id] ?? 0)
     }
 
     private func aggregatedStoryCount(for id: UUID) -> Int {
@@ -456,25 +456,25 @@ public final class CoreDataCategoryService: CategoryService {
         let trimmedKeyword = keyword.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         var results: [CategorySearchResult] = []
         
-        // 获取所有三级分类，并预加载 stories 关系数据
+        // 获取所有有故事的分类，并预加载 stories 关系数据
         let request = CategoryEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "level == %d", 3)
+        request.predicate = NSPredicate(format: "stories.@count > 0")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \CategoryEntity.sortOrder, ascending: true)]
         // ⚠️ 关键：预加载 stories 关系数据，避免 fault 导致数据为空
         request.relationshipKeyPathsForPrefetching = ["stories", "parent", "parent.parent"]
         
-        var level3Categories: [CategoryEntity] = []
+        var categoriesWithStories: [CategoryEntity] = []
         do {
-            level3Categories = try context.fetch(request)
+            categoriesWithStories = try context.fetch(request)
         } catch {
-            print("⚠️ [CategoryService] Error fetching level 3 categories for search: \(error)")
+            print("⚠️ [CategoryService] Error fetching categories for search: \(error)")
             return []
         }
         
-        for category in level3Categories {
+        for category in categoriesWithStories {
             var matchedStories: [StoryMatch] = []
             
-            // 1. 搜索三级分类名称
+            // 1. 搜索分类名称
             let categoryNameMatch = (category.name ?? "").lowercased().contains(trimmedKeyword)
             
             // 2. 搜索该分类下的所有故事
@@ -572,6 +572,9 @@ public final class CoreDataCategoryService: CategoryService {
         let sortedChildren = childEntities.sorted { $0.sortOrder < $1.sortOrder }
         let childNodes = sortedChildren.map { buildNode(from: $0) }
         
+        // 计算直属故事数
+        let directCount = entity.stories?.count ?? 0
+        
         // 计算总故事数（包含子分类）
         let storyCount = entity.id.map { totalStoryCount(for: $0) } ?? 0
         
@@ -580,7 +583,8 @@ public final class CoreDataCategoryService: CategoryService {
             category: categoryModel,
             children: childNodes,
             isExpanded: false,
-            storyCount: storyCount
+            storyCount: storyCount,
+            directStoryCount: directCount
         )
     }
     

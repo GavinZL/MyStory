@@ -125,7 +125,7 @@ public struct CategoryView: View {
                 // 只显示一级分类
                 ForEach(viewModel.tree, id: \.id) { node in
                     NavigationLink(destination: CategoryLevelView(parentNode: node, currentLevel: 2, viewModel: viewModel)) {
-                        CategoryCardView(node: node, displayMode: .children)
+                        CategoryCardView(node: node, displayMode: .hybrid)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .contextMenu {
@@ -232,7 +232,8 @@ public struct CategoryView: View {
                 ),
                 children: [],
                 isExpanded: false,
-                storyCount: category.stories?.count ?? 0
+                storyCount: category.stories?.count ?? 0,
+                directStoryCount: category.stories?.count ?? 0
             ))
         } else {
             EmptyView()
@@ -247,9 +248,13 @@ private struct CategoryListItem: View {
     let node: CategoryTreeNode
     let level: Int  // 1, 2, or 3
     @Binding var expandedCategories: Set<UUID>
-    @ObservedObject var viewModel: CategoryViewModel  // 新增
+    @ObservedObject var viewModel: CategoryViewModel
     let onEdit: (CategoryTreeNode) -> Void  // 编辑回调
     let onDelete: (CategoryTreeNode) -> Void  // 删除回调
+    
+    @Environment(\.managedObjectContext) private var context
+    @State private var navigateToStoryList = false
+    @State private var showStoryEditor = false
     
     var body: some View {
         Group {
@@ -272,6 +277,27 @@ private struct CategoryListItem: View {
                 .contextMenu {
                     contextMenuItems(for: node)
                 }
+                .background(
+                    NavigationLink(
+                        destination: CategoryStoryListView(category: node),
+                        isActive: $navigateToStoryList
+                    ) {
+                        EmptyView()
+                    }
+                    .hidden()
+                )
+                .sheet(isPresented: $showStoryEditor) {
+                    let categoryService = CoreDataCategoryService(context: context)
+                    if let categoryEntity = categoryService.fetchCategory(id: node.id) {
+                        NewStoryEditorView(existingStory: nil, category: categoryEntity) {
+                            viewModel.load()
+                        }
+                    } else {
+                        NewStoryEditorView(existingStory: nil, category: nil) {
+                            viewModel.load()
+                        }
+                    }
+                }
                 
                 // 如果展开，显示子分类
                 if isExpanded && !node.children.isEmpty {
@@ -280,9 +306,9 @@ private struct CategoryListItem: View {
                             node: childNode,
                             level: level + 1,
                             expandedCategories: $expandedCategories,
-                            viewModel: viewModel,  // 传递 viewModel
-                            onEdit: onEdit,  // 传递编辑回调
-                            onDelete: onDelete  // 传递删除回调
+                            viewModel: viewModel,
+                            onEdit: onEdit,
+                            onDelete: onDelete
                         )
                         .padding(.leading, 24)  // 缩进显示层级
                     }
@@ -295,6 +321,12 @@ private struct CategoryListItem: View {
     
     @ViewBuilder
     private func contextMenuItems(for node: CategoryTreeNode) -> some View {
+        Button {
+            showStoryEditor = true
+        } label: {
+            Label("category.createStory".localized, systemImage: "plus.circle")
+        }
+        
         Button {
             onEdit(node)
         } label: {
@@ -337,6 +369,26 @@ private struct CategoryListItem: View {
             
             Spacer()
             
+            // 故事数 Badge（仅 Level 1/2 且有直属故事时显示）
+            if level < 3 && node.directStoryCount > 0 {
+                Button {
+                    navigateToStoryList = true
+                } label: {
+                    HStack(spacing: AppTheme.Spacing.xs) {
+                        Image(systemName: "doc.text")
+                            .font(.caption2)
+                        Text("\(node.directStoryCount)")
+                            .font(.footnote)
+                    }
+                    .padding(.horizontal, AppTheme.Spacing.s)
+                    .padding(.vertical, AppTheme.Spacing.xs)
+                    .background(AppTheme.Colors.primary.opacity(0.1))
+                    .foregroundColor(AppTheme.Colors.primary)
+                    .cornerRadius(AppTheme.Radius.s)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
             // 统计信息
             Text(statisticsText)
                 .foregroundColor(.secondary)
@@ -363,14 +415,18 @@ private struct CategoryListItem: View {
     /// 统计信息文本
     private var statisticsText: String {
         switch level {
-        case 1:
-            // 一级分类：显示子目录数量
-            let count = node.children.count
-            return String(format: "category.childrenCount".localized, count)
-        case 2:
-            // 二级分类：显示子目录数量（三级分类数量）
-            let count = node.children.count
-            return String(format: "category.childrenCount".localized, count)
+        case 1, 2:
+            let childCount = node.children.count
+            let storyCount = node.directStoryCount
+            if childCount > 0 && storyCount > 0 {
+                return String(format: "category.childrenCount".localized, childCount)
+            } else if childCount > 0 {
+                return String(format: "category.childrenCount".localized, childCount)
+            } else if storyCount > 0 {
+                return String(format: "category.storyCount".localized, storyCount)
+            } else {
+                return String(format: "category.childrenCount".localized, 0)
+            }
         case 3:
             // 三级分类：显示故事数量
             return String(format: "category.storyCount".localized, node.storyCount)

@@ -235,7 +235,8 @@ struct StoryDetailView: View {
             ),
             children: [],
             isExpanded: false,
-            storyCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0
+            storyCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0,
+            directStoryCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0
         )
     }
     

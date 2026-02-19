@@ -94,8 +94,22 @@ enum ThemeType: String, CaseIterable, Identifiable {
     case classic = "classic"
     case ocean = "ocean"
     case sunset = "sunset"
+    case nightSky = "nightSky"
+    case forest = "forest"
+    case lavender = "lavender"
+    case dark = "dark"
     
     var id: String { rawValue }
+    
+    /// 是否为深色主题
+    var isDarkTheme: Bool {
+        switch self {
+        case .nightSky, .dark:
+            return true
+        default:
+            return false
+        }
+    }
     
     var displayName: String {
         switch self {
@@ -105,6 +119,14 @@ enum ThemeType: String, CaseIterable, Identifiable {
             return "settings.theme.ocean".localized
         case .sunset:
             return "settings.theme.sunset".localized
+        case .nightSky:
+            return "settings.theme.nightSky".localized
+        case .forest:
+            return "settings.theme.forest".localized
+        case .lavender:
+            return "settings.theme.lavender".localized
+        case .dark:
+            return "settings.theme.dark".localized
         }
     }
     
@@ -116,6 +138,14 @@ enum ThemeType: String, CaseIterable, Identifiable {
             return "settings.theme.ocean.description".localized
         case .sunset:
             return "settings.theme.sunset.description".localized
+        case .nightSky:
+            return "settings.theme.nightSky.description".localized
+        case .forest:
+            return "settings.theme.forest.description".localized
+        case .lavender:
+            return "settings.theme.lavender.description".localized
+        case .dark:
+            return "settings.theme.dark.description".localized
         }
     }
     
@@ -127,6 +157,14 @@ enum ThemeType: String, CaseIterable, Identifiable {
             return (primary: Color(hex: "00B4D8") ?? .cyan, surface: Color(hex: "E8F4F8") ?? .gray)
         case .sunset:
             return (primary: Color(hex: "FF6B6B") ?? .orange, surface: Color(hex: "FFF0E8") ?? .gray)
+        case .nightSky:
+            return (primary: Color(hex: "5B4E8C") ?? .purple, surface: Color(hex: "25253D") ?? .gray)
+        case .forest:
+            return (primary: Color(hex: "2D6A4F") ?? .green, surface: Color(hex: "E8F5E9") ?? .gray)
+        case .lavender:
+            return (primary: Color(hex: "9B8AC4") ?? .purple, surface: Color(hex: "F3E8FF") ?? .gray)
+        case .dark:
+            return (primary: Color(hex: "6B8AF7") ?? .blue, surface: Color(hex: "1E1E1E") ?? .gray)
         }
     }
 }
@@ -163,6 +201,25 @@ struct AppTheme {
                 return Color(hex: "00B4D8") ?? .cyan
             case .sunset:
                 return Color(hex: "FF6B6B") ?? .orange
+            case .nightSky:
+                return Color(hex: "5B4E8C") ?? .purple
+            case .forest:
+                return Color(hex: "2D6A4F") ?? .green
+            case .lavender:
+                return Color(hex: "9B8AC4") ?? .purple
+            case .dark:
+                return Color(hex: "6B8AF7") ?? .blue
+            }
+        }
+        
+        /// 金色强调色（用于 Night Sky 主题）
+        @MainActor
+        static var accent: Color {
+            switch ThemeManager.shared.currentTheme {
+            case .nightSky:
+                return Color(hex: "F5B041") ?? .yellow
+            default:
+                return primary
             }
         }
         
@@ -175,6 +232,14 @@ struct AppTheme {
                 return Color(hex: "F0F9FF") ?? Color(red: 0.94, green: 0.98, blue: 1.0)
             case .sunset:
                 return Color(hex: "FFF5F5") ?? Color(red: 1.0, green: 0.96, blue: 0.96)
+            case .nightSky:
+                return Color(hex: "1A1A2E") ?? Color(red: 0.10, green: 0.10, blue: 0.18)
+            case .forest:
+                return Color(hex: "F5FDF5") ?? Color(red: 0.96, green: 0.99, blue: 0.96)
+            case .lavender:
+                return Color(hex: "FAF5FF") ?? Color(red: 0.98, green: 0.96, blue: 1.0)
+            case .dark:
+                return Color(hex: "121212") ?? Color(red: 0.07, green: 0.07, blue: 0.07)
             }
         }
         
@@ -187,19 +252,59 @@ struct AppTheme {
                 return Color(hex: "E8F4F8") ?? Color(red: 0.91, green: 0.96, blue: 0.97)
             case .sunset:
                 return Color(hex: "FFF0E8") ?? Color(red: 1.0, green: 0.94, blue: 0.91)
+            case .nightSky:
+                return Color(hex: "25253D") ?? Color(red: 0.15, green: 0.15, blue: 0.24)
+            case .forest:
+                return Color(hex: "E8F5E9") ?? Color(red: 0.91, green: 0.96, blue: 0.91)
+            case .lavender:
+                return Color(hex: "F3E8FF") ?? Color(red: 0.95, green: 0.91, blue: 1.0)
+            case .dark:
+                return Color(hex: "1E1E1E") ?? Color(red: 0.12, green: 0.12, blue: 0.12)
             }
         }
         
+        @MainActor
         static var textPrimary: Color {
-            Color(hex: "1C1C1E") ?? Color(red: 0.11, green: 0.11, blue: 0.12)
+            switch ThemeManager.shared.currentTheme {
+            case .nightSky:
+                return Color(hex: "E8E8F0") ?? Color(red: 0.91, green: 0.91, blue: 0.94)
+            case .forest:
+                return Color(hex: "1B4332") ?? Color(red: 0.11, green: 0.26, blue: 0.20)
+            case .lavender:
+                return Color(hex: "4A3B6B") ?? Color(red: 0.29, green: 0.23, blue: 0.42)
+            case .dark:
+                return Color(hex: "E0E0E0") ?? Color(red: 0.88, green: 0.88, blue: 0.88)
+            default:
+                return Color(hex: "1C1C1E") ?? Color(red: 0.11, green: 0.11, blue: 0.12)
+            }
         }
         
+        @MainActor
         static var textSecondary: Color {
-            Color(hex: "8E8E93") ?? .gray
+            switch ThemeManager.shared.currentTheme {
+            case .nightSky:
+                return Color(hex: "9090A8") ?? Color(red: 0.56, green: 0.56, blue: 0.66)
+            case .forest:
+                return Color(hex: "52796F") ?? Color(red: 0.32, green: 0.47, blue: 0.44)
+            case .lavender:
+                return Color(hex: "8B7AA8") ?? Color(red: 0.55, green: 0.48, blue: 0.66)
+            case .dark:
+                return Color(hex: "9E9E9E") ?? Color(red: 0.62, green: 0.62, blue: 0.62)
+            default:
+                return Color(hex: "8E8E93") ?? .gray
+            }
         }
         
+        @MainActor
         static var border: Color {
-            Color(hex: "D1D1D6") ?? Color(red: 0.82, green: 0.82, blue: 0.84)
+            switch ThemeManager.shared.currentTheme {
+            case .nightSky:
+                return Color(hex: "3D3D5C") ?? Color(red: 0.24, green: 0.24, blue: 0.36)
+            case .dark:
+                return Color(hex: "3D3D3D") ?? Color(red: 0.24, green: 0.24, blue: 0.24)
+            default:
+                return Color(hex: "D1D1D6") ?? Color(red: 0.82, green: 0.82, blue: 0.84)
+            }
         }
         
         static var success: Color {
@@ -303,6 +408,82 @@ struct AppTheme {
         static let small = ShadowToken(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
         static let medium = ShadowToken(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
         static let large = ShadowToken(color: Color.black.opacity(0.16), radius: 12, x: 0, y: 8)
+    }
+    
+    // MARK: - Icon Size Token
+    struct IconSize {
+        static let xs: CGFloat = 12    // 装饰性小图标（List 行尾箭头）
+        static let s: CGFloat = 16     // 内联图标（文本旁图标、Tag 标记）
+        static let m: CGFloat = 20     // 工具栏按钮
+        static let l: CGFloat = 24     // 导航栏、主操作
+        static let xl: CGFloat = 28    // 强调图标
+        static let xxl: CGFloat = 42   // 分类图标
+        static let hero: CGFloat = 60  // 空状态大图标
+    }
+    
+    // MARK: - Opacity Token
+    struct Opacity {
+        static let subtle: Double = 0.05    // 极轻背景叠加
+        static let muted: Double = 0.15     // 禁用状态、占位符
+        static let medium: Double = 0.3     // 次要内容、辅助背景
+        static let strong: Double = 0.6     // 视频播放按钮、蒙层
+    }
+    
+    // MARK: - Gradient Token
+    @MainActor
+    struct Gradient {
+        /// 主色渐变（深→浅）
+        static var primary: LinearGradient {
+            let theme = ThemeManager.shared.currentTheme
+            let colors: [Color]
+            switch theme {
+            case .classic:
+                colors = [Color(hex: "007AFF") ?? .blue, Color(hex: "5AC8FA") ?? .cyan]
+            case .ocean:
+                colors = [Color(hex: "00B4D8") ?? .cyan, Color(hex: "90E0EF") ?? .teal]
+            case .sunset:
+                colors = [Color(hex: "FF6B6B") ?? .orange, Color(hex: "FFA07A") ?? .orange]
+            case .nightSky:
+                colors = [Color(hex: "5B4E8C") ?? .purple, Color(hex: "F5B041") ?? .yellow]
+            case .forest:
+                colors = [Color(hex: "2D6A4F") ?? .green, Color(hex: "95D5B2") ?? .green]
+            case .lavender:
+                colors = [Color(hex: "9B8AC4") ?? .purple, Color(hex: "D8B4FE") ?? .purple]
+            case .dark:
+                colors = [Color(hex: "6B8AF7") ?? .blue, Color(hex: "A5B4FC") ?? .blue]
+            }
+            return LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
+        
+        /// 蒙层渐变（底部渐隐）
+        static var overlay: LinearGradient {
+            LinearGradient(
+                colors: [Color.black.opacity(0), Color.black.opacity(Opacity.strong)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+    
+    // MARK: - Animation Token
+    struct Animation {
+        struct Duration {
+            static let fast: Double = 0.2      // 微交互（按钮点击、toggle）
+            static let normal: Double = 0.3    // 标准过渡（sheet 展开、fade）
+            static let slow: Double = 0.5      // 强调动画（删除确认、加载完成）
+        }
+        
+        struct Spring {
+            static var snappy: SwiftUI.Animation {
+                SwiftUI.Animation.spring(response: 0.3, dampingFraction: 0.7)
+            }
+            static var smooth: SwiftUI.Animation {
+                SwiftUI.Animation.spring(response: 0.5, dampingFraction: 0.8)
+            }
+            static var gentle: SwiftUI.Animation {
+                SwiftUI.Animation.spring(response: 0.8, dampingFraction: 0.9)
+            }
+        }
     }
 }
 

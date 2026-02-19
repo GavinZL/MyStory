@@ -121,15 +121,45 @@ struct StoryCardView: View {
         if let firstVideo = videos.first {
             // 存在视频时，仅展示视频缩略图
             videoItemView(media: firstVideo)
+        } else if images.count == 1 {
+            // 单张图片：全宽自适应显示
+            singleImageView(media: images[0])
         } else if !images.isEmpty {
-            // 仅图片时，按 3x3 九宫格展示
-            let columns = Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.s), count: 3)
+            // 多张图片：根据数量选择列数
+            let columnCount = images.count == 2 ? 2 : 3
+            let columns = Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.s), count: columnCount)
             
             LazyVGrid(columns: columns, spacing: AppTheme.Spacing.s) {
                 ForEach(Array(images.prefix(9).enumerated()), id: \.offset) { index, media in
                     mediaItemView(media: media, index: index, totalCount: min(images.count, 9))
                 }
             }
+        }
+    }
+    
+    /// 单张图片全宽自适应显示
+    @ViewBuilder
+    private func singleImageView(media: MediaEntity) -> some View {
+        if let image = loadMediaImage(media: media) {
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity, maxHeight: 200)
+                .clipped()
+                .cornerRadius(AppTheme.Radius.s)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    openImageViewer(media: media)
+                }
+        } else {
+            RoundedRectangle(cornerRadius: AppTheme.Radius.s)
+                .fill(AppTheme.Colors.surface.opacity(0.15))
+                .frame(maxWidth: .infinity, minHeight: 120)
+                .overlay(
+                    Image(systemName: "photo")
+                        .font(.system(size: 24))
+                        .foregroundColor(AppTheme.Colors.border)
+                )
         }
     }
     
@@ -140,6 +170,7 @@ struct StoryCardView: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+                    .frame(minWidth: 0, maxWidth: .infinity)
                     .frame(height: 90)
                     .clipped()
                     .cornerRadius(AppTheme.Radius.s)

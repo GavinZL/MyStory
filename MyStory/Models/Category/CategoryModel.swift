@@ -19,4 +19,5 @@ public struct CategoryTreeNode: Identifiable, Hashable {
     public var children: [CategoryTreeNode]
     public var isExpanded: Bool
     public var storyCount: Int // 含子分类总数
+    public var directStoryCount: Int // 仅该分类直属的故事数（不含子分类）
 }

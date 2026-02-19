@@ -109,6 +109,11 @@ private struct CategoryPickerSection: View {
     
     @State private var isExpanded: Bool = true
     
+    /// 是否选中
+    private var isSelected: Bool {
+        selectedCategories.contains(node.id)
+    }
+    
     var body: some View {
         Section(header: sectionHeader) {
             if isExpanded {
@@ -124,32 +129,61 @@ private struct CategoryPickerSection: View {
         }
     }
     
-    /// 区域头部
+    /// 区域头部 - 点击名称区域选中，点击箭头展开/折叠
     private var sectionHeader: some View {
-        Button {
-            withAnimation {
-                isExpanded.toggle()
+        HStack {
+            // 点击主区域：选中分类
+            Button {
+                toggleSelection()
+            } label: {
+                HStack {
+                    CategoryIconView(
+                        model: node.category,
+                        size: 20,
+                        color: Color(hex: node.category.colorHex)
+                    )
+                    
+                    Text(node.category.name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(AppTheme.Colors.primary)
+                            .font(.subheadline)
+                    }
+                }
             }
-        } label: {
-            HStack {
-                CategoryIconView(
-                    model: node.category,
-                    size: 20,
-                    color: Color(hex: node.category.colorHex)
-                )
-                
-                Text(node.category.name)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            .buttonStyle(PlainButtonStyle())
+            
+            Spacer()
+            
+            // 点击箭头：展开/折叠子分类
+            if !node.children.isEmpty {
+                Button {
+                    withAnimation {
+                        isExpanded.toggle()
+                    }
+                } label: {
+                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .frame(width: 30, height: 30)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
             }
         }
-        .buttonStyle(PlainButtonStyle())
+    }
+    
+    /// 切换选中状态（单选模式）
+    private func toggleSelection() {
+        if isSelected {
+            selectedCategories.remove(node.id)
+        } else {
+            selectedCategories.removeAll()
+            selectedCategories.insert(node.id)
+        }
     }
 }
 
@@ -182,53 +216,56 @@ private struct CategoryPickerItem: View {
         }
     }
     
-    /// 分类项按钮
+    /// 分类项按钮 - 点击名称区域选中，点击箭头展开/折叠
     private var categoryItemButton: some View {
-        Button {
+        HStack(spacing: AppTheme.Spacing.m) {
+            // 展开/折叠按钮（仅二级分类有子分类时显示）
             if level == 2 && !node.children.isEmpty {
-                // 二级分类：切换展开状态
-                withAnimation {
-                    isExpanded.toggle()
-                }
-            } else {
-                // 三级分类或无子分类的二级分类：切换选中状态
-                toggleSelection()
-            }
-        } label: {
-            HStack(spacing: AppTheme.Spacing.m) {
-                // 展开/折叠图标（仅二级分类有子分类时显示）
-                if level == 2 && !node.children.isEmpty {
+                Button {
+                    withAnimation {
+                        isExpanded.toggle()
+                    }
+                } label: {
                     Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                        .frame(width: 16)
+                        .frame(width: 16, height: 30)
+                        .contentShape(Rectangle())
                 }
-                
-                // 分类图标
-                CategoryIconView(
-                    model: node.category,
-                    size: 20,
-                    color: Color(hex: node.category.colorHex)
-                )
-                .frame(width: 24)
-                
-                // 分类名称
-                Text(node.category.name)
-                    .font(.body)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                // 选中状态指示器
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(AppTheme.Colors.primary)
-                }
+                .buttonStyle(PlainButtonStyle())
             }
-            .padding(.vertical, AppTheme.Spacing.s)
-            .contentShape(Rectangle())
+            
+            // 点击主区域：选中分类
+            Button {
+                toggleSelection()
+            } label: {
+                HStack(spacing: AppTheme.Spacing.m) {
+                    // 分类图标
+                    CategoryIconView(
+                        model: node.category,
+                        size: 20,
+                        color: Color(hex: node.category.colorHex)
+                    )
+                    .frame(width: 24)
+                    
+                    // 分类名称
+                    Text(node.category.name)
+                        .font(.body)
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    // 选中状态指示器
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(AppTheme.Colors.primary)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(PlainButtonStyle())
         }
-        .buttonStyle(PlainButtonStyle())
+        .padding(.vertical, AppTheme.Spacing.s)
     }
     
     /// 是否选中

@@ -4,6 +4,7 @@ import SwiftUI
 public enum CategoryCardDisplayMode {
     case children  // 显示子分类数量
     case stories   // 显示故事数量
+    case hybrid    // 混合模式：同时显示子目录数和直属故事数
 }
 
 public struct CategoryCardView: View {
@@ -39,6 +40,8 @@ public struct CategoryCardView: View {
                 Text(String(format: "category.storyCount".localized, node.storyCount))
                     .font(.footnote)
                     .foregroundColor(.secondary)
+            case .hybrid:
+                hybridStatisticsView
             }
         }
         .padding(AppTheme.Spacing.m)
@@ -49,13 +52,35 @@ public struct CategoryCardView: View {
     
     /// 子分类数量文本
     private var childrenCountText: String {
-        let count = node.children.count
-        if node.category.level == 1 {
-            return String(format: "category.secondLevelCount".localized, count)
-        } else if node.category.level == 2 {
-            return String(format: "category.thirdLevelCount".localized, count)
+        String(format: "category.childrenCount".localized, node.children.count)
+    }
+    
+    /// 混合模式统计视图
+    @ViewBuilder
+    private var hybridStatisticsView: some View {
+        let hasChildren = !node.children.isEmpty
+        let hasStories = node.directStoryCount > 0
+        
+        if hasChildren && hasStories {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Text(childrenCountText)
+                Text("·")
+                Text(String(format: "category.storyCount".localized, node.directStoryCount))
+            }
+            .font(.footnote)
+            .foregroundColor(.secondary)
+        } else if hasChildren {
+            Text(childrenCountText)
+                .font(.footnote)
+                .foregroundColor(.secondary)
+        } else if hasStories {
+            Text(String(format: "category.storyCount".localized, node.directStoryCount))
+                .font(.footnote)
+                .foregroundColor(.secondary)
         } else {
-            return String(format: "category.childrenCount".localized, count)
+            Text(childrenCountText)
+                .font(.footnote)
+                .foregroundColor(.secondary)
         }
     }
 }

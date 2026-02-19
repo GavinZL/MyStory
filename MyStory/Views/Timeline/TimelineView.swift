@@ -143,7 +143,8 @@ struct TimelineView: View {
             ),
             children: [],
             isExpanded: false,
-            storyCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0
+            storyCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0,
+            directStoryCount: (categoryEntity.stories as? Set<StoryEntity>)?.count ?? 0
         )
     }
     
@@ -200,9 +201,7 @@ struct TimelineView: View {
     // MARK: - Helper Methods
     private func setupViewModel() {
         vm.setContext(context)
-        if vm.stories.isEmpty { 
-            vm.loadFirstPage() 
-        }
+        vm.loadFirstPage()
     }
     
     private func handleItemAppear(index: Int) {
