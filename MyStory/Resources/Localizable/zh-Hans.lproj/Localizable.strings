@@ -48,6 +48,13 @@
 "location.accuracy.medium" = "中";
 "location.accuracy.low" = "低";
 
+// Location Errors
+"location.error.notAuthorized" = "未授权访问位置";
+"location.error.timeout" = "获取位置超时";
+"location.error.unknown" = "无法确定位置";
+"location.error.network" = "网络错误";
+"location.error.cancelled" = "已取消";
+
 // MARK: - Category
 "category.title" = "分类";
 "category.new" = "新建分类";

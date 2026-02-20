@@ -48,6 +48,13 @@
 "location.accuracy.medium" = "Medium";
 "location.accuracy.low" = "Low";
 
+// Location Errors
+"location.error.notAuthorized" = "Location access not authorized";
+"location.error.timeout" = "Location request timed out";
+"location.error.unknown" = "Unable to determine location";
+"location.error.network" = "Network error";
+"location.error.cancelled" = "Cancelled";
+
 // MARK: - Category
 "category.title" = "Categories";
 "category.new" = "New Category";
