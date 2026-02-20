@@ -170,15 +170,21 @@
 
 // MARK: - Search
 "search.title" = "搜索";
-"search.placeholder" = "搜索分类、故事标题或内容";
+"search.placeholder" = "搜索分类、故事标题、内容或位置";
 "search.noResults" = "没有找到相关结果";
 "search.matchInTitle" = "匹配标题";
 "search.matchInContent" = "匹配内容";
+"search.matchInLocation" = "匹配位置";
+"search.matchInCategory" = "匹配分类名称";
 "search.moreStories" = "还有 %d 个故事...";
 "search.emptyState.title" = "开始搜索";
-"search.emptyState.message" = "输入关键词搜索分类、故事标题或内容";
+"search.emptyState.message" = "输入关键词搜索分类、故事标题、内容或位置";
 "search.noResults.title" = "没有找到结果";
 "search.noResults.message" = "没有找到与 \"%@\" 相关的内容";
+"search.history.title" = "搜索历史";
+"search.history.clear" = "清除";
+"search.resultCount" = "%d 个结果";
+"search.loadMore" = "加载更多";
 
 // MARK: - Data Sync
 "dataSync.title" = "数据同步";

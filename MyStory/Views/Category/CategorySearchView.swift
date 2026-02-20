@@ -20,25 +20,37 @@ public struct CategorySearchView: View {
                 // 搜索框
                 searchBar
                 
-                // 搜索结果
-                if viewModel.isSearching && !viewModel.searchText.isEmpty {
+                // 内容区域
+                if viewModel.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    // 无搜索文本：显示搜索历史或空状态
+                    if viewModel.searchHistory.isEmpty {
+                        emptyStateView
+                    } else {
+                        searchHistoryView
+                    }
+                } else if !viewModel.searchResults.isEmpty {
+                    // 有搜索结果
                     CategorySearchResultView(
                         results: viewModel.searchResults,
+                        keywords: viewModel.searchKeywords,
+                        hasMoreResults: viewModel.hasMoreResults,
+                        totalResultCount: viewModel.totalResultCount,
                         onSelectCategory: { category in
-                            // 关闭搜索界面
+                            viewModel.addSearchHistory(
+                                keyword: viewModel.searchText,
+                                resultCount: viewModel.totalResultCount
+                            )
                             dismiss()
-                            // 清空搜索
                             viewModel.clearSearch()
-                            // 通知父视图进行导航
                             onSelectCategory(category)
+                        },
+                        onLoadMore: {
+                            viewModel.loadMoreResults()
                         }
                     )
-                } else if !viewModel.searchText.isEmpty && viewModel.searchResults.isEmpty {
-                    // 无结果提示
-                    noResultsView
                 } else {
-                    // 空状态提示
-                    emptyStateView
+                    // 无结果
+                    noResultsView
                 }
             }
             .navigationTitle("search.title".localized)
@@ -52,7 +64,6 @@ public struct CategorySearchView: View {
                 }
             }
             .onAppear {
-                // 自动聚焦搜索框
                 isSearchFieldFocused = true
             }
         }
@@ -61,14 +72,15 @@ public struct CategorySearchView: View {
     // MARK: - Subviews
     
     private var searchBar: some View {
-        HStack {
+        HStack(spacing: AppTheme.Spacing.s) {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.secondary)
+                .foregroundColor(AppTheme.Colors.textSecondary)
             
             TextField("search.placeholder".localized, text: $viewModel.searchText)
                 .focused($isSearchFieldFocused)
                 .textFieldStyle(.plain)
-                .onChange(of: viewModel.searchText) { _ in
+                .submitLabel(.search)
+                .onSubmit {
                     viewModel.performSearch()
                 }
             
@@ -77,51 +89,102 @@ public struct CategorySearchView: View {
                     viewModel.searchText = ""
                 }) {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
         }
-        .padding(12)
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
-        .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(AppTheme.Spacing.m)
+        .background(AppTheme.Colors.surface)
+        .cornerRadius(AppTheme.Radius.m)
+        .padding(.horizontal, AppTheme.Spacing.l)
+        .padding(.vertical, AppTheme.Spacing.s)
+    }
+    
+    private var searchHistoryView: some View {
+        List {
+            Section {
+                ForEach(viewModel.searchHistory) { item in
+                    Button {
+                        viewModel.searchFromHistory(item.keyword)
+                    } label: {
+                        HStack(spacing: AppTheme.Spacing.s) {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .font(AppTheme.Typography.subheadline)
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .frame(width: 20)
+                            
+                            Text(item.keyword)
+                                .font(AppTheme.Typography.body)
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                            
+                            Spacer()
+                            
+                            Text(String(format: "search.resultCount".localized, item.resultCount))
+                                .font(AppTheme.Typography.caption)
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                        }
+                    }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            viewModel.removeSearchHistoryItem(item)
+                        } label: {
+                            Label("common.delete".localized, systemImage: "trash")
+                        }
+                    }
+                }
+            } header: {
+                HStack {
+                    Text("search.history.title".localized)
+                        .font(AppTheme.Typography.footnote)
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                    
+                    Spacer()
+                    
+                    Button("search.history.clear".localized) {
+                        viewModel.clearSearchHistory()
+                    }
+                    .font(AppTheme.Typography.footnote)
+                    .foregroundColor(AppTheme.Colors.primary)
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
     }
     
     private var emptyStateView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppTheme.Spacing.l) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 60))
-                .foregroundColor(.secondary)
+                .foregroundColor(AppTheme.Colors.textSecondary)
             
             Text("search.emptyState.title".localized)
-                .font(.headline)
-                .foregroundColor(.secondary)
+                .font(AppTheme.Typography.headline)
+                .foregroundColor(AppTheme.Colors.textSecondary)
             
             Text("search.emptyState.message".localized)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                .font(AppTheme.Typography.subheadline)
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                .padding(.horizontal, AppTheme.Spacing.xxl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private var noResultsView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppTheme.Spacing.l) {
             Image(systemName: "doc.text.magnifyingglass")
                 .font(.system(size: 60))
-                .foregroundColor(.secondary)
+                .foregroundColor(AppTheme.Colors.textSecondary)
             
             Text("search.noResults.title".localized)
-                .font(.headline)
-                .foregroundColor(.secondary)
+                .font(AppTheme.Typography.headline)
+                .foregroundColor(AppTheme.Colors.textSecondary)
             
             Text(String(format: "search.noResults.message".localized, viewModel.searchText))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                .font(AppTheme.Typography.subheadline)
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                .padding(.horizontal, AppTheme.Spacing.xxl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

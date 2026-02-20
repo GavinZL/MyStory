@@ -537,14 +537,23 @@ public final class CoreDataCategoryService: CategoryService {
     public func searchStories(keyword: String) -> [CategorySearchResult] {
         guard !keyword.isEmpty else { return [] }
         
-        let trimmedKeyword = keyword.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        var results: [CategorySearchResult] = []
+        let trimmedKeyword = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedKeyword.isEmpty else { return [] }
         
-        // 获取所有有故事的分类，并预加载 stories 关系数据
+        // 支持多关键词（空格分隔）
+        let keywords = trimmedKeyword.lowercased()
+            .split(separator: " ")
+            .map { String($0) }
+            .filter { !$0.isEmpty }
+        guard !keywords.isEmpty else { return [] }
+        
+        var results: [CategorySearchResult] = []
+        var processedCategoryIds: Set<UUID> = []
+        
+        // 1. 搜索有故事的分类
         let request = CategoryEntity.fetchRequest()
         request.predicate = NSPredicate(format: "stories.@count > 0")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \CategoryEntity.sortOrder, ascending: true)]
-        // ⚠️ 关键：预加载 stories 关系数据，避免 fault 导致数据为空
         request.relationshipKeyPathsForPrefetching = ["stories", "parent", "parent.parent"]
         
         var categoriesWithStories: [CategoryEntity] = []
@@ -552,81 +561,97 @@ public final class CoreDataCategoryService: CategoryService {
             categoriesWithStories = try context.fetch(request)
         } catch {
             print("⚠️ [CategoryService] Error fetching categories for search: \(error)")
-            return []
         }
         
         for category in categoriesWithStories {
+            guard let categoryId = category.id else { continue }
+            processedCategoryIds.insert(categoryId)
+            
             var matchedStories: [StoryMatch] = []
+            let categoryNameMatch = keywords.allSatisfy { (category.name ?? "").lowercased().contains($0) }
             
-            // 1. 搜索分类名称
-            let categoryNameMatch = (category.name ?? "").lowercased().contains(trimmedKeyword)
-            
-            // 2. 搜索该分类下的所有故事
             if let stories = category.stories as? Set<StoryEntity> {
                 for story in stories {
-                    // ⚠️ 异常处理：检查故事对象是否有效
-                    guard !story.isFault, let storyId = story.id else {
-                        print("⚠️ [CategoryService] Skipping invalid story in category '\(category.name ?? "Unknown")'")
-                        continue
-                    }
+                    guard !story.isFault, story.id != nil else { continue }
                     
                     let titleLower = (story.title ?? "").lowercased()
-                    let contentLower = (story.plainTextContent ?? "").lowercased()
+                    let contentLower = (story.plainTextContent ?? story.content ?? "").lowercased()
+                    let locationParts = [story.locationName, story.locationAddress, story.locationCity].compactMap { $0 }
+                    let locationLower = locationParts.joined(separator: " ").lowercased()
                     
-                    var matchScore = 0
-                    var matchType: StoryMatch.MatchType? = nil
+                    var totalScore = 0
+                    var primaryMatchType: StoryMatch.MatchType? = nil
                     var snippet = ""
                     
-                    // 标题匹配（更高分数）
-                    if titleLower.contains(trimmedKeyword) {
-                        matchScore = 100
-                        matchType = .title
-                        snippet = story.title ?? ""
-                    }
-                    // 内容匹配
-                    else if contentLower.contains(trimmedKeyword) {
-                        matchScore = 50
-                        matchType = .content
-                        // 提取匹配的文本片段
-                        snippet = extractSnippet(from: story.plainTextContent ?? "", keyword: trimmedKeyword)
+                    // 标题匹配（最高优先级，每个关键词 100 分）
+                    for keyword in keywords {
+                        if titleLower.contains(keyword) {
+                            totalScore += 100
+                            if primaryMatchType == nil {
+                                primaryMatchType = .title
+                                snippet = story.title ?? ""
+                            }
+                        } else if contentLower.contains(keyword) {
+                            totalScore += 50
+                            if primaryMatchType == nil {
+                                primaryMatchType = .content
+                                snippet = extractSnippet(from: story.plainTextContent ?? story.content ?? "", keyword: keyword)
+                            }
+                        } else if !locationLower.isEmpty && locationLower.contains(keyword) {
+                            totalScore += 30
+                            if primaryMatchType == nil {
+                                primaryMatchType = .location
+                                snippet = locationParts.joined(separator: " · ")
+                            }
+                        }
                     }
                     
-                    // 如果有匹配，添加到结果
-                    if let type = matchType {
-                        let match = StoryMatch(
+                    if let matchType = primaryMatchType {
+                        matchedStories.append(StoryMatch(
                             story: story,
-                            matchType: type,
+                            matchType: matchType,
                             matchSnippet: snippet,
-                            matchScore: matchScore
-                        )
-                        matchedStories.append(match)
+                            matchScore: totalScore
+                        ))
                     }
                 }
             }
             
-            // 如果分类名称匹配或有故事匹配，添加到结果
             if categoryNameMatch || !matchedStories.isEmpty {
-                // ⚠️ 异常处理：检查分类对象是否有效
-                guard category.id != nil else {
-                    print("⚠️ [CategoryService] Skipping category with nil id")
-                    continue
-                }
-                
-                // 按匹配分数排序故事
                 matchedStories.sort { $0.matchScore > $1.matchScore }
-                
-                // 构建分类路径
                 let categoryPath = buildCategoryPath(for: category)
-                
-                // 如果分类名称匹配但没有故事匹配，也要显示（但分数较低）
-                let result = CategorySearchResult(
+                results.append(CategorySearchResult(
                     category: category,
                     categoryPath: categoryPath,
-                    matchedStories: matchedStories
-                )
-                
-                results.append(result)
+                    matchedStories: matchedStories,
+                    categoryNameMatched: categoryNameMatch
+                ))
             }
+        }
+        
+        // 2. 搜索分类名称匹配（没有故事的分类）
+        let allCategoryRequest = CategoryEntity.fetchRequest()
+        allCategoryRequest.sortDescriptors = [NSSortDescriptor(keyPath: \CategoryEntity.sortOrder, ascending: true)]
+        allCategoryRequest.relationshipKeyPathsForPrefetching = ["parent", "parent.parent"]
+        
+        do {
+            let allCategories = try context.fetch(allCategoryRequest)
+            for category in allCategories {
+                guard let categoryId = category.id, !processedCategoryIds.contains(categoryId) else { continue }
+                
+                let categoryNameMatch = keywords.allSatisfy { (category.name ?? "").lowercased().contains($0) }
+                if categoryNameMatch {
+                    let categoryPath = buildCategoryPath(for: category)
+                    results.append(CategorySearchResult(
+                        category: category,
+                        categoryPath: categoryPath,
+                        matchedStories: [],
+                        categoryNameMatched: true
+                    ))
+                }
+            }
+        } catch {
+            print("⚠️ [CategoryService] Error fetching all categories for search: \(error)")
         }
         
         // 按总分排序

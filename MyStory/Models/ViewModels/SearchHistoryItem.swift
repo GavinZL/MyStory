@@ -7,13 +7,19 @@
 
 import Foundation
 
-struct SearchHistoryItem: Codable, Identifiable {
-    let id = UUID()
-    let keyword: String
-    let timestamp: Date
-    let resultCount: Int
+public struct SearchHistoryItem: Codable, Identifiable {
+    public let id = UUID()
+    public let keyword: String
+    public let timestamp: Date
+    public let resultCount: Int
     
     enum CodingKeys: String, CodingKey {
         case keyword, timestamp, resultCount
+    }
+    
+    public init(keyword: String, timestamp: Date, resultCount: Int) {
+        self.keyword = keyword
+        self.timestamp = timestamp
+        self.resultCount = resultCount
     }
 }

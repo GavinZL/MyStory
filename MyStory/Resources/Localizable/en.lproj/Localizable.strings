@@ -170,15 +170,21 @@
 
 // MARK: - Search
 "search.title" = "Search";
-"search.placeholder" = "Search categories, story titles or content";
+"search.placeholder" = "Search categories, titles, content or locations";
 "search.noResults" = "No results found";
 "search.matchInTitle" = "Match in Title";
 "search.matchInContent" = "Match in Content";
+"search.matchInLocation" = "Match in Location";
+"search.matchInCategory" = "Match in Category Name";
 "search.moreStories" = "And %d more stories...";
 "search.emptyState.title" = "Start Searching";
-"search.emptyState.message" = "Enter keywords to search categories, story titles or content";
+"search.emptyState.message" = "Enter keywords to search categories, titles, content or locations";
 "search.noResults.title" = "No Results Found";
 "search.noResults.message" = "No content found related to \"%@\"";
+"search.history.title" = "Search History";
+"search.history.clear" = "Clear";
+"search.resultCount" = "%d results";
+"search.loadMore" = "Load More";
 
 // MARK: - Data Sync
 "dataSync.title" = "Data Sync";
