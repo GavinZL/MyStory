@@ -207,6 +207,7 @@ struct StoryDetailView: View {
     @State private var selectedImageIndex = 0
     @State private var playingVideoIndex: Int?
     @State private var videoPlayers: [Int: AVPlayer] = [:]
+    @State private var fullscreenVideoURL: URL? // nil=非全屏，有值=全屏播放
     
     // MARK: - Services
     private let mediaService = MediaStorageService()
@@ -295,6 +296,12 @@ struct StoryDetailView: View {
         }
         .fullScreenCover(isPresented: $showImageViewer) {
             imageGalleryViewer
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { fullscreenVideoURL != nil },
+            set: { if !$0 { fullscreenVideoURL = nil } }
+        )) {
+            VideoPlayerView(videoURL: fullscreenVideoURL)
         }
         .onDisappear {
             cleanupResources()
@@ -468,16 +475,53 @@ struct StoryDetailView: View {
     @ViewBuilder
     private func videoPlayerView(media: MediaEntity, index: Int) -> some View {
         if playingVideoIndex == index, let player = videoPlayers[index] {
-            activeVideoPlayer(player: player)
+            activeVideoPlayer(player: player, media: media)
         } else {
             videoThumbnailView(media: media, index: index)
         }
     }
     
-    private func activeVideoPlayer(player: AVPlayer) -> some View {
-        VideoPlayer(player: player)
-            .frame(maxWidth: .infinity)
-            .aspectRatio(contentMode: .fit)
+    private func activeVideoPlayer(player: AVPlayer, media: MediaEntity) -> some View {
+        ZStack(alignment: .topTrailing) {
+            VideoPlayer(player: player)
+                .frame(maxWidth: .infinity)
+                .aspectRatio(contentMode: .fit)
+            
+            // 全屏按钮
+            Button {
+                enterFullscreenVideo(media: media)
+            } label: {
+                Image(systemName: "arrow.up.right.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(.white)
+                    .shadow(radius: 3)
+            }
+            .padding(AppTheme.Spacing.m)
+        }
+    }
+    
+    private func enterFullscreenVideo(media: MediaEntity) {
+        // 获取当前正在播放的视频进度
+        let currentTime: CMTime?
+        if let currentIndex = playingVideoIndex,
+           let currentPlayingPlayer = videoPlayers[currentIndex],
+           currentPlayingPlayer.rate > 0 || currentPlayingPlayer.currentTime().seconds > 0 {
+            // 用户正在观看此视频，记录当前进度
+            currentTime = currentPlayingPlayer.currentTime()
+        } else {
+            currentTime = nil
+        }
+        
+        // 兜底方案：加载视频 URL
+        guard let url = mediaService.loadVideoURL(fileName: media.fileName ?? "") else {
+            print("DEBUG: Failed to load video URL for fullscreen")
+            return
+        }
+        
+        fullscreenVideoURL = url
+        
+        // 如果有之前的进度，需要在全屏播放器中恢复（这个需要 VideoPlayerView 支持）
+        // TODO: 可以优化 VideoPlayerView 以支持初始播放时间
     }
     
     @ViewBuilder
@@ -749,5 +793,42 @@ struct ZoomableImageView: View {
                 lastOffset = .zero
             }
         }
+    }
+}
+
+// MARK: - Fullscreen Video Player View
+struct FullscreenVideoPlayerView: View {
+    let player: AVPlayer
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        VideoPlayerControllerRepresentable(player: player)
+            .onDisappear {
+                // 视图消失时调用，但不暂停视频
+                onDismiss()
+            }
+    }
+}
+
+// MARK: - Video Player Controller Representable
+struct VideoPlayerControllerRepresentable: UIViewControllerRepresentable {
+    let player: AVPlayer
+    
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let controller = AVPlayerViewController()
+        controller.player = player
+        controller.showsPlaybackControls = true
+        controller.allowsPictureInPicturePlayback = true
+        
+        // 如果视频未播放，则自动播放
+        if player.rate == 0 {
+            player.play()
+        }
+        
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+        // 不需要更新
     }
 }
