@@ -441,13 +441,15 @@ struct StoryDetailView: View {
             Button {
                 openImageViewer(at: index)
             } label: {
-                GeometryReader { geometry in
+                ZStack {
+                    Color.black // 黑边背景
+                    
                     Image(uiImage: img)
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+                .clipped()
             }
             .buttonStyle(PlainButtonStyle())
         }
@@ -493,13 +495,12 @@ struct StoryDetailView: View {
     
     private func videoThumbnailContent(image: UIImage) -> some View {
         ZStack(alignment: .center) {
-            GeometryReader { geometry in
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-            }
+            Color.black // 黑边背景
+            
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             playButtonOverlay
         }
