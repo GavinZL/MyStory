@@ -2,6 +2,7 @@ import SwiftUI
 import PhotosUI
 import AVFoundation
 import CoreData
+import Photos
 
 // MARK: - New Story Editor View
 
@@ -616,9 +617,12 @@ final class NewStoryEditorViewModel: ObservableObject {
     private var coreData: CoreDataStack?
     private var mediaService = MediaStorageService()
     private var locationService = LocationService()
+    private var videoProcessingService = VideoProcessingService()
     private var existingStory: StoryEntity?
     private var initialCategory: CategoryEntity?
     private var isConfigured = false
+    private var videoImportTask: Task<Void, Never>?
+    private var isImportingVideo = false
     
     var canSave: Bool { !title.isEmpty || !richTextEditorViewModel.isEmpty }
     var hasVideoThumbnail: Bool { !videoThumbnails.isEmpty || videoFileName != nil }
@@ -716,32 +720,156 @@ final class NewStoryEditorViewModel: ObservableObject {
         guard !items.isEmpty else { return }
         
         if expectedVideo {
-            images.removeAll()
-            LoadingIndicatorManager.shared.show(message: "story.videoLoading".localized)
+            await MainActor.run {
+                images.removeAll()
+            }
+            await handleVideoImport(items: items)
         } else {
-            videoURLs.removeAll()
-            videoThumbnails.removeAll()
-            videoFileName = nil
+            await MainActor.run {
+                videoURLs.removeAll()
+                videoThumbnails.removeAll()
+                videoFileName = nil
+            }
+            await handleImageImport(items: items)
         }
-        
+    }
+    
+    private func handleImageImport(items: [PhotosPickerItem]) async {
         for item in items {
-            if !expectedVideo,
-               let data = try? await item.loadTransferable(type: Data.self),
+            if let data = try? await item.loadTransferable(type: Data.self),
                let image = UIImage(data: data) {
                 await MainActor.run {
                     self.images.append(image)
                 }
-            } else if expectedVideo,
-                      let movie = try? await item.loadTransferable(type: VideoTransferable.self) {
-                await handleVideoLoad(movie.url)
+            }
+        }
+    }
+    
+    private func handleVideoImport(items: [PhotosPickerItem]) async {
+        guard let item = items.first else { return }
+        
+        // 防止重复导入
+        guard !isImportingVideo else { return }
+        isImportingVideo = true
+        defer { isImportingVideo = false }
+        
+        // 取消之前的导入任务
+        videoImportTask?.cancel()
+        
+        // 显示带进度的加载指示器（从 5% 起跳，给予即时反馈）
+        await MainActor.run {
+            LoadingIndicatorManager.shared.showWithProgress(
+                message: "video.importing".localized,
+                progress: 0.05,
+                cancelHandler: { [weak self] in
+                    self?.cancelVideoImport()
+                }
+            )
+        }
+        
+        // 方式1: 尝试通过 PHAsset 导入（可获取进度）
+        if let assetId = item.itemIdentifier {
+            let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
+            if let phAsset = fetchResult.firstObject {
+                await importVideoFromPHAsset(phAsset)
+                return
             }
         }
         
-        if expectedVideo {
+        // 方式2: 回退到 Transferable 方式（无进度）
+        await importVideoViaTransferable(item)
+    }
+    
+    private func importVideoFromPHAsset(_ asset: PHAsset) async {
+        do {
+            let url = try await videoProcessingService.importVideo(from: asset) { progress in
+                Task { @MainActor in
+                    // 5% 起跳，导入进度映射到 5%~95%（缩略图生成已近乎瞬间）
+                    let displayProgress = 0.05 + progress * 0.90
+                    LoadingIndicatorManager.shared.updateProgress(
+                        displayProgress,
+                        message: "video.importing".localized
+                    )
+                }
+            }
+            
+            await processImportedVideo(url: url)
+            
+        } catch let error as VideoProcessingError {
+            await MainActor.run {
+                LoadingIndicatorManager.shared.hide()
+                if case .cancelled = error {
+                    // 用户取消，不显示错误
+                } else {
+                    print("视频导入失败: \(error.localizedDescription)")
+                }
+            }
+        } catch {
+            await MainActor.run {
+                LoadingIndicatorManager.shared.hide()
+                print("视频导入失败: \(error)")
+            }
+        }
+    }
+    
+    private func importVideoViaTransferable(_ item: PhotosPickerItem) async {
+        // 模拟进度：5% 起跳 + 快速指数衰减曲线（匹配去掉加密后的实际速度）
+        let startTime = CFAbsoluteTimeGetCurrent()
+        let progressTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 100_000_000)  // 0.1秒更新，更流畅
+                let elapsed = CFAbsoluteTimeGetCurrent() - startTime
+                // 快速指数衰减：progress = 0.05 + 0.90 * (1 - e^(-t/4))
+                // t=1s → 27%, t=2s → 44%, t=4s → 69%, t=6s → 83%, t=8s → 90%
+                let progress = 0.05 + 0.90 * (1.0 - exp(-elapsed / 4.0))
+                await MainActor.run {
+                    LoadingIndicatorManager.shared.updateProgress(
+                        progress,
+                        message: "video.importing".localized
+                    )
+                }
+            }
+        }
+        
+        if let movie = try? await item.loadTransferable(type: VideoTransferable.self) {
+            progressTask.cancel()
+            await processImportedVideo(url: movie.url)
+        } else {
+            progressTask.cancel()
             await MainActor.run {
                 LoadingIndicatorManager.shared.hide()
             }
         }
+    }
+    
+    private func processImportedVideo(url: URL) async {
+        await MainActor.run {
+            videoURLs.removeAll()
+            videoThumbnails.removeAll()
+            videoURLs.append(url)
+        }
+        
+        // 使用快速缩略图（小尺寸 + 大容差），几乎瞬间完成
+        if let thumbnail = await videoProcessingService.generateQuickThumbnail(from: url) {
+            await MainActor.run {
+                videoThumbnails.append(thumbnail)
+            }
+        }
+        
+        // 完成动画：先跳到 100%，短暂停留让用户感知"完成"
+        await MainActor.run {
+            LoadingIndicatorManager.shared.updateProgress(1.0, message: "video.completed".localized)
+        }
+        try? await Task.sleep(nanoseconds: 200_000_000)  // 200ms 完成确认
+        
+        await MainActor.run {
+            LoadingIndicatorManager.shared.hide()
+        }
+    }
+    
+    func cancelVideoImport() {
+        videoImportTask?.cancel()
+        videoProcessingService.cancel()
     }
     
     private func handleVideoLoad(_ url: URL) async {

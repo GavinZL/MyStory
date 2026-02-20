@@ -40,6 +40,16 @@
 "story.videoLoading" = "Loading video...";
 "story.move" = "Move";
 
+// Video Processing
+"video.importing" = "Importing video";
+"video.generatingThumbnail" = "Generating preview";
+"video.completed" = "Completed";
+"video.error.accessDenied" = "Cannot access video";
+"video.error.notFound" = "Video not found";
+"video.error.thumbnailFailed" = "Failed to generate preview";
+"video.error.cancelled" = "Cancelled";
+"video.error.timeout" = "Processing timeout";
+
 // Location
 "location.accuracy" = "Accuracy";
 "location.fetching" = "Fetching location...";

@@ -40,6 +40,16 @@
 "story.videoLoading" = "正在加载视频...";
 "story.move" = "移动";
 
+// Video Processing
+"video.importing" = "正在导入视频";
+"video.generatingThumbnail" = "正在生成预览";
+"video.completed" = "处理完成";
+"video.error.accessDenied" = "无法访问视频";
+"video.error.notFound" = "视频不存在";
+"video.error.thumbnailFailed" = "生成预览失败";
+"video.error.cancelled" = "已取消";
+"video.error.timeout" = "处理超时";
+
 // Location
 "location.accuracy" = "精度";
 "location.fetching" = "正在获取位置...";

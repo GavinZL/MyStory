@@ -87,9 +87,10 @@ struct StoryCardView: View {
                     
                     if let locationText = locationText {
                         HStack(spacing: AppTheme.Spacing.xs) {
-                            Image(systemName: "mappin.circle.fill")
-                                .font(.system(size: 16))
-                                .foregroundColor(AppTheme.Colors.primary)
+                            Image("address")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
                             
                             Text(locationText)
                                 .font(AppTheme.Typography.caption)
