@@ -38,6 +38,7 @@
 "story.addLocation" = "Add Location";
 "story.locationSelected" = "Location Selected";
 "story.videoLoading" = "Loading video...";
+"story.move" = "Move";
 
 // Location
 "location.accuracy" = "Accuracy";
@@ -79,6 +80,10 @@
 "category.subcategoriesTitle" = "Subcategories";
 "category.viewAll" = "View All";
 "category.createStory" = "New Story";
+"category.move" = "Move";
+"category.moveTo" = "Move To";
+"category.moveError" = "Move Failed";
+"category.moveNoTarget" = "No available target category";
 
 // Category Display Modes
 "category.mode.card" = "Card";

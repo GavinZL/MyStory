@@ -69,6 +69,16 @@ public final class CategoryViewModel: ObservableObject {
         load()
     }
     
+    public func moveCategory(id: UUID, newParentId: UUID) throws {
+        try service.moveCategory(id: id, newParentId: newParentId)
+        load()
+    }
+    
+    public func moveStory(storyId: UUID, toCategoryId: UUID) throws {
+        try service.moveStory(storyId: storyId, toCategoryId: toCategoryId)
+        load()
+    }
+    
     public func getCategoryForEdit(id: UUID) -> CategoryEntity? {
         return service.fetchCategory(id: id)
     }

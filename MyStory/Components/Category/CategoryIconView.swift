@@ -84,9 +84,11 @@ struct CategoryIconView: View {
     /// Assets 预置图标视图
     private var assetIconView: some View {
         Image(iconName)
+            .renderingMode(.template)
             .resizable()
             .scaledToFit()
             .frame(width: size, height: size)
+            .foregroundColor(color)
     }
     
     // MARK: - Helper Properties

@@ -30,6 +30,11 @@ struct CategoryLevelView: View {
     @State private var showDeleteError = false
     @State private var directStories: [StoryEntity] = []
     @State private var navigateToAllStories = false
+    @State private var editingStory: StoryEntity?
+    @State private var categoryToMove: CategoryTreeNode?
+    @State private var showMoveError = false
+    @State private var moveErrorMessage = ""
+    @State private var storyToMove: StoryEntity?
     
     // MARK: - Services
     @State private var mediaService = MediaStorageService()
@@ -119,6 +124,54 @@ struct CategoryLevelView: View {
         } message: {
             Text(deleteErrorMessage)
         }
+        .sheet(item: $editingStory) { story in
+            NewStoryEditorView(existingStory: story, category: nil) {
+                viewModel.load()
+                loadDirectStories()
+            }
+        }
+        .alert("category.moveError".localized, isPresented: $showMoveError) {
+            Button("common.confirm".localized, role: .cancel) {}
+        } message: {
+            Text(moveErrorMessage)
+        }
+        .sheet(item: $categoryToMove) { node in
+            CategoryMovePicker(
+                movingNode: node,
+                onMove: { targetId in
+                    do {
+                        try viewModel.moveCategory(id: node.id, newParentId: targetId)
+                    } catch {
+                        moveErrorMessage = error.localizedDescription
+                        showMoveError = true
+                    }
+                    categoryToMove = nil
+                },
+                onDismiss: {
+                    categoryToMove = nil
+                }
+            )
+        }
+        .sheet(item: $storyToMove) { story in
+            CategoryMovePicker(
+                moveStory: true,
+                onMove: { targetId in
+                    if let storyId = story.id {
+                        do {
+                            try viewModel.moveStory(storyId: storyId, toCategoryId: targetId)
+                            loadDirectStories()
+                        } catch {
+                            moveErrorMessage = error.localizedDescription
+                            showMoveError = true
+                        }
+                    }
+                    storyToMove = nil
+                },
+                onDismiss: {
+                    storyToMove = nil
+                }
+            )
+        }
         .onAppear {
             loadDirectStories()
         }
@@ -173,6 +226,9 @@ struct CategoryLevelView: View {
                         ) { }
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .contextMenu {
+                        storyContextMenu(for: story)
+                    }
                 }
             }
             .padding(.horizontal, AppTheme.Spacing.s)
@@ -254,6 +310,12 @@ struct CategoryLevelView: View {
             Label("category.edit".localized, systemImage: "pencil")
         }
         
+        Button {
+            categoryToMove = node
+        } label: {
+            Label("category.move".localized, systemImage: "folder.badge.gearshape")
+        }
+        
         Button(role: .destructive) {
             prepareDeleteCategory(node)
         } label: {
@@ -313,6 +375,40 @@ struct CategoryLevelView: View {
     private func prepareDeleteCategory(_ node: CategoryTreeNode) {
         categoryToDelete = node
         showDeleteConfirm = true
+    }
+    
+    /// 故事上下文菜单
+    @ViewBuilder
+    private func storyContextMenu(for story: StoryEntity) -> some View {
+        Button {
+            editingStory = story
+        } label: {
+            Label("categoryStory.edit".localized, systemImage: "pencil")
+        }
+        
+        Button {
+            storyToMove = story
+        } label: {
+            Label("story.move".localized, systemImage: "folder.badge.gearshape")
+        }
+        
+        Button(role: .destructive) {
+            deleteStory(story)
+        } label: {
+            Label("categoryStory.delete".localized, systemImage: "trash")
+        }
+    }
+    
+    /// 删除故事
+    private func deleteStory(_ story: StoryEntity) {
+        context.delete(story)
+        directStories.removeAll { $0.objectID == story.objectID }
+        do {
+            try context.save()
+        } catch {
+            print("Error deleting story: \(error)")
+        }
+        viewModel.load()
     }
     
     // MARK: - Data Loading

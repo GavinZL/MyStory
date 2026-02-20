@@ -29,8 +29,12 @@ public protocol CategoryService {
     // 增删改
     func addCategory(name: String, level: Int, parentId: UUID?, iconName: String, colorHex: String, customIconData: Data?, isCustomIcon: Bool) throws
     func updateCategory(id: UUID, name: String, iconName: String, colorHex: String, customIconData: Data?, isCustomIcon: Bool) throws
+    func moveCategory(id: UUID, newParentId: UUID) throws
     func deleteCategory(id: UUID) throws
     func deleteCategoryRecursively(id: UUID, mediaService: MediaStorageService) throws
+    
+    // 故事操作
+    func moveStory(storyId: UUID, toCategoryId: UUID) throws
     
     // 统计
     func storyCount(for id: UUID) -> Int
@@ -147,7 +151,24 @@ public final class InMemoryCategoryService: CategoryService {
         categories[id] = nil
     }
     
+    public func moveCategory(id: UUID, newParentId: UUID) throws {
+        // InMemory 服务：简单更新 parentId
+        guard var cat = categories[id] else { throw CategoryError.notFound }
+        guard categories[newParentId] != nil else { throw CategoryError.notFound }
+        if let oldPid = cat.parentId {
+            childrenMap[oldPid] = (childrenMap[oldPid] ?? []).filter { $0 != id }
+        }
+        cat = CategoryModel(id: cat.id, name: cat.name, iconName: cat.iconName, colorHex: cat.colorHex, level: cat.level, parentId: newParentId, sortOrder: cat.sortOrder, createdAt: cat.createdAt)
+        categories[id] = cat
+        childrenMap[newParentId] = (childrenMap[newParentId] ?? []) + [id]
+    }
+    
     public func deleteCategoryRecursively(id: UUID, mediaService: MediaStorageService) throws {
+        // InMemory 服务不支持此功能
+        throw CategoryError.notFound
+    }
+    
+    public func moveStory(storyId: UUID, toCategoryId: UUID) throws {
         // InMemory 服务不支持此功能
         throw CategoryError.notFound
     }
@@ -372,6 +393,38 @@ public final class CoreDataCategoryService: CategoryService {
         try context.save()
     }
     
+    public func moveCategory(id: UUID, newParentId: UUID) throws {
+        guard let category = fetchCategory(id: id) else {
+            throw CategoryError.notFound
+        }
+        guard let newParent = fetchCategory(id: newParentId) else {
+            throw CategoryError.notFound
+        }
+        
+        // 验证目标父分类层级正确性
+        let expectedParentLevel = category.level - 1
+        guard newParent.level == expectedParentLevel else {
+            throw CategoryError.invalidParentLevel
+        }
+        
+        // 验证不能移动到自身
+        guard id != newParentId else {
+            throw CategoryError.invalidParentLevel
+        }
+        
+        // 验证目标父分类的子分类数量限制
+        let targetChildrenCount = fetchChildren(parentId: newParentId).count
+        if category.level == 2 && targetChildrenCount >= 20 {
+            throw CategoryError.overLimit
+        } else if category.level == 3 && targetChildrenCount >= 30 {
+            throw CategoryError.overLimit
+        }
+        
+        // 执行移动：更新 parent 关系
+        category.parent = newParent
+        try context.save()
+    }
+    
     /// 递归删除分类、所有子分类、关联故事及媒体文件
     public func deleteCategoryRecursively(id: UUID, mediaService: MediaStorageService) throws {
         guard let category = fetchCategory(id: id) else {
@@ -405,6 +458,37 @@ public final class CoreDataCategoryService: CategoryService {
         context.delete(category)
         
         // 4. 保存更改
+        try context.save()
+    }
+    
+    /// 移动故事到指定分类
+    /// 将故事从所有当前分类中移除，添加到新分类
+    public func moveStory(storyId: UUID, toCategoryId: UUID) throws {
+        // 查询故事
+        let storyRequest = StoryEntity.fetchRequest()
+        storyRequest.predicate = NSPredicate(format: "id == %@", storyId as CVarArg)
+        storyRequest.fetchLimit = 1
+        
+        guard let story = try context.fetch(storyRequest).first else {
+            throw CategoryError.notFound
+        }
+        
+        // 查询目标分类
+        guard let targetCategory = fetchCategory(id: toCategoryId) else {
+            throw CategoryError.notFound
+        }
+        
+        // 移除故事当前的所有分类关联
+        if let currentCategories = story.categories as? Set<CategoryEntity> {
+            for category in currentCategories {
+                story.removeFromCategories(category)
+            }
+        }
+        
+        // 添加到新分类
+        story.addToCategories(targetCategory)
+        
+        // 保存更改
         try context.save()
     }
     

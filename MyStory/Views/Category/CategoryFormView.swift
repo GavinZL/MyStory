@@ -50,8 +50,18 @@ struct CategoryFormView: View {
     ]
     
     private let colorOptions = [
-        "#007AFF", "#34C759", "#FF9F0A", "#FF375F",
-        "#5856D6", "#AF52DE", "#00C7BE", "#FF2D55"
+        // Row 1: Blues & Cyans
+        "#007AFF", "#0A84FF", "#32ADE6", "#5AC8FA",
+        "#00C7BE", "#30B0C7", "#2196F3", "#03A9F4",
+        // Row 2: Greens & Yellows
+        "#34C759", "#30D158", "#A8D870", "#8BC34A",
+        "#CDDC39", "#FFCC02", "#FF9F0A", "#FFB340",
+        // Row 3: Reds & Pinks
+        "#FF375F", "#FF2D55", "#FF6482", "#FF6B6B",
+        "#E91E63", "#F44336", "#FF5722", "#FF7043",
+        // Row 4: Purples & Browns
+        "#5856D6", "#AF52DE", "#BF5AF2", "#9C27B0",
+        "#673AB7", "#7C5CFC", "#8E8E93", "#A2845E"
     ]
     
     // MARK: - Initialization
@@ -203,32 +213,43 @@ struct CategoryFormView: View {
     
     private var colorSection: some View {
         Section(header: Text("category.color".localized)) {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: AppTheme.Spacing.l) {
-                ForEach(colorOptions, id: \.self) { color in
-                    colorButton(color: color)
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHGrid(rows: [GridItem(.fixed(50)), GridItem(.fixed(50))], spacing: AppTheme.Spacing.m) {
+                    ForEach(colorOptions, id: \.self) { color in
+                        colorButton(color: color)
+                    }
                 }
+                .padding(.vertical, AppTheme.Spacing.s)
+                .padding(.horizontal, AppTheme.Spacing.xs)
             }
-            .padding(.vertical, AppTheme.Spacing.s)
         }
     }
     
     private func iconButton(icon: String) -> some View {
-        Button {
+        let isSelected = !isCustomIcon && selectedIcon == icon
+        let iconColor = isSelected ? (Color(hex: selectedColor) ?? AppTheme.Colors.primary) : .primary
+        
+        return Button {
             selectedIcon = icon
-            isCustomIcon = false  // 切换到系统图标
+            isCustomIcon = false
             customIconData = nil
         } label: {
             ZStack {
                 Circle()
-                    .fill(!isCustomIcon && selectedIcon == icon ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
+                    .fill(isSelected ? iconColor.opacity(0.15) : Color.gray.opacity(0.1))
                     .frame(width: 50, height: 50)
                 
                 Image(icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 28, height: 28)
-                    .foregroundColor(!isCustomIcon && selectedIcon == icon ? AppTheme.Colors.primary : .primary)
+                    .foregroundColor(isSelected ? iconColor : .primary)
             }
+            .overlay(
+                Circle()
+                    .strokeBorder(isSelected ? iconColor : .clear, lineWidth: 2)
+                    .frame(width: 50, height: 50)
+            )
             .contentShape(Circle())
         }
         .buttonStyle(.plain)

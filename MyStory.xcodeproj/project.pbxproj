@@ -37,6 +37,7 @@
 		1F9BF55B2F09140B009E5A49 /* MediaEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9BF5562F09140B009E5A49 /* MediaEntity+CoreDataProperties.swift */; };
 		1F9BF55C2F09140B009E5A49 /* SettingEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9BF5572F09140B009E5A49 /* SettingEntity+CoreDataProperties.swift */; };
 		1F9BF55D2F09140B009E5A49 /* StoryEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9BF5582F09140B009E5A49 /* StoryEntity+CoreDataProperties.swift */; };
+		1FA8F4C42F4764B2000C5536 /* CategoryMovePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA8F4C32F4764B2000C5536 /* CategoryMovePicker.swift */; };
 		1FCB03FD2F0E4178000E5BC2 /* MigrationBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB03F92F0E4178000E5BC2 /* MigrationBackupService.swift */; };
 		1FCB03FE2F0E4178000E5BC2 /* MigrationCryptoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB03FA2F0E4178000E5BC2 /* MigrationCryptoService.swift */; };
 		1FCB03FF2F0E4178000E5BC2 /* MigrationSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCB03FC2F0E4178000E5BC2 /* MigrationSessionManager.swift */; };
@@ -111,6 +112,7 @@
 		1F9BF5562F09140B009E5A49 /* MediaEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MediaEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		1F9BF5572F09140B009E5A49 /* SettingEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		1F9BF5582F09140B009E5A49 /* StoryEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StoryEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		1FA8F4C32F4764B2000C5536 /* CategoryMovePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryMovePicker.swift; sourceTree = "<group>"; };
 		1FCB03F92F0E4178000E5BC2 /* MigrationBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationBackupService.swift; sourceTree = "<group>"; };
 		1FCB03FA2F0E4178000E5BC2 /* MigrationCryptoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationCryptoService.swift; sourceTree = "<group>"; };
 		1FCB03FB2F0E4178000E5BC2 /* MigrationRestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationRestoreService.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 		1F7FA2D52ED33CEE004D91C4 /* Category */ = {
 			isa = PBXGroup;
 			children = (
+				1FA8F4C32F4764B2000C5536 /* CategoryMovePicker.swift */,
 				1FD7248E2F02B34900F46B20 /* CategoryIconView.swift */,
 				1FDA9BDF2EDF22D700818D62 /* SimpleCategoryPicker.swift */,
 				1F7FA2D42ED33CEE004D91C4 /* CategoryCardView.swift */,
@@ -573,6 +576,7 @@
 				1F7FA2CC2ED33C9E004D91C4 /* SearchHistoryItem.swift in Sources */,
 				1FDA9BDE2EDF16A900818D62 /* CategoryLevelView.swift in Sources */,
 				AF2752832F0E9FF2003293D9 /* DataSyncView.swift in Sources */,
+				1FA8F4C42F4764B2000C5536 /* CategoryMovePicker.swift in Sources */,
 				1F7FA2CD2ED33C9E004D91C4 /* LocationInfo.swift in Sources */,
 				1FCB03FD2F0E4178000E5BC2 /* MigrationBackupService.swift in Sources */,
 				1FCB03FE2F0E4178000E5BC2 /* MigrationCryptoService.swift in Sources */,

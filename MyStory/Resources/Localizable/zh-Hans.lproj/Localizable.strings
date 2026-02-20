@@ -38,6 +38,7 @@
 "story.addLocation" = "添加位置";
 "story.locationSelected" = "已选择位置";
 "story.videoLoading" = "正在加载视频...";
+"story.move" = "移动";
 
 // Location
 "location.accuracy" = "精度";
@@ -75,10 +76,14 @@
 "category.childrenCount" = "%d个目录";
 "category.secondLevelCount" = "%d个目录";
 "category.thirdLevelCount" = "%d个目录";
-"category.directStoriesTitle" = "本分类故事";
+"category.directStoriesTitle" = "分类故事";
 "category.subcategoriesTitle" = "子分类";
 "category.viewAll" = "查看全部";
 "category.createStory" = "新建故事";
+"category.move" = "移动";
+"category.moveTo" = "移动到";
+"category.moveError" = "移动失败";
+"category.moveNoTarget" = "没有可移动的目标分类";
 
 // Category Display Modes
 "category.mode.card" = "卡片";

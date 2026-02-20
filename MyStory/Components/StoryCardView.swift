@@ -19,6 +19,11 @@ struct StoryCardView: View {
         return Array(mediaSet).sorted { ($0.createdAt ?? Date.distantPast) < ($1.createdAt ?? Date.distantPast) }
     }
     
+    private var firstCategoryEntity: CategoryEntity? {
+        guard let categories = story.categories as? Set<CategoryEntity> else { return nil }
+        return categories.first
+    }
+    
     private var categoryNamesText: String? {
         guard let categories = story.categories as? Set<CategoryEntity>, !categories.isEmpty else {
             return nil
@@ -62,9 +67,13 @@ struct StoryCardView: View {
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                     if !hideCategoryDisplay, let categoryNamesText = categoryNamesText {
                         HStack(spacing: AppTheme.Spacing.xs) {
-                            Image(systemName: "folder.fill")
-                                .font(.system(size: 16))
-                                .foregroundColor(AppTheme.Colors.primary)
+                            if let categoryEntity = firstCategoryEntity {
+                                CategoryIconView(entity: categoryEntity, size: 16)
+                            } else {
+                                Image(systemName: "folder.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(AppTheme.Colors.primary)
+                            }
                             
                             Text(categoryNamesText)
                                 .font(AppTheme.Typography.subheadline)

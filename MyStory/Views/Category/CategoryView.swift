@@ -14,6 +14,9 @@ public struct CategoryView: View {
     @State private var showDeleteConfirm = false  // 显示删除确认对话框
     @State private var deleteErrorMessage = ""  // 删除错误消息
     @State private var showDeleteError = false  // 显示删除错误
+    @State private var categoryToMove: CategoryTreeNode?  // 要移动的分类
+    @State private var showMoveError = false
+    @State private var moveErrorMessage = ""
     
     // MARK: - Services
     @State private var mediaService = MediaStorageService()
@@ -86,6 +89,23 @@ public struct CategoryView: View {
         } message: {
             Text(deleteErrorMessage)
         }
+        .alert("category.moveError".localized, isPresented: $showMoveError) {
+            Button("common.confirm".localized, role: .cancel) {}
+        } message: {
+            Text(moveErrorMessage)
+        }
+        .sheet(item: $categoryToMove) { node in
+            CategoryMovePicker(
+                movingNode: node,
+                onMove: { targetId in
+                    performMove(categoryId: node.id, targetParentId: targetId)
+                    categoryToMove = nil
+                },
+                onDismiss: {
+                    categoryToMove = nil
+                }
+            )
+        }
         .onAppear {
             // 重新加载分类树以更新故事计数
             viewModel.load()
@@ -117,6 +137,21 @@ public struct CategoryView: View {
     private func prepareDeleteCategory(_ node: CategoryTreeNode) {
         categoryToDelete = node
         showDeleteConfirm = true
+    }
+    
+    /// 准备移动分类
+    private func prepareMoveCategory(_ node: CategoryTreeNode) {
+        categoryToMove = node
+    }
+    
+    /// 执行移动操作
+    private func performMove(categoryId: UUID, targetParentId: UUID) {
+        do {
+            try viewModel.moveCategory(id: categoryId, newParentId: targetParentId)
+        } catch {
+            moveErrorMessage = error.localizedDescription
+            showMoveError = true
+        }
     }
 
     private var cardGrid: some View {
@@ -154,9 +189,10 @@ public struct CategoryView: View {
                     node: level1Node,
                     level: 1,
                     expandedCategories: $expandedCategories,
-                    viewModel: viewModel,  // 传递 viewModel
-                    onEdit: editCategory,  // 传递编辑回调
-                    onDelete: prepareDeleteCategory  // 传递删除回调
+                    viewModel: viewModel,
+                    onEdit: editCategory,
+                    onDelete: prepareDeleteCategory,
+                    onMove: prepareMoveCategory
                 )
             }
         }
@@ -249,8 +285,9 @@ private struct CategoryListItem: View {
     let level: Int  // 1, 2, or 3
     @Binding var expandedCategories: Set<UUID>
     @ObservedObject var viewModel: CategoryViewModel
-    let onEdit: (CategoryTreeNode) -> Void  // 编辑回调
-    let onDelete: (CategoryTreeNode) -> Void  // 删除回调
+    let onEdit: (CategoryTreeNode) -> Void
+    let onDelete: (CategoryTreeNode) -> Void
+    let onMove: (CategoryTreeNode) -> Void
     
     @Environment(\.managedObjectContext) private var context
     @State private var navigateToStoryList = false
@@ -264,7 +301,8 @@ private struct CategoryListItem: View {
                     node: node, 
                     viewModel: viewModel,
                     onEdit: onEdit,
-                    onDelete: onDelete
+                    onDelete: onDelete,
+                    onMove: onMove
                 ) {
                     categoryRow
                 }
@@ -308,7 +346,8 @@ private struct CategoryListItem: View {
                             expandedCategories: $expandedCategories,
                             viewModel: viewModel,
                             onEdit: onEdit,
-                            onDelete: onDelete
+                            onDelete: onDelete,
+                            onMove: onMove
                         )
                         .padding(.leading, 24)  // 缩进显示层级
                     }
@@ -331,6 +370,15 @@ private struct CategoryListItem: View {
             onEdit(node)
         } label: {
             Label("category.edit".localized, systemImage: "pencil")
+        }
+        
+        // Level 2 分类支持移动
+        if node.category.level >= 2 {
+            Button {
+                onMove(node)
+            } label: {
+                Label("category.move".localized, systemImage: "folder.badge.gearshape")
+            }
         }
         
         Button(role: .destructive) {
@@ -457,6 +505,7 @@ private struct CategoryStoryNavigationView<Content: View>: View {
     @ObservedObject var viewModel: CategoryViewModel
     let onEdit: (CategoryTreeNode) -> Void
     let onDelete: (CategoryTreeNode) -> Void
+    let onMove: (CategoryTreeNode) -> Void
     
     @Environment(\.managedObjectContext) private var context
     @State private var showEditor = false
@@ -467,12 +516,14 @@ private struct CategoryStoryNavigationView<Content: View>: View {
         viewModel: CategoryViewModel,
         onEdit: @escaping (CategoryTreeNode) -> Void,
         onDelete: @escaping (CategoryTreeNode) -> Void,
+        onMove: @escaping (CategoryTreeNode) -> Void,
         @ViewBuilder content: () -> Content
     ) {
         self.node = node
         self.viewModel = viewModel
         self.onEdit = onEdit
         self.onDelete = onDelete
+        self.onMove = onMove
         self.content = content()
     }
     
@@ -526,6 +577,14 @@ private struct CategoryStoryNavigationView<Content: View>: View {
             onEdit(node)
         } label: {
             Label("category.edit".localized, systemImage: "pencil")
+        }
+        
+        if node.category.level >= 2 {
+            Button {
+                onMove(node)
+            } label: {
+                Label("category.move".localized, systemImage: "folder.badge.gearshape")
+            }
         }
         
         Button(role: .destructive) {
