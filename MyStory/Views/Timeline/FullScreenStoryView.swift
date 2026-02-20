@@ -219,6 +219,25 @@ struct StoryDetailView: View {
         return names.joined(separator: " >> ")
     }
     
+    private func categoryIconName() -> String? {
+        guard let categories = story.categories as? Set<CategoryEntity>, let categoryEntity = categories.first else { return nil }
+        let iconName = categoryEntity.iconName ?? "folder"
+        print("DEBUG: Category iconName = \(iconName ?? "nil")")
+        return iconName
+    }
+    
+    /// 判断是否为 SF Symbols 图标
+    private func isSystemSymbol(name: String) -> Bool {
+        // SF Symbols 通常包含点号分隔，如 "folder.fill", "star.circle"
+        // 或者是一些常见的 SF Symbols 名称模式
+        let systemSymbols = [
+            "folder", "folder.fill", "star", "star.fill",
+            "heart", "heart.fill", "circle", "circle.fill",
+            "square", "square.fill", "triangle", "triangle.fill"
+        ]
+        return systemSymbols.contains(name)
+    }
+    
     private func categoryNode() -> CategoryTreeNode? {
         guard let categories = story.categories as? Set<CategoryEntity>, let categoryEntity = categories.first else { return nil }
         return CategoryTreeNode(
@@ -316,11 +335,22 @@ struct StoryDetailView: View {
             }
             
             // 分类
-            if let text = categoryNamesText {
+            if let text = categoryNamesText, let iconName = categoryIconName() {
                 HStack(spacing: AppTheme.Spacing.s) {
-                    Image(systemName: "folder.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(AppTheme.Colors.primary)
+                    Group {
+                        if isSystemSymbol(name: iconName) {
+                            // SF Symbols
+                            Image(systemName: iconName)
+                                .font(.system(size: 14))
+                        } else {
+                            // Assets 自定义图标
+                            Image(iconName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                        }
+                    }
+                    .foregroundColor(AppTheme.Colors.primary)
                     Text(text)
                         .font(AppTheme.Typography.caption)
                         .foregroundColor(AppTheme.Colors.textSecondary)
@@ -335,8 +365,10 @@ struct StoryDetailView: View {
             // 位置
             if let city = story.locationCity, !city.isEmpty {
                 HStack(spacing: AppTheme.Spacing.s) {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.system(size: 14))
+                    Image("address")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
                         .foregroundColor(AppTheme.Colors.primary)
                     Text(city)
                         .font(AppTheme.Typography.caption)
