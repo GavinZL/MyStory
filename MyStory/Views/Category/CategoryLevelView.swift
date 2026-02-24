@@ -53,7 +53,7 @@ struct CategoryLevelView: View {
         ScrollView {
             VStack(spacing: AppTheme.Spacing.l) {
                 // 分区 1：子分类卡片网格
-                if !parentNode.children.isEmpty {
+                if !sortedChildren.isEmpty {
                     subcategoriesSection
                 }
                 
@@ -63,7 +63,7 @@ struct CategoryLevelView: View {
                 }
                 
                 // 空状态
-                if parentNode.children.isEmpty && directStories.isEmpty {
+                if sortedChildren.isEmpty && directStories.isEmpty {
                     emptyStateView
                 }
             }
@@ -177,6 +177,13 @@ struct CategoryLevelView: View {
         }
     }
     
+    // MARK: - Computed Properties
+    
+    /// 按 sortOrder 排序的子分类
+    private var sortedChildren: [CategoryTreeNode] {
+        parentNode.children.sorted { $0.category.sortOrder < $1.category.sortOrder }
+    }
+    
     // MARK: - View Components
     
     /// 子分类网格区域
@@ -187,7 +194,7 @@ struct CategoryLevelView: View {
                 .padding(.horizontal)
             
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(parentNode.children, id: \.id) { childNode in
+                ForEach(sortedChildren, id: \.id) { childNode in
                     navigationLink(for: childNode)
                 }
             }
