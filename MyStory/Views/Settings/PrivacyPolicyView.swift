@@ -130,23 +130,20 @@ struct PrivacyPolicyView: View {
     // MARK: - Private Methods
     
     private func openFullPrivacyPolicy() {
-        // 根据当前语言选择对应的隐私政策文件
-        let languageCode = Locale.current.language.languageCode?.identifier ?? "en"
-        let fileName = languageCode.hasPrefix("zh") ? "PRIVACY_POLICY_zh-Hans.md" : "PRIVACY_POLICY_en.md"
+        // 根据应用设置中的语言选择对应的隐私政策链接
+        let currentLanguage = LocalizationManager.shared.currentLanguage
+        let privacyURLString: String
         
-        // 构建文件路径（假设文件在应用包中）
-        if let privacyPath = Bundle.main.path(forResource: "privacy/\(fileName)", ofType: nil) {
-            let fileURL = URL(fileURLWithPath: privacyPath)
-            if UIApplication.shared.canOpenURL(fileURL) {
-                UIApplication.shared.open(fileURL)
-            }
+        if currentLanguage == .chinese {
+            // 中文链接
+            privacyURLString = "https://github.com/GavinZL/MyStory/blob/main/privacy/PRIVACY_POLICY_zh-Hans.md"
         } else {
-            // 如果找不到文件，尝试从项目根目录读取（开发环境）
-            let projectPath = "/Volumes/LiSSD/ProjectT/App/MyStory/privacy/\(fileName)"
-            let fileURL = URL(fileURLWithPath: projectPath)
-            if FileManager.default.fileExists(atPath: projectPath) {
-                UIApplication.shared.open(fileURL)
-            }
+            // 英文链接
+            privacyURLString = "https://github.com/GavinZL/MyStory/blob/main/privacy/PRIVACY_POLICY_en.md"
+        }
+        
+        if let url = URL(string: privacyURLString) {
+            UIApplication.shared.open(url)
         }
     }
 }

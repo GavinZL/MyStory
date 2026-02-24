@@ -301,21 +301,36 @@
 "settings.font.extraLarge" = "Extra Large";
 
 // Font Preview Content
-"settings.font.preview.welcome" = "Welcome to MyStory, your personal diary.";
-"settings.font.preview.description1" = "In MyStory, you can conveniently record your daily life with images and text. No ads, no social features, secure cloud sync protects your data from loss.";
-"settings.font.preview.description2" = "Rich diary formats enrich every moment of your recording.";
-"settings.font.preview.featuresTitle" = "MyStory supports adding:";
-"settings.font.preview.feature1" = "1. Pure text diary;";
-"settings.font.preview.feature2" = "2. Multiple images;";
-"settings.font.preview.feature3" = "3. Record audio;";
-"settings.font.preview.feature4" = "4. Record mood;";
-"settings.font.preview.feature5" = "5. Auto-record weather/location;";
-"settings.font.preview.closing" = "Rich diary formats enrich every moment of your recording.";
+"settings.font.preview.welcome" = "Welcome to MyStory, capture every moment of your life.";
+"settings.font.preview.description1" = "In MyStory, you can record life moments with text, images, and videos. Local encrypted storage and AI text polish make every story worth revisiting.";
+"settings.font.preview.description2" = "Flexible category management and timeline browsing keep your memories well organized.";
+"settings.font.preview.featuresTitle" = "MyStory supports:";
+"settings.font.preview.feature1" = "1. Rich text editing;";
+"settings.font.preview.feature2" = "2. Images and videos;";
+"settings.font.preview.feature3" = "3. AI text polish;";
+"settings.font.preview.feature4" = "4. Location recording;";
+"settings.font.preview.feature5" = "5. Three-level category management;";
+"settings.font.preview.closing" = "Timeline storytelling makes your stories more vivid and organized.";
 
 // MARK: - Privacy Policy
 "settings.privacyPolicy" = "Privacy Policy";
 "privacyPolicy.title" = "Privacy Policy";
 "privacyPolicy.lastUpdated" = "Last Updated: January 2025";
+
+// MARK: - Technical Support
+"settings.technicalSupport" = "Technical Support";
+"support.title" = "Technical Support";
+"support.description" = "Welcome to MyStory Technical Support. Here you can find FAQ, tutorials, and troubleshooting guides.";
+"support.viewFullDocument" = "View Full Technical Support Document";
+"support.quickHelp" = "Quick Help";
+"support.faq" = "FAQ";
+"support.faq.description" = "15+ frequently asked questions and detailed answers, including how to create stories, use AI polish, manage categories, etc.";
+"support.tutorials" = "Tutorials";
+"support.tutorials.description" = "Step-by-step tutorials to guide you through creating your first story, managing categories, using search, etc.";
+"support.troubleshooting" = "Troubleshooting";
+"support.troubleshooting.description" = "Solutions for common issues including app crashes, image loading, data sync problems, etc.";
+"support.contact" = "Contact Us";
+"support.contact.description" = "If you encounter unresolved issues, feel free to contact us through the App Store developer contact information.";
 
 // Privacy Policy Sections
 "privacyPolicy.section.intro.title" = "Introduction";

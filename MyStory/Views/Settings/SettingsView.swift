@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var showFontSettings = false
     @State private var showDataSync = false
     @State private var showPrivacyPolicy = false
+    @State private var showTechnicalSupport = false
     @State private var showCacheCleanupConfirm = false
     @State private var isCleaningCache = false
     @State private var showCleanupResult = false
@@ -36,7 +37,7 @@ struct SettingsView: View {
                             Text(localizationManager.currentLanguage.displayName)
                                 .foregroundColor(.secondary)
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -51,7 +52,7 @@ struct SettingsView: View {
                             Text(themeManager.currentTheme.displayName)
                                 .foregroundColor(.secondary)
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -66,7 +67,7 @@ struct SettingsView: View {
                             Text(fontScaleManager.currentScale.displayName)
                                 .foregroundColor(.secondary)
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -82,7 +83,7 @@ struct SettingsView: View {
                             Label("settings.dataSync".localized, systemImage: "arrow.triangle.2.circlepath")
                             Spacer()
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -100,7 +101,7 @@ struct SettingsView: View {
                                     .progressViewStyle(CircularProgressViewStyle())
                             } else {
                                 Image(systemName: "chevron.right")
-                                    .font(.caption)
+                                    .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
                         }
@@ -117,7 +118,20 @@ struct SettingsView: View {
                             Label("settings.privacyPolicy".localized, systemImage: "hand.raised")
                             Spacer()
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .foregroundColor(.primary)
+                    
+                    Button {
+                        showTechnicalSupport = true
+                    } label: {
+                        HStack {
+                            Label("settings.technicalSupport".localized, systemImage: "questionmark.circle")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -147,6 +161,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showPrivacyPolicy) {
                 PrivacyPolicyView()
+            }
+            .sheet(isPresented: $showTechnicalSupport) {
+                TechnicalSupportView()
             }
             .alert("settings.cacheCleanup.confirm.title".localized, isPresented: $showCacheCleanupConfirm) {
                 Button("common.cancel".localized, role: .cancel) { }

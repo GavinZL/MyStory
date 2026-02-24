@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F7A8E832F4D94AE0025CAFE /* TechnicalSupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7A8E822F4D94AE0025CAFE /* TechnicalSupportView.swift */; };
 		1F7FA2A72ED33A99004D91C4 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2A42ED33A99004D91C4 /* KeychainStore.swift */; };
 		1F7FA2BF2ED33AD2004D91C4 /* AIPolishService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2B82ED33AD2004D91C4 /* AIPolishService.swift */; };
 		1F7FA2C02ED33AD2004D91C4 /* CategoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7FA2BA2ED33AD2004D91C4 /* CategoryService.swift */; };
@@ -84,6 +85,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1F7A8E822F4D94AE0025CAFE /* TechnicalSupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicalSupportView.swift; sourceTree = "<group>"; };
 		1F7FA2A42ED33A99004D91C4 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		1F7FA2B82ED33AD2004D91C4 /* AIPolishService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPolishService.swift; sourceTree = "<group>"; };
 		1F7FA2BA2ED33AD2004D91C4 /* CategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryService.swift; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 		1F7FA2E12ED33D23004D91C4 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				1F7A8E822F4D94AE0025CAFE /* TechnicalSupportView.swift */,
 				1F83D7B22F1E5EE8001F1CF5 /* PrivacyPolicyView.swift */,
 				AF2752862F0EB23B003293D9 /* FontSettingsView.swift */,
 				AF2752822F0E9FF2003293D9 /* DataSyncView.swift */,
@@ -547,6 +550,7 @@
 			files = (
 				E100000001 /* MyStoryApp.swift in Sources */,
 				1F7FA2E82ED33D42004D91C4 /* AIPolishView.swift in Sources */,
+				1F7A8E832F4D94AE0025CAFE /* TechnicalSupportView.swift in Sources */,
 				1F7FA2BF2ED33AD2004D91C4 /* AIPolishService.swift in Sources */,
 				1FDA9BF92EE05D9200818D62 /* LanguageSettingsView.swift in Sources */,
 				1F7FA2C02ED33AD2004D91C4 /* CategoryService.swift in Sources */,

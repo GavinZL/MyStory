@@ -301,21 +301,36 @@
 "settings.font.extraLarge" = "超大";
 
 // Font Preview Content
-"settings.font.preview.welcome" = "欢迎使用一本日记，您的专属日记本。";
-"settings.font.preview.description1" = "在一本日记中，您可以方便的图文记录每日日常。无广告无社交，安全的云同步保护您的数据不会丢失。";
-"settings.font.preview.description2" = "丰富的日记形式丰富您的每一次记录。";
-"settings.font.preview.featuresTitle" = "一本日记支持添加：";
-"settings.font.preview.feature1" = "1. 纯文字日记；";
-"settings.font.preview.feature2" = "2. 多张图片；";
-"settings.font.preview.feature3" = "3. 记录录音；";
-"settings.font.preview.feature4" = "4. 记录心情；";
-"settings.font.preview.feature5" = "5. 自动记录天气/位置；";
-"settings.font.preview.closing" = "丰富的日记形式丰富您的每一次记录。";
+"settings.font.preview.welcome" = "欢迎使用「我的故事」，记录生活的每一刻。";
+"settings.font.preview.description1" = "在「我的故事」中，您可以用文字、图片和视频记录生活点滴。本地加密存储，AI智能润色，让每一个故事都值得回味。";
+"settings.font.preview.description2" = "灵活的分类管理和时间轴浏览，让您的记忆井然有序。";
+"settings.font.preview.featuresTitle" = "「我的故事」支持：";
+"settings.font.preview.feature1" = "1. 富文本编辑；";
+"settings.font.preview.feature2" = "2. 图片和视频；";
+"settings.font.preview.feature3" = "3. AI 文本润色；";
+"settings.font.preview.feature4" = "4. 位置记录；";
+"settings.font.preview.feature5" = "5. 三级分类管理；";
+"settings.font.preview.closing" = "时间轴叙事，让您的故事更加生动有序。";
 
 // MARK: - Privacy Policy
 "settings.privacyPolicy" = "隐私政策";
 "privacyPolicy.title" = "隐私政策";
 "privacyPolicy.lastUpdated" = "最后更新日期：2025年1月";
+
+// MARK: - Technical Support
+"settings.technicalSupport" = "技术支持";
+"support.title" = "技术支持";
+"support.description" = "欢迎使用「我的故事」技术支持。在这里您可以找到常见问题解答、使用教程和故障排除方法。";
+"support.viewFullDocument" = "查看完整技术支持文档";
+"support.quickHelp" = "快速帮助";
+"support.faq" = "常见问题";
+"support.faq.description" = "15+ 个常见问题和详细解答，包括如何创建故事、使用 AI 润色、管理分类等。";
+"support.tutorials" = "使用教程";
+"support.tutorials.description" = "分步骤教程指导您创建第一个故事、管理分类体系、使用搜索功能等。";
+"support.troubleshooting" = "故障排除";
+"support.troubleshooting.description" = "常见问题的解决方案，包括应用崩溃、图片加载、数据同步等问题。";
+"support.contact" = "联系我们";
+"support.contact.description" = "如果您遇到未解决的问题，欢迎通过 App Store 开发者联系方式与我们取得联系。";
 
 // Privacy Policy Sections
 "privacyPolicy.section.intro.title" = "引言";
