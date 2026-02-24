@@ -91,12 +91,13 @@ struct StoryCardView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 16, height: 16)
+                                .foregroundColor(AppTheme.Colors.primary)
                             
                             Text(locationText)
-                                .font(AppTheme.Typography.caption)
+                                .font(AppTheme.Typography.subheadline)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .lineLimit(1)
-                        }.padding(.vertical, AppTheme.Spacing.s)
+                        }
                     }
                 }
             }

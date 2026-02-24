@@ -216,19 +216,9 @@ struct CategoryLevelView: View {
             }
             .padding(.horizontal)
             
-            LazyVStack(spacing: AppTheme.Spacing.s) {
+            LazyVStack(spacing: AppTheme.Spacing.l) {
                 ForEach(directStories.prefix(3), id: \.objectID) { story in
-                    NavigationLink(destination: storyDetailView(for: story)) {
-                        StoryCardView(
-                            story: story,
-                            firstImage: loadCoverImage(for: story),
-                            hideCategoryDisplay: true
-                        ) { }
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .contextMenu {
-                        storyContextMenu(for: story)
-                    }
+                    storyItemView(story: story)
                 }
             }
             .padding(.horizontal, AppTheme.Spacing.s)
@@ -263,6 +253,62 @@ struct CategoryLevelView: View {
     }
     
     // MARK: - Navigation Links
+    
+    /// 单个故事项视图（与 CategoryStoryListView 保持一致）
+    @ViewBuilder
+    private func storyItemView(story: StoryEntity) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            solidLineView
+            dateHeaderView(for: story)
+            
+            HStack(spacing: 2) {
+                NavigationLink(destination: storyDetailView(for: story)) {
+                    StoryCardView(
+                        story: story,
+                        firstImage: loadCoverImage(for: story),
+                        hideCategoryDisplay: true
+                    ) { }
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.horizontal, 8)
+        }
+        .contextMenu {
+            storyContextMenu(for: story)
+        }
+    }
+    
+    /// 日期头部视图（与 CategoryStoryListView 保持一致）
+    private func dateHeaderView(for story: StoryEntity) -> some View {
+        HStack(alignment: .center, spacing: AppTheme.Spacing.s) {
+            // 大号日期数字（月-日格式）
+            Text(formatDayNumber(story.timestamp!))
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            // 小号时间星期 + 年份
+            VStack(alignment: .leading, spacing: 2) {
+                Text(formatTime(story.timestamp!))
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                
+                Text(formatYearMonth(story.timestamp!))
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+            }
+            
+            Spacer()
+        }
+        .padding(.vertical, AppTheme.Spacing.s)
+    }
+    
+    /// 分隔线
+    private var solidLineView: some View {
+        Rectangle()
+            .fill(AppTheme.Colors.border.opacity(0.3))
+            .frame(height: 1)
+            .padding(.bottom, AppTheme.Spacing.s)
+    }
     
     /// 根据当前层级决定导航链接目标
     @ViewBuilder
@@ -440,6 +486,47 @@ struct CategoryLevelView: View {
             let fileName = (media.thumbnailFileName ?? media.fileName) ?? ""
             return mediaService.loadImage(fileName: fileName)
         }
+    }
+    
+    // MARK: - Date Formatting
+    
+    /// 格式化日期数字（月-日格式，与 CategoryStoryListView 保持一致）
+    private func formatDayNumber(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd"
+        return formatter.string(from: date)
+    }
+    
+    /// 格式化年份
+    private func formatYearMonth(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        
+        let isChineseLocale = LocalizationManager.shared.currentLanguage == .chinese
+        formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
+        
+        if isChineseLocale {
+            formatter.dateFormat = "YYYY年"
+        } else {
+            formatter.dateFormat = "YYYY"
+        }
+        
+        return formatter.string(from: date)
+    }
+    
+    /// 格式化时间和星期
+    private func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        
+        let isChineseLocale = LocalizationManager.shared.currentLanguage == .chinese
+        formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
+        
+        if isChineseLocale {
+            formatter.dateFormat = "HH:mm / E"
+        } else {
+            formatter.dateFormat = "HH:mm / EEE"
+        }
+        
+        return formatter.string(from: date)
     }
 }
 

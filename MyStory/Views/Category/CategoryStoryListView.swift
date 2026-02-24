@@ -140,18 +140,18 @@ struct CategoryStoryListView: View {
     /// 日期头部视图
     private func dateHeaderView(for story: StoryEntity) -> some View {
         HStack(alignment: .center, spacing: AppTheme.Spacing.s) {
-            // 大号日期数字
+            // 大号日期数字（月-日格式，与 TimelineView 保持一致）
             Text(formatDayNumber(story.timestamp!))
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            // 小号年月时分 + 星期
+            // 小号时间星期 + 年份
             VStack(alignment: .leading, spacing: 2) {
-                Text(formatYearMonth(story.timestamp!))
+                Text(formatTime(story.timestamp!))
                     .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.textSecondary)
                 
-                Text(formatTime(story.timestamp!))
+                Text(formatYearMonth(story.timestamp!))
                     .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
@@ -308,14 +308,14 @@ struct CategoryStoryListView: View {
     
     // MARK: - Date Formatting
     
-    /// 格式化日期数字（日）
+    /// 格式化日期数字（月-日格式，与 TimelineView 保持一致）
     private func formatDayNumber(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd"
+        formatter.dateFormat = "MM-dd"
         return formatter.string(from: date)
     }
     
-    /// 格式化年月和星期
+    /// 格式化年份
     private func formatYearMonth(_ date: Date) -> String {
         let formatter = DateFormatter()
         
@@ -324,18 +324,28 @@ struct CategoryStoryListView: View {
         formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
         
         if isChineseLocale {
-            formatter.dateFormat = "YYYY年MM月 / E"
+            formatter.dateFormat = "YYYY年"
         } else {
-            formatter.dateFormat = "MMM / EEE"
+            formatter.dateFormat = "YYYY"
         }
         
         return formatter.string(from: date)
     }
     
-    /// 格式化时间
+    /// 格式化时间和星期
     private func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+        
+        let isChineseLocale = LocalizationManager.shared.currentLanguage == .chinese
+        // 根据配置的语言设置 locale
+        formatter.locale = Locale(identifier: isChineseLocale ? "zh-Hans" : "en")
+        
+        if isChineseLocale {
+            formatter.dateFormat = "HH:mm / E"
+        } else {
+            formatter.dateFormat = "HH:mm / EEE"
+        }
+        
         return formatter.string(from: date)
     }
     

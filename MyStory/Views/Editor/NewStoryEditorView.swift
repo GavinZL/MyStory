@@ -624,8 +624,45 @@ final class NewStoryEditorViewModel: ObservableObject {
     private var videoImportTask: Task<Void, Never>?
     private var isImportingVideo = false
     
-    var canSave: Bool { !title.isEmpty || !richTextEditorViewModel.isEmpty }
+    // 追踪初始状态用于判断是否有修改
+    private var initialImageCount: Int = 0
+    private var initialHasVideo: Bool = false
+    private var initialLocationInfo: LocationInfo? = nil
+    private var initialCategoryId: UUID? = nil
+    
+    var canSave: Bool {
+        // 编辑现有故事：只要有任何修改就可以保存
+        if existingStory != nil {
+            return hasContentChanges || hasMediaChanges || hasLocationChanges || hasCategoryChanges
+        }
+        // 新建故事：必须有文字或媒体内容
+        return !richTextEditorViewModel.isEmpty || !images.isEmpty || hasVideoThumbnail
+    }
+    
     var hasVideoThumbnail: Bool { !videoThumbnails.isEmpty || videoFileName != nil }
+    
+    // 检测各类变化
+    private var hasContentChanges: Bool {
+        richTextEditorViewModel.plainText != (initialContentText ?? "")
+    }
+    
+    private var hasMediaChanges: Bool {
+        images.count != initialImageCount || hasVideoThumbnail != initialHasVideo
+    }
+    
+    private var hasLocationChanges: Bool {
+        let currentHasLocation = locationInfo != nil
+        let initialHasLocation = initialLocationInfo != nil
+        if currentHasLocation != initialHasLocation { return true }
+        if let current = locationInfo, let initial = initialLocationInfo {
+            return current.latitude != initial.latitude || current.longitude != initial.longitude
+        }
+        return false
+    }
+    
+    private var hasCategoryChanges: Bool {
+        selectedCategoryId != initialCategoryId
+    }
     
     var currentDateTitle: String {
         let formatter = DateFormatter()
@@ -676,6 +713,7 @@ final class NewStoryEditorViewModel: ObservableObject {
                     city: city,
                     country: nil
                 )
+                initialLocationInfo = locationInfo
             }
             
             let mediaService = self.mediaService
@@ -686,6 +724,8 @@ final class NewStoryEditorViewModel: ObservableObject {
                     guard let name = media.fileName else { return nil }
                     return mediaService.loadImage(fileName: name)
                 }
+                initialImageCount = images.count
+                
                 let videoMedias = medias.filter { $0.type == "video" }
                 if let videoMedia = videoMedias.first {
                     videoFileName = videoMedia.fileName
@@ -697,6 +737,7 @@ final class NewStoryEditorViewModel: ObservableObject {
                        let thumbnail = mediaService.loadVideoThumbnail(fileName: thumbFileName) {
                         videoThumbnails = [thumbnail]
                     }
+                    initialHasVideo = true
                 }
             }
             
@@ -704,9 +745,11 @@ final class NewStoryEditorViewModel: ObservableObject {
                let first = set.first,
                let cid = first.id {
                 selectedCategoryId = cid
+                initialCategoryId = cid
             }
         } else if let category = initialCategory, let cid = category.id {
             selectedCategoryId = cid
+            initialCategoryId = cid
         }
         
         if let cid = selectedCategoryId {
