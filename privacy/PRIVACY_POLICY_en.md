@@ -54,17 +54,15 @@ We do **NOT** collect:
 - **Encryption Keys**: Stored in iOS Keychain with system-level protection
 - **Settings**: Stored in Core Data database
 
-### 2.2 Data Encryption
+### 2.2 Data Security
 
-We use industry-standard encryption technology to protect your data:
-- **Encryption Algorithm**: AES-256-GCM (Advanced Encryption Standard)
-- **Key Management**: Master key securely stored in iOS Keychain, with independent derived keys for each media file
-- **Encryption Scope**: All photos and videos are automatically encrypted before being written to disk
+We use iOS system-level security mechanisms to protect your data:
+- **Local Storage**: All data is stored on your device using iOS secure sandbox mechanism
+- **Access Control**: Other apps cannot access your data
 
 ### 2.3 Data Backup
 
 - If you enable iCloud backup, your app data may be included in iCloud backups
-- Encrypted media files remain encrypted in backups
 - You can manage backups in iPhone's "Settings > Apple ID > iCloud > Manage Storage"
 
 ---
@@ -124,16 +122,15 @@ When you use the "AI Text Polish" feature:
 
 MyStory provides **peer-to-peer (P2P) data sync** functionality for migrating data when switching devices:
 - **No Server Required**: Two devices connect directly via local network or Bluetooth to transfer data
-- **End-to-End Encryption**: Transfer process uses AES-256-GCM encryption to ensure data is not intercepted by third parties
 - **PIN Code Verification**: Uses 6-digit PIN code for device pairing to prevent data from being received by wrong devices
 
 ### 5.2 Sync Process
 
-1. **Sender (Old Phone)**: Creates encrypted backup package
+1. **Sender (Old Phone)**: Creates backup package
 2. **Receiver (New Phone)**: Generates PIN code and waits for connection
-3. **Device Pairing**: Establishes encrypted connection via MultipeerConnectivity framework
-4. **Data Transfer**: Encrypted data package is transferred over local network
-5. **Data Restoration**: Receiver decrypts and restores data
+3. **Device Pairing**: Establishes connection via MultipeerConnectivity framework
+4. **Data Transfer**: Backup data package is transferred over local network
+5. **Data Restoration**: Receiver restores data
 
 **Throughout the process, data is not uploaded to any internet servers.**
 
@@ -244,17 +241,10 @@ The interpretation, validity, and dispute resolution of this Privacy Policy shal
 
 ## Appendix: Technical Details
 
-### Encryption Technology
-- **Algorithm**: AES-256-GCM (Galois/Counter Mode)
-- **Key Length**: 256 bits
-- **Key Derivation**: PBKDF2 or deterministic derivation based on master key
-- **Integrity Verification**: GCM mode includes built-in Message Authentication Code (MAC)
-
 ### Data Storage Locations
 - **App Sandbox**: `/var/mobile/Containers/Data/Application/[UUID]/`
 - **Core Data**: `Documents/MyStory.sqlite`
-- **Media Files**: `Documents/Media/` (encrypted storage)
-- **Keychain**: System Keychain, not accessible via file system
+- **Media Files**: `Documents/Media/`
 
 ---
 

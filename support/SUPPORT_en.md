@@ -211,8 +211,7 @@ Available themes: Classic, Ocean, Sunset, Night Sky, Forest, Lavender, Dark Mode
 **A:** 
 - **All data is stored locally on your device**
 - Text content stored in Core Data database
-- Images and videos encrypted with AES-256-GCM and stored in app sandbox
-- Encryption keys stored in iOS system Keychain
+- Images and videos stored in app sandbox with iOS system security
 - **We do not upload your data to any servers**
 
 ### Q12: How to migrate data to new phone?
@@ -416,14 +415,8 @@ Tap icon at top right of category page to switch modes.
 - Uses iOS system secure sandbox mechanism
 - Other apps cannot access your data
 
-#### Encryption Protection
-- **Text Content**: Stored in Core Data database
-- **Media Files**: Encrypted using **AES-256-GCM** algorithm
-- **Encryption Keys**: Stored in iOS system Keychain with system-level protection
-- **Encryption Strength**: Military-grade encryption standard, secure and reliable
-
 #### Data Transfer Security
-- **Device Sync**: End-to-end encryption, data fully encrypted during transfer
+- **Device Sync**: Peer-to-peer transfer over local network
 - **PIN Code Verification**: 6-digit PIN ensures data transfers to correct device
 - **No Server Transit**: Peer-to-peer transfer, data not uploaded to any internet servers
 
@@ -438,7 +431,7 @@ Tap icon at top right of category page to switch modes.
 
 #### We Only Process
 - ✅ Story content you actively input (stored locally only)
-- ✅ Images and videos you choose to add (encrypted storage)
+- ✅ Images and videos you choose to add (stored locally with iOS system security)
 - ✅ Location information you authorize (stored locally only)
 - ✅ Your personalization settings (language, theme, etc.)
 

@@ -410,11 +410,10 @@ struct DataSyncView: View {
     private func runBackup() {
         isRunningBackup = true
         alertMessage = nil
-        let password = "test-password" // 测试阶段使用固定密码
         let service = MigrationBackupService(context: context)
         DispatchQueue.global(qos: .userInitiated).async {
             do {
-                let url = try service.createEncryptedBackup(password: password) { _ in }
+                let url = try service.createBackup { _ in }
                 DispatchQueue.main.async {
                     isRunningBackup = false
                     let message = String(format: "dataSync.alert.backupComplete".localized, url.lastPathComponent)
@@ -479,7 +478,6 @@ struct DataSyncView: View {
     private func runRestore() {
         isRunningRestore = true
         alertMessage = nil
-        let password = "test-password" // 测试阶段使用固定密码
         guard let url = latestBackupURL() else {
             isRunningRestore = false
             // 使用Toast显示错误
@@ -493,7 +491,7 @@ struct DataSyncView: View {
         let service = MigrationRestoreService(context: context)
         DispatchQueue.global(qos: .userInitiated).async {
             do {
-                try service.restoreFromEncryptedBackup(encryptedURL: url, password: password) { _ in }
+                try service.restoreFromBackup(backupURL: url) { _ in }
                 DispatchQueue.main.async {
                     isRunningRestore = false
                     // 使用Toast显示成功消息

@@ -1,8 +1,7 @@
 import Foundation
 import CoreData
-import Security
 
-/// 负责导出 Core Data + 媒体文件 + MasterKey 并生成加密备份文件
+/// 负责导出 Core Data + 媒体文件 并生成备份文件（不加密）
 final class MigrationBackupService {
     struct Progress {
         let step: String
@@ -87,8 +86,8 @@ final class MigrationBackupService {
         var hasBrokenMedia: Bool
         var brokenMediaCount: Int
 
-        // MasterKey（Base64 编码）
-        var masterKeyBase64: String?
+        // MasterKey（已移除）
+        // var masterKeyBase64: String?
 
         // 实体数据
         var categories: [CategoryDTO]
@@ -101,19 +100,16 @@ final class MigrationBackupService {
     }
 
     private let context: NSManagedObjectContext
-    private let cryptoService = MigrationCryptoService()
 
     init(context: NSManagedObjectContext) {
         self.context = context
     }
 
-    /// 创建加密备份文件
+    /// 创建备份文件（不加密）
     /// - Parameters:
-    ///   - password: 用户迁移密码
     ///   - progressHandler: 进度回调（可选）
-    /// - Returns: 加密后的备份文件路径
-    func createEncryptedBackup(password: String,
-                               progressHandler: ((Progress) -> Void)? = nil) throws -> URL {
+    /// - Returns: 备份文件路径
+    func createBackup(progressHandler: ((Progress) -> Void)? = nil) throws -> URL {
         let backupId = UUID()
         progressHandler?(Progress(step: "collecting_data", fractionCompleted: 0.05))
 
@@ -126,19 +122,8 @@ final class MigrationBackupService {
                                                   backupId: backupId,
                                                   progressHandler: progressHandler)
 
-        progressHandler?(Progress(step: "encrypting", fractionCompleted: 0.9))
-
-        // 3. 调用加密服务，生成 .enc 文件
-        let encryptedURL = try cryptoService.encryptBackup(zipURL: containerURL,
-                                                           password: password,
-                                                           backupId: backupId)
-
-        // 4. 删除中间产物（未加密的 .bin 容器文件）
-        try? FileManager.default.removeItem(at: containerURL)
-        print("🗑️ [Backup] 已删除中间容器文件: \(containerURL.lastPathComponent)")
-
         progressHandler?(Progress(step: "finished", fractionCompleted: 1.0))
-        return encryptedURL
+        return containerURL
     }
 
     // MARK: - Core Data 导出
@@ -234,9 +219,6 @@ final class MigrationBackupService {
         // 媒体目录扫描
         let (mediaFiles, mediaStats, hasBrokenMedia, brokenCount) = scanMediaDirectory()
 
-        // MasterKey 导出
-        let masterKeyBase64 = exportMasterKey()?.base64EncodedString()
-
         // 应用版本 & schemaVersion
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         let schemaVersion = 1
@@ -256,7 +238,6 @@ final class MigrationBackupService {
             mediaStats: mediaStats,
             hasBrokenMedia: hasBrokenMedia,
             brokenMediaCount: brokenCount,
-            masterKeyBase64: masterKeyBase64,
             categories: categories,
             stories: stories,
             media: mediaItems,
@@ -324,22 +305,6 @@ final class MigrationBackupService {
         let stats = BackupPayload.MediaStats(totalFiles: totalFiles, totalBytes: totalBytes)
         let hasBroken = brokenCount > 0
         return (descriptors, stats, hasBroken, brokenCount)
-    }
-
-    // MARK: - MasterKey 导出
-
-    private func exportMasterKey() -> Data? {
-        let account = "MyStory.MasterKey"
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: account,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
-        guard status == errSecSuccess, let data = item as? Data else { return nil }
-        return data
     }
 
     // MARK: - 容器文件构建（简单自定义格式）
