@@ -83,6 +83,34 @@ struct PrivacyPolicyView: View {
                         content: "privacyPolicy.section.changes.content".localized,
                         icon: "arrow.triangle.2.circlepath"
                     )
+                    
+                    // 查看完整政策
+                    VStack(spacing: AppTheme.Spacing.s) {
+                        Text("privacyPolicy.fullDocument.hint".localized)
+                            .font(AppTheme.Typography.caption)
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
+                        
+                        Button(action: {
+                            openFullPrivacyPolicy()
+                        }) {
+                            HStack {
+                                Image(systemName: "doc.text")
+                                Text("privacyPolicy.fullDocument.button".localized)
+                            }
+                            .font(AppTheme.Typography.body)
+                            .foregroundColor(AppTheme.Colors.primary)
+                            .padding(.horizontal, AppTheme.Spacing.l)
+                            .padding(.vertical, AppTheme.Spacing.m)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                                    .stroke(AppTheme.Colors.primary, lineWidth: 1)
+                            )
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, AppTheme.Spacing.l)
+                    .padding(.horizontal)
                 }
                 .padding(.vertical)
             }
@@ -95,6 +123,29 @@ struct PrivacyPolicyView: View {
                         dismiss()
                     }
                 }
+            }
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func openFullPrivacyPolicy() {
+        // 根据当前语言选择对应的隐私政策文件
+        let languageCode = Locale.current.language.languageCode?.identifier ?? "en"
+        let fileName = languageCode.hasPrefix("zh") ? "PRIVACY_POLICY_zh-Hans.md" : "PRIVACY_POLICY_en.md"
+        
+        // 构建文件路径（假设文件在应用包中）
+        if let privacyPath = Bundle.main.path(forResource: "privacy/\(fileName)", ofType: nil) {
+            let fileURL = URL(fileURLWithPath: privacyPath)
+            if UIApplication.shared.canOpenURL(fileURL) {
+                UIApplication.shared.open(fileURL)
+            }
+        } else {
+            // 如果找不到文件，尝试从项目根目录读取（开发环境）
+            let projectPath = "/Volumes/LiSSD/ProjectT/App/MyStory/privacy/\(fileName)"
+            let fileURL = URL(fileURLWithPath: projectPath)
+            if FileManager.default.fileExists(atPath: projectPath) {
+                UIApplication.shared.open(fileURL)
             }
         }
     }

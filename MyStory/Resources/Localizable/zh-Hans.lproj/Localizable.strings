@@ -344,3 +344,6 @@
 
 "privacyPolicy.section.changes.title" = "政策变更";
 "privacyPolicy.section.changes.content" = "我们可能会不时更新本隐私政策。更新后的政策将在应用内公布，建议您定期查阅。继续使用本应用即表示您同意接受更新后的隐私政策。";
+
+"privacyPolicy.fullDocument.hint" = "以上为隐私政策摘要，您可以查看完整版隐私政策文档";
+"privacyPolicy.fullDocument.button" = "查看完整隐私政策";

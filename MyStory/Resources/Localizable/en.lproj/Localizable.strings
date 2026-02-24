@@ -344,3 +344,6 @@
 
 "privacyPolicy.section.changes.title" = "Policy Changes";
 "privacyPolicy.section.changes.content" = "We may update this privacy policy from time to time. Updated policies will be published within the app. We recommend checking periodically. Continued use of this app indicates your acceptance of the updated privacy policy.";
+
+"privacyPolicy.fullDocument.hint" = "The above is a summary of the privacy policy. You can view the full privacy policy document";
+"privacyPolicy.fullDocument.button" = "View Full Privacy Policy";
