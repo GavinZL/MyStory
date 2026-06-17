@@ -19,12 +19,10 @@ extension AppTheme {
                     .background(
                         RoundedRectangle(cornerRadius: AppTheme.Radius.m)
                             .fill(AppTheme.Colors.surface)
-                            .shadow(
-                                color: AppTheme.Shadow.small.color,
-                                radius: AppTheme.Shadow.small.radius,
-                                x: AppTheme.Shadow.small.x,
-                                y: AppTheme.Shadow.small.y
-                            )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                            .stroke(AppTheme.Surface.cardBorder, lineWidth: 1)
                     )
             }
         }
@@ -78,6 +76,12 @@ extension AppTheme {
                     .padding(.horizontal, AppTheme.Spacing.l)
                     .padding(.vertical, AppTheme.Spacing.m)
                     .background(AppTheme.Colors.surface)
+                    .overlay(
+                        Rectangle()
+                            .fill(AppTheme.Surface.cardBorder)
+                            .frame(height: 1),
+                        alignment: .bottom
+                    )
             }
         }
     }

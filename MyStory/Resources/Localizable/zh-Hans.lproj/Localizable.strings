@@ -13,6 +13,9 @@
 "common.confirm" = "确定";
 "common.error" = "错误";
 "common.loading" = "加载中...";
+"common.close" = "关闭";
+"common.search" = "搜索";
+"common.retry" = "重试";
 
 // MARK: - Tab Bar
 "tab.timeline" = "时间轴";
@@ -24,6 +27,19 @@
 "timeline.edit" = "编辑";
 "timeline.delete" = "删除";
 "timeline.dateFormat" = "yyyy年MM月dd日 HH:mm";
+"timeline.empty.title" = "开始记录你的故事";
+"timeline.empty.message" = "用文字、照片、视频、地点和分类留下一段记忆。";
+"timeline.empty.create" = "创建第一个故事";
+"timeline.search.prompt" = "搜索故事、地点、分类";
+"timeline.create.accessibility" = "创建故事";
+"timeline.search.accessibility" = "搜索故事";
+"timeline.today" = "今天";
+"timeline.yesterday" = "昨天";
+"timeline.unknownDate" = "未知日期";
+"timeline.card.category.accessibility" = "打开分类";
+"timeline.card.location.accessibility" = "故事地点";
+"timeline.media.openImage" = "打开图片";
+"timeline.media.playVideo" = "播放视频";
 
 // MARK: - Story Editor
 "story.new" = "新建故事";
@@ -39,6 +55,29 @@
 "story.locationSelected" = "已选择位置";
 "story.videoLoading" = "正在加载视频...";
 "story.move" = "移动";
+"story.media.library" = "图库";
+"story.media.video" = "视频";
+"story.media.photo" = "照片";
+"story.media.addPhoto" = "添加照片";
+"story.media.addVideo" = "添加视频";
+"story.composer.tools" = "故事工具";
+"story.composer.addMedia" = "添加媒体";
+"story.composer.addCategory" = "选择分类";
+"story.composer.clearLocation" = "清除位置";
+"story.composer.saveDisabled" = "添加文字或媒体后可保存";
+"story.composer.saving" = "保存中...";
+"story.composer.saved" = "故事已保存";
+"story.composer.saveFailed" = "故事保存失败";
+"story.composer.close.accessibility" = "关闭编辑器";
+"story.composer.save.accessibility" = "保存故事";
+"story.composer.media.accessibility" = "添加媒体";
+"story.composer.photo.accessibility" = "添加照片";
+"story.composer.video.accessibility" = "添加视频";
+"story.composer.location.accessibility" = "添加位置";
+"story.composer.category.accessibility" = "选择分类";
+"story.composer.aiPolish.accessibility" = "使用 AI 润色文本";
+"imageCropper.customIcon" = "自定义图标";
+"imageCropper.error.processing" = "图片处理失败，请重试。";
 
 // Video Processing
 "video.importing" = "正在导入视频";
@@ -80,6 +119,12 @@
 "category.color" = "选择颜色";
 "category.displayMode" = "显示模式";
 "category.page" = "分类页面";
+"category.collection" = "故事集合";
+"category.storyline" = "故事线";
+"category.empty.title" = "还没有故事集合";
+"category.empty.message" = "创建分类，把记忆整理成一条条故事线。";
+"category.search.accessibility" = "搜索分类";
+"category.create.accessibility" = "创建分类";
 
 // Category Levels
 "category.level1" = "一级分类";
@@ -169,16 +214,24 @@
 "fullscreen.loadingNewer" = "正在加载更新的故事...";
 "fullscreen.noMoreNewer" = "已无更新的故事";
 "fullscreen.noMoreEarlier" = "已无更早的故事";
+"fullscreen.textOnly" = "文字故事";
+"fullscreen.metadata" = "故事详情";
+"fullscreen.closeVideo.accessibility" = "关闭视频";
+"fullscreen.enterVideo.accessibility" = "全屏打开视频";
 
 // MARK: - Category Story List
 "categoryStory.empty" = "该分类下还没有故事";
 "categoryStory.createFirst" = "创建第一个故事";
 "categoryStory.edit" = "编辑";
 "categoryStory.delete" = "删除";
+"categoryStory.empty.title" = "这里还没有故事";
+"categoryStory.empty.message" = "直接在这个分类下创建故事，开始这条故事线。";
 
 // MARK: - AI Polish
 "ai.polish.title" = "AI 文本润色";
 "ai.polish.start" = "开始润色";
+"ai.polish.error.empty" = "请输入需要润色的文本。";
+"ai.polish.error.rateLimited" = "润色请求过于频繁，请稍后再试。";
 
 // MARK: - Category Picker
 "categoryPicker.title" = "选择分类";
@@ -291,6 +344,8 @@
 // MARK: - Font Settings
 "settings.font.title" = "字体样式";
 "settings.font.label" = "字体";
+"settings.font.size" = "字体大小";
+"settings.font.color" = "字体颜色";
 "settings.font.reset" = "重置";
 "settings.font.hint" = "字体大小会实时应用到整个应用";
 

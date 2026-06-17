@@ -20,6 +20,8 @@ struct NewStoryEditorView: View {
     @State private var imagePickerItems: [PhotosPickerItem] = []
     @State private var videoPickerItems: [PhotosPickerItem] = []
     @State private var showMediaSourceSheet = false
+    @State private var showAIPolishSheet = false
+    @State private var toastMessage: ToastMessage?
     
     var body: some View {
         ZStack {
@@ -56,6 +58,14 @@ struct NewStoryEditorView: View {
                 viewModel.applySelectedCategory()
             }
         }
+        .sheet(isPresented: $showAIPolishSheet) {
+            aiPolishSheet
+        }
+        .toast($toastMessage)
+        .onChange(of: viewModel.saveErrorMessage) { message in
+            guard let message = message else { return }
+            toastMessage = ToastMessage(type: .error, message: message)
+        }
         .withLoadingIndicator()
     }
     
@@ -70,6 +80,7 @@ struct NewStoryEditorView: View {
                     Image(systemName: "xmark")
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
+                .accessibilityLabel("story.composer.close.accessibility".localized)
                 
                 Spacer()
                 
@@ -90,10 +101,17 @@ struct NewStoryEditorView: View {
                         dismiss()
                     }
                 } label: {
-                    Image(systemName: "checkmark")
-                        .foregroundColor(viewModel.canSave ? AppTheme.Colors.primary : AppTheme.Colors.textSecondary)
+                    if viewModel.isSaving {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.primary))
+                    } else {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(viewModel.canSave ? AppTheme.Colors.primary : AppTheme.Colors.textSecondary)
+                    }
                 }
                 .disabled(!viewModel.canSave || viewModel.isSaving)
+                .accessibilityLabel("story.composer.save.accessibility".localized)
+                .accessibilityHint(viewModel.canSave ? "" : "story.composer.saveDisabled".localized)
             }
             .padding(.horizontal, AppTheme.Spacing.l)
             .padding(.vertical, AppTheme.Spacing.m)
@@ -110,6 +128,7 @@ struct NewStoryEditorView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.l) {
                 textEditorSection
+                composerToolsSection
                 mediaSection
                 locationSection
                 categorySection
@@ -120,14 +139,104 @@ struct NewStoryEditorView: View {
     }
     
     private var textEditorSection: some View {
-        RichTextEditorView(
-            viewModel: viewModel.richTextEditorViewModel,
-            config: RichTextEditorConfig(
-                minHeight: 160,
-                backgroundColor: .clear
-            ),
-            initialText: viewModel.initialContentText
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
+            Text("story.content".localized)
+                .font(AppTheme.Typography.headline)
+                .foregroundColor(AppTheme.Colors.textPrimary)
+
+            RichTextEditorView(
+                viewModel: viewModel.richTextEditorViewModel,
+                config: RichTextEditorConfig(
+                    minHeight: 240,
+                    backgroundColor: .clear
+                ),
+                initialText: viewModel.initialContentText
+            )
+        }
+        .padding(AppTheme.Spacing.l)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.l)
+                .fill(AppTheme.Colors.surface)
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.l)
+                .stroke(AppTheme.Surface.cardBorder, lineWidth: 1)
+        )
+    }
+
+    // MARK: - Composer Tools
+
+    private var composerToolsSection: some View {
+        HStack(spacing: AppTheme.Spacing.s) {
+            composerToolButton(
+                title: "story.composer.addMedia".localized,
+                systemImage: "photo.on.rectangle",
+                accessibilityLabel: "story.composer.media.accessibility".localized
+            ) {
+                showMediaSourceSheet = true
+            }
+
+            composerToolButton(
+                title: "story.addLocation".localized,
+                systemImage: "mappin.circle",
+                accessibilityLabel: "story.composer.location.accessibility".localized
+            ) {
+                viewModel.fetchCurrentLocation()
+            }
+
+            composerToolButton(
+                title: "story.composer.addCategory".localized,
+                systemImage: "folder",
+                accessibilityLabel: "story.composer.category.accessibility".localized
+            ) {
+                viewModel.showCategoryPicker = true
+            }
+
+            composerToolButton(
+                title: "ai.polish.title".localized,
+                systemImage: "sparkles",
+                accessibilityLabel: "story.composer.aiPolish.accessibility".localized
+            ) {
+                showAIPolishSheet = true
+            }
+            .disabled(viewModel.richTextEditorViewModel.isEmpty)
+        }
+    }
+
+    private func composerToolButton(
+        title: String,
+        systemImage: String,
+        accessibilityLabel: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: AppTheme.Spacing.xs) {
+                Image(systemName: systemImage)
+                    .font(.system(size: AppTheme.IconSize.m, weight: .medium))
+                Text(title)
+                    .font(AppTheme.Typography.caption)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: AppTheme.Metrics.composerToolHeight)
+            .padding(.vertical, AppTheme.Spacing.s)
+            .foregroundColor(AppTheme.Colors.primary)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                    .fill(AppTheme.Surface.subtleFill)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                    .stroke(AppTheme.Surface.cardBorder, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var aiPolishSheet: some View {
+        AIPolishSheet(initialText: viewModel.richTextEditorViewModel.plainText)
     }
     
     // MARK: - Media Section
@@ -178,6 +287,7 @@ struct NewStoryEditorView: View {
                             .background(Circle().fill(Color.black.opacity(0.6)))
                     }
                     .padding(AppTheme.Spacing.xs)
+                    .accessibilityLabel("common.delete".localized)
                 }
             }
         }
@@ -226,6 +336,7 @@ struct NewStoryEditorView: View {
                     .background(Circle().fill(Color.black.opacity(0.6)))
             }
             .padding(AppTheme.Spacing.xs)
+            .accessibilityLabel("common.delete".localized)
         }
     }
     
@@ -245,6 +356,7 @@ struct NewStoryEditorView: View {
                         )
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("story.composer.media.accessibility".localized)
             } else if !viewModel.images.isEmpty {
                 PhotosPicker(
                     selection: $imagePickerItems,
@@ -260,6 +372,7 @@ struct NewStoryEditorView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         )
                 }
+                .accessibilityLabel("story.composer.photo.accessibility".localized)
                 .onChange(of: imagePickerItems) { items in
                     Task {
                         await viewModel.handleMediaItemsChange(items: items, expectedVideo: false)
@@ -281,6 +394,7 @@ struct NewStoryEditorView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         )
                 }
+                .accessibilityLabel("story.composer.video.accessibility".localized)
                 .onChange(of: videoPickerItems) { items in
                     Task {
                         await viewModel.handleMediaItemsChange(items: items, expectedVideo: true)
@@ -307,11 +421,12 @@ struct NewStoryEditorView: View {
                         VStack(spacing: AppTheme.Spacing.s) {
                             Image(systemName: "photo.on.rectangle")
                                 .font(.system(size: 24))
-                            Text("图库")
+                            Text("story.media.library".localized)
                                 .font(AppTheme.Typography.body)
                         }
                         .frame(maxWidth: .infinity)
                     }
+                    .accessibilityLabel("story.composer.photo.accessibility".localized)
                     .onChange(of: imagePickerItems) { items in
                         Task {
                             await viewModel.handleMediaItemsChange(items: items, expectedVideo: false)
@@ -328,11 +443,12 @@ struct NewStoryEditorView: View {
                         VStack(spacing: AppTheme.Spacing.s) {
                             Image(systemName: "video")
                                 .font(.system(size: 24))
-                            Text("视频")
+                            Text("story.media.video".localized)
                                 .font(AppTheme.Typography.body)
                         }
                         .frame(maxWidth: .infinity)
                     }
+                    .accessibilityLabel("story.composer.video.accessibility".localized)
                     .onChange(of: videoPickerItems) { items in
                         Task {
                             await viewModel.handleMediaItemsChange(items: items, expectedVideo: true)
@@ -569,7 +685,7 @@ struct NewStoryEditorView: View {
                     // 收起键盘
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 } label: {
-                    Text("完成")
+                    Text("common.done".localized)
                         .fontWeight(.medium)
                 }
             }
@@ -591,6 +707,21 @@ struct NewStoryEditorView: View {
     }
 }
 
+private struct AIPolishSheet: View {
+    let initialText: String
+
+    @StateObject private var viewModel = AIPolishViewModel(
+        service: AIPolishService(keychain: KeychainStore())
+    )
+
+    var body: some View {
+        AIPolishView(viewModel: viewModel)
+            .onAppear {
+                viewModel.inputText = initialText
+            }
+    }
+}
+
 // MARK: - View Model
 
 final class NewStoryEditorViewModel: ObservableObject {
@@ -602,6 +733,7 @@ final class NewStoryEditorViewModel: ObservableObject {
     @Published var selectedCategoryId: UUID? = nil
     @Published var locationInfo: LocationInfo? = nil
     @Published var isSaving: Bool = false
+    @Published var saveErrorMessage: String? = nil
     @Published var isShowingVideoPlayer: Bool = false
     @Published var currentPlayingVideoURL: URL? = nil
     @Published var showCategoryPicker: Bool = false
@@ -1035,8 +1167,13 @@ final class NewStoryEditorViewModel: ObservableObject {
     // MARK: - Save
     
     func save(onSuccess: @escaping () -> Void) {
-        guard !isSaving, let context = context, let coreData = coreData else { return }
+        guard !isSaving else { return }
+        guard let context = context, let coreData = coreData else {
+            saveErrorMessage = "story.composer.saveFailed".localized
+            return
+        }
         isSaving = true
+        saveErrorMessage = nil
         
         let story = getOrCreateStory(in: context)
         updateStoryBasicInfo(story)

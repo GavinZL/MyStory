@@ -65,52 +65,80 @@ struct CategoryStoryListView: View {
     
     /// 空状态视图
     private var emptyStateView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppTheme.Spacing.l) {
             Image(systemName: "tray")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
+                .font(.system(size: AppTheme.IconSize.hero, weight: .light))
+                .foregroundColor(AppTheme.Colors.primary)
+                .accessibilityHidden(true)
             
-            Text("categoryStory.empty".localized)
-                .font(.headline)
-                .foregroundColor(.secondary)
+            VStack(spacing: AppTheme.Spacing.s) {
+                Text("categoryStory.empty.title".localized)
+                    .font(AppTheme.Typography.title3)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+
+                Text("categoryStory.empty.message".localized)
+                    .font(AppTheme.Typography.body)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             
             Button {
                 createNewStory()
             } label: {
                 Label("categoryStory.createFirst".localized, systemImage: "plus.circle.fill")
-                    .font(.body)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
-                    .cornerRadius(AppTheme.Radius.m)
             }
+//            .buttonStyle(AppTheme.ButtonStyles.primary)
+            .accessibilityLabel("categoryStory.createFirst".localized)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
+        .frame(maxWidth: .infinity, minHeight: 420)
+        .padding(.horizontal, AppTheme.Spacing.xl)
+        .padding(.vertical, AppTheme.Spacing.xxl)
     }
     
     /// 故事列表视图
     private var storyListView: some View {
-        LazyVStack(alignment: .leading, spacing: 20) {
-            ForEach(stories, id: \ .objectID) { story in
-                storyItemView(story: story)
+        LazyVStack(alignment: .leading, spacing: AppTheme.Spacing.xl) {
+            ForEach(Array(stories.enumerated()), id: \.element.objectID) { index, story in
+                storyItemView(story: story, isLast: index == stories.count - 1)
             }
         }
-        .padding(.horizontal, AppTheme.Spacing.s)
+        .padding(.horizontal, AppTheme.Spacing.l)
         .padding(.vertical, AppTheme.Spacing.m)
     }
     
     /// 单个故事项视图
-    private func storyItemView(story: StoryEntity) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            solidLineView
-            dateHeaderView(for: story)
-            
-            HStack(spacing: 2) {
+    private func storyItemView(story: StoryEntity, isLast: Bool) -> some View {
+        HStack(alignment: .top, spacing: AppTheme.Spacing.m) {
+            timelineAxisView(isLast: isLast)
+
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
+                dateHeaderView(for: story)
                 storyCardButton(for: story)
-            }.padding(.horizontal, 8)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    private func timelineAxisView(isLast: Bool) -> some View {
+        VStack(spacing: AppTheme.Spacing.xs) {
+            Circle()
+                .fill(AppTheme.Colors.primary)
+                .frame(width: AppTheme.Metrics.timelineNodeSize, height: AppTheme.Metrics.timelineNodeSize)
+                .overlay(
+                    Circle()
+                        .stroke(AppTheme.Colors.background, lineWidth: 2)
+                )
+
+            if !isLast {
+                Rectangle()
+                    .fill(AppTheme.Surface.timelineAxis)
+                    .frame(width: AppTheme.Metrics.timelineLineWidth)
+                    .frame(maxHeight: .infinity)
+            }
+        }
+        .frame(width: AppTheme.Metrics.timelineAxisWidth)
+        .accessibilityHidden(true)
     }
     
     /// 从 story 推导分类节点，用于跳转 CategoryStoryListView
@@ -139,34 +167,23 @@ struct CategoryStoryListView: View {
     
     /// 日期头部视图
     private func dateHeaderView(for story: StoryEntity) -> some View {
-        HStack(alignment: .center, spacing: AppTheme.Spacing.s) {
-            // 大号日期数字（月-日格式，与 TimelineView 保持一致）
-            Text(formatDayNumber(story.timestamp!))
-                .font(.system(size: 28, weight: .bold))
+        let date = story.timestamp ?? Date()
+        return HStack(alignment: .center, spacing: AppTheme.Spacing.s) {
+            Text(relativeDateLabel(date))
+                .font(AppTheme.Typography.headline)
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            // 小号时间星期 + 年份
-            VStack(alignment: .leading, spacing: 2) {
-                Text(formatTime(story.timestamp!))
-                    .font(AppTheme.Typography.caption)
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                
-                Text(formatYearMonth(story.timestamp!))
-                    .font(AppTheme.Typography.caption)
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-            }
+            Text(formatDayNumber(date))
+                .font(AppTheme.Typography.subheadline)
+                .foregroundColor(AppTheme.Colors.textSecondary)
+
+            Text(formatTime(date))
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.textSecondary)
             
             Spacer()
         }
-        .padding(.vertical, AppTheme.Spacing.s)
-    }
-    
-    /// 分隔线
-    private var solidLineView: some View {
-        Rectangle()
-            .fill(AppTheme.Colors.border.opacity(0.3))
-            .frame(height: 1)
-            .padding(.bottom, AppTheme.Spacing.s)
+        .padding(.top, AppTheme.Spacing.xs)
     }
     
     /// 故事卡片按钮
@@ -213,6 +230,7 @@ struct CategoryStoryListView: View {
             } label: {
                 Image(systemName: "plus")
             }
+            .accessibilityLabel("timeline.create.accessibility".localized)
         }
     }
     
@@ -313,6 +331,17 @@ struct CategoryStoryListView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM-dd"
         return formatter.string(from: date)
+    }
+
+    private func relativeDateLabel(_ date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return "timeline.today".localized
+        }
+        if calendar.isDateInYesterday(date) {
+            return "timeline.yesterday".localized
+        }
+        return formatYearMonth(date)
     }
     
     /// 格式化年份

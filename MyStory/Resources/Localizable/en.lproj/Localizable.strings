@@ -13,6 +13,9 @@
 "common.confirm" = "OK";
 "common.error" = "Error";
 "common.loading" = "Loading...";
+"common.close" = "Close";
+"common.search" = "Search";
+"common.retry" = "Retry";
 
 // MARK: - Tab Bar
 "tab.timeline" = "Timeline";
@@ -24,6 +27,19 @@
 "timeline.edit" = "Edit";
 "timeline.delete" = "Delete";
 "timeline.dateFormat" = "MMM dd, yyyy HH:mm";
+"timeline.empty.title" = "Start your story";
+"timeline.empty.message" = "Capture a memory with text, photos, video, place, and category.";
+"timeline.empty.create" = "Create First Story";
+"timeline.search.prompt" = "Search stories, places, categories";
+"timeline.create.accessibility" = "Create story";
+"timeline.search.accessibility" = "Search stories";
+"timeline.today" = "Today";
+"timeline.yesterday" = "Yesterday";
+"timeline.unknownDate" = "Unknown date";
+"timeline.card.category.accessibility" = "Open category";
+"timeline.card.location.accessibility" = "Story location";
+"timeline.media.openImage" = "Open image";
+"timeline.media.playVideo" = "Play video";
 
 // MARK: - Story Editor
 "story.new" = "New Story";
@@ -39,6 +55,29 @@
 "story.locationSelected" = "Location Selected";
 "story.videoLoading" = "Loading video...";
 "story.move" = "Move";
+"story.media.library" = "Library";
+"story.media.video" = "Video";
+"story.media.photo" = "Photo";
+"story.media.addPhoto" = "Add Photo";
+"story.media.addVideo" = "Add Video";
+"story.composer.tools" = "Story Tools";
+"story.composer.addMedia" = "Add media";
+"story.composer.addCategory" = "Choose category";
+"story.composer.clearLocation" = "Clear location";
+"story.composer.saveDisabled" = "Add text or media to save";
+"story.composer.saving" = "Saving...";
+"story.composer.saved" = "Story saved";
+"story.composer.saveFailed" = "Failed to save story";
+"story.composer.close.accessibility" = "Close editor";
+"story.composer.save.accessibility" = "Save story";
+"story.composer.media.accessibility" = "Add media";
+"story.composer.photo.accessibility" = "Add photos";
+"story.composer.video.accessibility" = "Add video";
+"story.composer.location.accessibility" = "Add location";
+"story.composer.category.accessibility" = "Choose category";
+"story.composer.aiPolish.accessibility" = "Polish text with AI";
+"imageCropper.customIcon" = "Custom Icon";
+"imageCropper.error.processing" = "Image processing failed. Please try again.";
 
 // Video Processing
 "video.importing" = "Importing video";
@@ -80,6 +119,12 @@
 "category.color" = "Select Color";
 "category.displayMode" = "Display Mode";
 "category.page" = "Categories";
+"category.collection" = "Story Collection";
+"category.storyline" = "Storyline";
+"category.empty.title" = "No story collections yet";
+"category.empty.message" = "Create categories to organize memories into storylines.";
+"category.search.accessibility" = "Search categories";
+"category.create.accessibility" = "Create category";
 
 // Category Levels
 "category.level1" = "Level 1";
@@ -169,16 +214,24 @@
 "fullscreen.loadingNewer" = "Loading newer stories...";
 "fullscreen.noMoreNewer" = "No more newer stories";
 "fullscreen.noMoreEarlier" = "No more earlier stories";
+"fullscreen.textOnly" = "Text Story";
+"fullscreen.metadata" = "Story Details";
+"fullscreen.closeVideo.accessibility" = "Close video";
+"fullscreen.enterVideo.accessibility" = "Open video full screen";
 
 // MARK: - Category Story List
 "categoryStory.empty" = "No stories in this category yet";
 "categoryStory.createFirst" = "Create the first story";
 "categoryStory.edit" = "Edit";
 "categoryStory.delete" = "Delete";
+"categoryStory.empty.title" = "No stories here yet";
+"categoryStory.empty.message" = "Create a story directly in this category to start this storyline.";
 
 // MARK: - AI Polish
 "ai.polish.title" = "AI Text Polish";
 "ai.polish.start" = "Start Polish";
+"ai.polish.error.empty" = "Enter text to polish.";
+"ai.polish.error.rateLimited" = "Too many polish requests. Please try again later.";
 
 // MARK: - Category Picker
 "categoryPicker.title" = "Select Category";
@@ -291,6 +344,8 @@
 // MARK: - Font Settings
 "settings.font.title" = "Font Style";
 "settings.font.label" = "Font";
+"settings.font.size" = "Font Size";
+"settings.font.color" = "Font Color";
 "settings.font.reset" = "Reset";
 "settings.font.hint" = "Font size will be applied to the entire app instantly";
 

@@ -49,7 +49,7 @@ struct ImageCropperView: View {
                     .padding(AppTheme.Spacing.m)
                     .background(Color(uiColor: .systemBackground))
             }
-            .navigationTitle("自定义图标")
+            .navigationTitle("imageCropper.customIcon".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -274,7 +274,7 @@ struct ImageCropperView: View {
     /// 确认裁剪
     private func confirmCrop() {
         guard let iconData = viewModel.cropAndProcess() else {
-            errorMessage = "图片处理失败，请重试"
+            errorMessage = "imageCropper.error.processing".localized
             showError = true
             return
         }

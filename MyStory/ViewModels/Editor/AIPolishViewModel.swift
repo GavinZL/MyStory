@@ -17,11 +17,13 @@ public final class AIPolishViewModel: ObservableObject {
 
     public func polish() {
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            errorMessage = "请输入需要润色的文本"; return
+            errorMessage = "ai.polish.error.empty".localized
+            return
         }
         pruneOld()
         guard requestTimestamps.count < maxPerMinute else {
-            errorMessage = "已超出速率限制，请稍后再试"; return
+            errorMessage = "ai.polish.error.rateLimited".localized
+            return
         }
         requestTimestamps.append(Date())
         isLoading = true

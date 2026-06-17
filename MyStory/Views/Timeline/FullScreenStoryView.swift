@@ -294,6 +294,7 @@ struct StoryDetailView: View {
                 }
             }
         }
+        .background(AppTheme.Colors.background)
         .fullScreenCover(isPresented: $showImageViewer) {
             imageGalleryViewer
         }
@@ -319,10 +320,19 @@ struct StoryDetailView: View {
         Text(story.content ?? "")
             .font(AppTheme.Typography.body)
             .foregroundColor(AppTheme.Colors.textPrimary)
-            .lineSpacing(4)
+            .lineSpacing(imageMediaList.isEmpty && videoMediaList.isEmpty ? 7 : 4)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(AppTheme.Spacing.l)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                    .fill(imageMediaList.isEmpty && videoMediaList.isEmpty ? AppTheme.Colors.surface : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                    .stroke(imageMediaList.isEmpty && videoMediaList.isEmpty ? AppTheme.Surface.cardBorder : Color.clear, lineWidth: 1)
+            )
             .padding(.horizontal, AppTheme.Spacing.l)
-            .padding(.top, AppTheme.Spacing.l)
+            .padding(.top, imageMediaList.isEmpty && videoMediaList.isEmpty ? AppTheme.Spacing.xxl : AppTheme.Spacing.l)
             .padding(.bottom, AppTheme.Spacing.m)
     }
     
@@ -331,6 +341,11 @@ struct StoryDetailView: View {
     // 元数据区域（日期、分类、位置）
     private var metadataSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.m) {
+            Text("fullscreen.metadata".localized)
+                .font(AppTheme.Typography.footnote)
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .textCase(.uppercase)
+
             // 日期时间
             HStack(spacing: AppTheme.Spacing.s) {
                 Image(systemName: "clock")
@@ -497,6 +512,7 @@ struct StoryDetailView: View {
                     .shadow(radius: 3)
             }
             .padding(AppTheme.Spacing.m)
+            .accessibilityLabel("fullscreen.enterVideo.accessibility".localized)
         }
     }
     
@@ -534,6 +550,7 @@ struct StoryDetailView: View {
                 videoThumbnailContent(image: img)
             }
             .buttonStyle(PlainButtonStyle())
+            .accessibilityLabel("timeline.media.playVideo".localized)
         }
     }
     

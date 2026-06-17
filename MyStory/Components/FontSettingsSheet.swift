@@ -54,7 +54,7 @@ struct FontSettingsSheet: View {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
                 HStack {
                     Image(systemName: "textformat.size")
-                    Text("字体大小")
+                    Text("settings.font.size".localized)
                     Spacer()
                 }
                 .font(.system(size: 16))
@@ -78,7 +78,7 @@ struct FontSettingsSheet: View {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.s) {
                 HStack {
                     Image(systemName: "paintpalette")
-                    Text("字体颜色")
+                    Text("settings.font.color".localized)
                     Spacer()
                 }
                 .font(.system(size: 16))

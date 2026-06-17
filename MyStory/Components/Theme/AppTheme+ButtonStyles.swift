@@ -98,10 +98,10 @@ extension AppTheme {
             func makeBody(configuration: Configuration) -> some View {
                 configuration.label
                     .foregroundColor(isEnabled ? AppTheme.Colors.primary : AppTheme.Colors.textSecondary)
-                    .frame(width: 44, height: 44)
+                    .frame(width: AppTheme.Metrics.minimumTouchTarget, height: AppTheme.Metrics.minimumTouchTarget)
                     .background(
                         Circle()
-                            .fill(configuration.isPressed ? AppTheme.Colors.surface : Color.clear)
+                            .fill(configuration.isPressed ? AppTheme.Surface.pressedFill : Color.clear)
                     )
                     .opacity(configuration.isPressed ? 0.8 : 1.0)
                     .animation(.easeInOut(duration: AppTheme.Animation.Duration.fast), value: configuration.isPressed)

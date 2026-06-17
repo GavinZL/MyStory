@@ -225,12 +225,14 @@ public struct CategoryView: View {
                 } label: {
                     Image(systemName: "magnifyingglass")
                 }
+                .accessibilityLabel("category.search.accessibility".localized)
                 
                 Button {
                     showCategoryForm = true
                 } label: {
                     Image(systemName: "plus")
                 }
+                .accessibilityLabel("category.create.accessibility".localized)
             }
         }
     }
@@ -349,7 +351,7 @@ private struct CategoryListItem: View {
                             onDelete: onDelete,
                             onMove: onMove
                         )
-                        .padding(.leading, 24)  // 缩进显示层级
+                        .padding(.leading, AppTheme.Spacing.xl)  // 缩进显示层级
                     }
                 }
             }
@@ -391,29 +393,31 @@ private struct CategoryListItem: View {
     // MARK: - View Components
     
     private var categoryRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: AppTheme.Spacing.m) {
             // 展开/折叠指示器（只有一二级且有子分类时显示）
             if level < 3 && !node.children.isEmpty {
                 Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(width: 16)
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .frame(width: AppTheme.IconSize.s)
             } else if level < 3 {
                 // 占位，保持对齐
-                Color.clear.frame(width: 16)
+                Color.clear.frame(width: AppTheme.IconSize.s)
             }
             
             // 分类图标
             CategoryIconView(
                 model: node.category,
-                size: 20,
+                size: AppTheme.IconSize.m,
                 color: Color(hex: node.category.colorHex)
             )
-            .frame(width: 24)
+            .frame(width: AppTheme.IconSize.l)
             
             // 分类名称
             Text(node.category.name)
-                .font(.body)
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .lineLimit(1)
             
             Spacer()
             
@@ -424,32 +428,33 @@ private struct CategoryListItem: View {
                 } label: {
                     HStack(spacing: AppTheme.Spacing.xs) {
                         Image(systemName: "doc.text")
-                            .font(.caption2)
+                            .font(AppTheme.Typography.caption)
                         Text("\(node.directStoryCount)")
-                            .font(.footnote)
+                            .font(AppTheme.Typography.footnote)
                     }
                     .padding(.horizontal, AppTheme.Spacing.s)
                     .padding(.vertical, AppTheme.Spacing.xs)
-                    .background(AppTheme.Colors.primary.opacity(0.1))
+                    .background(AppTheme.Surface.subtleFill)
                     .foregroundColor(AppTheme.Colors.primary)
-                    .cornerRadius(AppTheme.Radius.s)
+                    .clipShape(Capsule())
                 }
                 .buttonStyle(PlainButtonStyle())
             }
             
             // 统计信息
             Text(statisticsText)
-                .foregroundColor(.secondary)
-                .font(.footnote)
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .font(AppTheme.Typography.footnote)
+                .lineLimit(1)
             
             // 三级分类显示导航箭头
             if level == 3 {
                 Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, AppTheme.Spacing.xs)
         .contentShape(Rectangle())  // 确保整个区域可点击
     }
     

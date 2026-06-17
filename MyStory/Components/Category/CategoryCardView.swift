@@ -17,35 +17,51 @@ public struct CategoryCardView: View {
     }
 
     public var body: some View {
-        VStack(spacing: AppTheme.Spacing.s) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.m) {
             ZStack {
                 RoundedRectangle(cornerRadius: AppTheme.Radius.m)
-                    .fill(Color(UIColor.secondarySystemBackground))
-                    .frame(height: 100)
+                    .fill(AppTheme.Surface.subtleFill)
+                    .frame(height: AppTheme.Metrics.cardMediaCompactHeight)
                 CategoryIconView(
                     model: node.category,
-                    size: 42
+                    size: AppTheme.IconSize.xxl
                 )
             }
+
+            Text("category.collection".localized)
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.primary)
+                .lineLimit(1)
+
             Text(node.category.name)
-                .font(.headline)
+                .font(AppTheme.Typography.headline)
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .lineLimit(2)
             
             // 根据显示模式显示不同的统计信息
             switch displayMode {
             case .children:
                 Text(childrenCountText)
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
+                    .font(AppTheme.Typography.footnote)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             case .stories:
                 Text(String(format: "category.storyCount".localized, node.storyCount))
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
+                    .font(AppTheme.Typography.footnote)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             case .hybrid:
                 hybridStatisticsView
             }
         }
-        .padding(AppTheme.Spacing.m)
-        .background(RoundedRectangle(cornerRadius: AppTheme.Radius.m).strokeBorder(AppTheme.Colors.border.opacity(0.2)))
+        .padding(AppTheme.Spacing.l)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                .fill(AppTheme.Colors.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                .stroke(AppTheme.Surface.cardBorder, lineWidth: 1)
+        )
     }
     
     // MARK: - Helper Properties
@@ -67,20 +83,20 @@ public struct CategoryCardView: View {
                 Text("·")
                 Text(String(format: "category.storyCount".localized, node.directStoryCount))
             }
-            .font(.footnote)
-            .foregroundColor(.secondary)
+            .font(AppTheme.Typography.footnote)
+            .foregroundColor(AppTheme.Colors.textSecondary)
         } else if hasChildren {
             Text(childrenCountText)
-                .font(.footnote)
-                .foregroundColor(.secondary)
+                .font(AppTheme.Typography.footnote)
+                .foregroundColor(AppTheme.Colors.textSecondary)
         } else if hasStories {
             Text(String(format: "category.storyCount".localized, node.directStoryCount))
-                .font(.footnote)
-                .foregroundColor(.secondary)
+                .font(AppTheme.Typography.footnote)
+                .foregroundColor(AppTheme.Colors.textSecondary)
         } else {
             Text(childrenCountText)
-                .font(.footnote)
-                .foregroundColor(.secondary)
+                .font(AppTheme.Typography.footnote)
+                .foregroundColor(AppTheme.Colors.textSecondary)
         }
     }
 }

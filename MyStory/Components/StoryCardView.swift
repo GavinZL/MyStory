@@ -30,7 +30,7 @@ struct StoryCardView: View {
         }
         let names = categories.compactMap { $0.name?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
         guard !names.isEmpty else { return nil }
-        return names.joined(separator: " >> ")
+        return names.joined(separator: " / ")
     }
     
     private var locationText: String? {
@@ -48,62 +48,18 @@ struct StoryCardView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.xl) {
-            // 内容摘要（隐藏标题，只显示content）
-            if let content = story.content, !content.isEmpty {
-                Text(content)
-                    .font(AppTheme.Typography.body)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                    .lineLimit(5)
-            }
-            
-            // 图片网格展示
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.m) {
             if !allMediaItems.isEmpty {
                 mediaGridView
+                contentSummaryView(lineLimit: 3)
+            } else {
+                contentSummaryView(lineLimit: 6)
             }
             
-            // 分类信息 + 位置信息（分为两行显示）
-            if !hideCategoryDisplay || locationText != nil {
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                    if !hideCategoryDisplay, let categoryNamesText = categoryNamesText {
-                        HStack(spacing: AppTheme.Spacing.xs) {
-                            if let categoryEntity = firstCategoryEntity {
-                                CategoryIconView(entity: categoryEntity, size: 16)
-                            } else {
-                                Image(systemName: "folder.fill")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(AppTheme.Colors.primary)
-                            }
-                            
-                            Text(categoryNamesText)
-                                .font(AppTheme.Typography.subheadline)
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                                .lineLimit(1)
-                        }
-                        .onTapGesture {
-                            onCategoryTap?()
-                        }
-                    }
-                    
-                    if let locationText = locationText {
-                        HStack(spacing: AppTheme.Spacing.xs) {
-                            Image("address")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 16)
-                                .foregroundColor(AppTheme.Colors.primary)
-                            
-                            Text(locationText)
-                                .font(AppTheme.Typography.subheadline)
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                                .lineLimit(1)
-                        }
-                    }
-                }
-            }
+            metadataSection
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppTheme.Spacing.s)
+        .padding(AppTheme.Spacing.l)
         .fullScreenCover(isPresented: $showImageViewer) {
             ImageGalleryViewer(
                 images: loadAllImages(),
@@ -114,13 +70,93 @@ struct StoryCardView: View {
         .background(
             RoundedRectangle(cornerRadius: AppTheme.Radius.m)
                 .fill(AppTheme.Colors.surface)
-                .shadow(
-                    color: AppTheme.Shadow.small.color,
-                    radius: AppTheme.Shadow.small.radius,
-                    x: AppTheme.Shadow.small.x,
-                    y: AppTheme.Shadow.small.y
-                )
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.m)
+                .stroke(AppTheme.Surface.cardBorder, lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private var metadataSection: some View {
+        if (!hideCategoryDisplay && categoryNamesText != nil) || locationText != nil {
+            HStack(spacing: AppTheme.Spacing.s) {
+                if !hideCategoryDisplay, let categoryNamesText = categoryNamesText {
+                    Button {
+                        onCategoryTap?()
+                    } label: {
+                        metadataChip(
+                            text: categoryNamesText,
+                            systemImage: firstCategoryEntity == nil ? "folder.fill" : nil,
+                            assetImage: nil,
+                            categoryEntity: firstCategoryEntity
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("timeline.card.category.accessibility".localized)
+                }
+
+                if let locationText = locationText {
+                    metadataChip(
+                        text: locationText,
+                        systemImage: nil,
+                        assetImage: "address",
+                        categoryEntity: nil
+                    )
+                    .accessibilityLabel("timeline.card.location.accessibility".localized)
+                }
+            }
+        }
+    }
+
+    private func metadataChip(
+        text: String,
+        systemImage: String?,
+        assetImage: String?,
+        categoryEntity: CategoryEntity?
+    ) -> some View {
+        HStack(spacing: AppTheme.Spacing.xs) {
+            if let categoryEntity = categoryEntity {
+                CategoryIconView(entity: categoryEntity, size: AppTheme.Metrics.metadataIconSize)
+            } else if let systemImage = systemImage {
+                Image(systemName: systemImage)
+                    .font(.system(size: AppTheme.Metrics.metadataIconSize, weight: .medium))
+                    .foregroundColor(AppTheme.Colors.primary)
+            } else if let assetImage = assetImage {
+                Image(assetImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: AppTheme.Metrics.metadataIconSize, height: AppTheme.Metrics.metadataIconSize)
+                    .foregroundColor(AppTheme.Colors.primary)
+            }
+
+            Text(text)
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .lineLimit(1)
+        }
+        .frame(minHeight: AppTheme.Metrics.metadataChipMinHeight)
+        .padding(.horizontal, AppTheme.Spacing.s)
+        .background(
+            Capsule()
+                .fill(AppTheme.Surface.metadataFill)
+        )
+        .overlay(
+            Capsule()
+                .stroke(AppTheme.Surface.cardBorder, lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func contentSummaryView(lineLimit: Int) -> some View {
+        if let content = story.content?.trimmingCharacters(in: .whitespacesAndNewlines), !content.isEmpty {
+            Text(content)
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .lineSpacing(3)
+                .lineLimit(lineLimit)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
     
     // MARK: - Media Grid / Video View
@@ -155,7 +191,8 @@ struct StoryCardView: View {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: 200)
+                .frame(maxWidth: .infinity)
+                .frame(height: AppTheme.Metrics.cardMediaHeroHeight)
                 .clipped()
                 .cornerRadius(AppTheme.Radius.s)
                 .contentShape(Rectangle())
@@ -165,7 +202,8 @@ struct StoryCardView: View {
         } else {
             RoundedRectangle(cornerRadius: AppTheme.Radius.s)
                 .fill(AppTheme.Colors.surface.opacity(0.15))
-                .frame(maxWidth: .infinity, minHeight: 120)
+                .frame(maxWidth: .infinity)
+                .frame(height: AppTheme.Metrics.cardMediaStandardHeight)
                 .overlay(
                     Image(systemName: "photo")
                         .font(.system(size: 24))
@@ -182,13 +220,13 @@ struct StoryCardView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(minWidth: 0, maxWidth: .infinity)
-                    .frame(height: 90)
+                    .frame(height: AppTheme.Metrics.cardMediaCompactHeight)
                     .clipped()
                     .cornerRadius(AppTheme.Radius.s)
             } else {
                 RoundedRectangle(cornerRadius: AppTheme.Radius.s)
                     .fill(AppTheme.Colors.surface.opacity(0.15))
-                    .frame(height: 90)
+                    .frame(height: AppTheme.Metrics.cardMediaCompactHeight)
                     .overlay(
                         Image(systemName: "photo")
                             .font(.system(size: 24))
@@ -197,6 +235,7 @@ struct StoryCardView: View {
             }
         }
         .contentShape(Rectangle())
+        .accessibilityLabel("timeline.media.openImage".localized)
         .onTapGesture {
             openImageViewer(media: media)
         }
@@ -209,23 +248,25 @@ struct StoryCardView: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: 180)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: AppTheme.Metrics.cardMediaStandardHeight)
                     .clipped()
                     .cornerRadius(AppTheme.Radius.s)
             } else {
                 RoundedRectangle(cornerRadius: AppTheme.Radius.s)
                     .fill(AppTheme.Colors.surface.opacity(0.15))
-                    .frame(height: 180)
+                    .frame(height: AppTheme.Metrics.cardMediaStandardHeight)
             }
             
             Circle()
                 .fill(Color.black.opacity(0.6))
-                .frame(width: 40, height: 40)
+                .frame(width: AppTheme.Metrics.minimumTouchTarget, height: AppTheme.Metrics.minimumTouchTarget)
             Image(systemName: "play.fill")
                 .font(.system(size: 22))
                 .foregroundColor(.white)
         }
         .contentShape(Rectangle())
+        .accessibilityLabel("timeline.media.playVideo".localized)
         .onTapGesture {
             openVideoFullscreen(media: media)
         }

@@ -395,6 +395,7 @@ struct AppTheme {
         static let s: CGFloat = 8
         static let m: CGFloat = 12
         static let l: CGFloat = 16
+        static let pill: CGFloat = 999
     }
 
     struct ShadowToken {
@@ -420,6 +421,20 @@ struct AppTheme {
         static let xxl: CGFloat = 42   // 分类图标
         static let hero: CGFloat = 60  // 空状态大图标
     }
+
+    // MARK: - Component Metric Tokens
+    struct Metrics {
+        static let minimumTouchTarget: CGFloat = 44
+        static let timelineAxisWidth: CGFloat = 24
+        static let timelineNodeSize: CGFloat = 10
+        static let timelineLineWidth: CGFloat = 2
+        static let metadataIconSize: CGFloat = 14
+        static let metadataChipMinHeight: CGFloat = 28
+        static let composerToolHeight: CGFloat = 48
+        static let cardMediaCompactHeight: CGFloat = 96
+        static let cardMediaStandardHeight: CGFloat = 180
+        static let cardMediaHeroHeight: CGFloat = 220
+    }
     
     // MARK: - Opacity Token
     struct Opacity {
@@ -427,6 +442,30 @@ struct AppTheme {
         static let muted: Double = 0.15     // 禁用状态、占位符
         static let medium: Double = 0.3     // 次要内容、辅助背景
         static let strong: Double = 0.6     // 视频播放按钮、蒙层
+    }
+
+    // MARK: - Surface Tokens
+    @MainActor
+    struct Surface {
+        static var cardBorder: Color {
+            AppTheme.Colors.border.opacity(AppTheme.Opacity.medium)
+        }
+
+        static var subtleFill: Color {
+            AppTheme.Colors.primary.opacity(AppTheme.Opacity.subtle)
+        }
+
+        static var metadataFill: Color {
+            AppTheme.Colors.surface.opacity(0.72)
+        }
+
+        static var pressedFill: Color {
+            AppTheme.Colors.primary.opacity(AppTheme.Opacity.muted)
+        }
+
+        static var timelineAxis: Color {
+            AppTheme.Colors.border.opacity(AppTheme.Opacity.medium)
+        }
     }
     
     // MARK: - Gradient Token
