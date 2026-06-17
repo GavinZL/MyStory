@@ -1,0 +1,120 @@
+openspec/changes/improve-story-ui-experience/specs/story-composer-experience/spec.md
+  s_adecaf1a4b1cd7::t_5724813ce44011 1-53
+openspec/changes/improve-story-ui-experience/tasks.md
+  s_adecaf1a4b1cd7::t_ff678a56c18383 22
+  s_adecaf1a4b1cd7::t_db7fdc8b7f8a0d 4
+  s_adecaf1a4b1cd7::t_83dbde9249ac73 5
+  s_adecaf1a4b1cd7::t_8c9a7f7c9e0bc9 3
+  s_adecaf1a4b1cd7::t_e82b3f426fd587 6
+  s_adecaf1a4b1cd7::t_918339e9590d8c 30
+  s_adecaf1a4b1cd7::t_42ecc61a1805c9 31
+  s_adecaf1a4b1cd7::t_fc67ef77b43338 12
+  s_adecaf1a4b1cd7::t_ddfa5937bbfaa6 37
+  s_adecaf1a4b1cd7::t_428d95eb1e3e4f 21
+  s_adecaf1a4b1cd7::t_8a2cda4256df66 45
+  s_adecaf1a4b1cd7::t_720a705bca0973 23
+  s_adecaf1a4b1cd7::t_b18379da6a4418 14
+  s_adecaf1a4b1cd7::t_401357743a5919 15
+  s_adecaf1a4b1cd7::t_27dbac53007248 1-2,7-9,16-18,24-26,32-36,38-44
+  s_adecaf1a4b1cd7::t_43d91db25831d0 11
+  s_adecaf1a4b1cd7::t_c2b11cfdc0f453 19
+  s_adecaf1a4b1cd7::t_a3fd77baf7d337 20
+  s_adecaf1a4b1cd7::t_3b8030246d440f 13
+  s_adecaf1a4b1cd7::t_60005fc8861a0c 27
+  s_adecaf1a4b1cd7::t_685e81104b03ce 29
+  s_adecaf1a4b1cd7::t_b20ae46dfde9a0 10
+  s_adecaf1a4b1cd7::t_714c80e5e88986 28
+MyStory/Views/Category/CategoryStoryListView.swift
+  s_adecaf1a4b1cd7::t_7a2a4895086c48 68,70-72,74-84,92-96
+  s_adecaf1a4b1cd7::t_511fed4b583273 233
+  ai_agent 91,171
+  s_adecaf1a4b1cd7::t_95e75b0de93076 335-344
+  s_adecaf1a4b1cd7::t_a64132b8843315 101-103,106,111-116,118-138,140-141,170,172-173,176-182,186
+MyStory/Components/StoryCardView.swift
+  s_adecaf1a4b1cd7::t_c9123249793aa5 33,59,76-142,144-145
+  s_adecaf1a4b1cd7::t_511fed4b583273 238,269
+  s_adecaf1a4b1cd7::t_de5869039b3c6e 205-206,223,229,251-252,258,263
+  s_adecaf1a4b1cd7::t_41d50f9578e2e5 194-195
+  s_adecaf1a4b1cd7::t_f2eb356fea374e 51,54-56,62,73-75,146-159
+openspec/changes/improve-story-ui-experience/specs/ui-theme-consistency/spec.md
+  s_adecaf1a4b1cd7::t_5724813ce44011 1-37
+openspec/changes/improve-story-ui-experience/specs/story-browse-experience/spec.md
+  s_adecaf1a4b1cd7::t_5724813ce44011 1-45
+MyStory/Components/Theme/AppTheme+CardStyles.swift
+  s_adecaf1a4b1cd7::t_7580b230676d2b 23-26,79-84
+MyStory/Components/Theme/AppTheme.swift
+  s_adecaf1a4b1cd7::t_279fb873427ecd 398,424-437,445-468
+openspec/changes/improve-story-ui-experience/specs/story-timeline-experience/spec.md
+  s_adecaf1a4b1cd7::t_5724813ce44011 1-45
+MyStory/Views/Editor/ImageCropperView.swift
+  s_adecaf1a4b1cd7::t_c264d439aa2ed1 52
+  s_adecaf1a4b1cd7::t_e2bc410d45e062 277
+MyStory/Components/Category/CategoryCardView.swift
+  s_adecaf1a4b1cd7::t_b2aa155a5371da 86
+  s_adecaf1a4b1cd7::t_4056ef6f69f82e 20,23-24,27,30-35,37-39,45-46,49-50,55-64,87,90-91,94-95,98-99
+MyStory/Views/Timeline/FullScreenStoryView.swift
+  s_adecaf1a4b1cd7::t_511fed4b583273 553
+  s_adecaf1a4b1cd7::t_fc8acc20f9457b 515
+  s_adecaf1a4b1cd7::t_ff09e0ca1d2ee3 297,323,325-333,335,344-348
+MyStory/Views/Editor/NewStoryEditorView.swift
+  s_adecaf1a4b1cd7::t_511fed4b583273 83,339,359,375,397,429,451
+  s_adecaf1a4b1cd7::t_bbcbe78fdfc83c 736,1170-1174,1176
+  s_adecaf1a4b1cd7::t_56e01dfb874a8a 23,61-63,131
+  s_adecaf1a4b1cd7::t_c264d439aa2ed1 424,446,688
+  s_adecaf1a4b1cd7::t_41d50f9578e2e5 710-721
+  s_adecaf1a4b1cd7::t_7c6482e785aa86 239,290
+  s_adecaf1a4b1cd7::t_2de7f75478dc65 24,64-68,104-110,113-114
+  s_adecaf1a4b1cd7::t_f1263ce60113ef 142-163
+  s_adecaf1a4b1cd7::t_d9a22f2819c952 166-235,237-238,240
+MyStory/Views/Category/CategoryView.swift
+  s_adecaf1a4b1cd7::t_511fed4b583273 228,235
+  s_adecaf1a4b1cd7::t_5bc0bfbf79b807 354,396,400-402,405,411,414,418-420,431,433,437,439,446-448,453-454,457
+MyStory/Views/Editor/AIPolishView.swift
+  s_adecaf1a4b1cd7::t_d867f013295466 11,13-15,19-25,30-34,39,41-46,52-58,64
+openspec/changes/improve-story-ui-experience/proposal.md
+  s_adecaf1a4b1cd7::t_182fc6d827c300 1-33
+openspec/changes/improve-story-ui-experience/.openspec.yaml
+  s_adecaf1a4b1cd7::t_c6c155b5e9776e 1-2
+MyStory/Components/FontSettingsSheet.swift
+  s_adecaf1a4b1cd7::t_e2bc410d45e062 57,81
+MyStory/Views/Timeline/TimelineView.swift
+  s_adecaf1a4b1cd7::t_c1fd99658fac39 34,36,105-128,130-136,269
+  s_adecaf1a4b1cd7::t_cf1411808bf81d 15,26-33,57-62,72-104,223-226
+  s_adecaf1a4b1cd7::t_0abf69036c5915 138,140,143-144,147-152,154-155,159-177,179-180,184,186-187,190-192,194-196,200,350-360
+  ai_agent 129,185
+MyStory/Components/Theme/AppTheme+ButtonStyles.swift
+  s_adecaf1a4b1cd7::t_7580b230676d2b 101,104
+openspec/changes/improve-story-ui-experience/design.md
+  s_adecaf1a4b1cd7::t_5724813ce44011 1-83
+MyStory/Resources/Localizable/en.lproj/Localizable.strings
+  s_adecaf1a4b1cd7::t_c264d439aa2ed1 79
+  s_adecaf1a4b1cd7::t_a8fbb77c6c8424 16-18,30-42,58-78,122-127,217-219,227-228
+  s_adecaf1a4b1cd7::t_d867f013295466 233-234
+  s_adecaf1a4b1cd7::t_e2bc410d45e062 80,347-348
+  s_adecaf1a4b1cd7::t_fc8acc20f9457b 220
+MyStory/ViewModels/Editor/AIPolishViewModel.swift
+  s_adecaf1a4b1cd7::t_d867f013295466 20-21,25-26
+MyStory/Resources/Localizable/zh-Hans.lproj/Localizable.strings
+  s_adecaf1a4b1cd7::t_d867f013295466 233-234
+  s_adecaf1a4b1cd7::t_a8fbb77c6c8424 16-18,30-42,58-78,122-127,217-219,227-228
+  s_adecaf1a4b1cd7::t_e2bc410d45e062 80,347-348
+  s_adecaf1a4b1cd7::t_c264d439aa2ed1 79
+  s_adecaf1a4b1cd7::t_fc8acc20f9457b 220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "659489ae7bd00a935be4b152cc62d5cc15257811",
+  "prompts": {},
+  "logical_commit_id": "659489ae7bd00a935be4b152cc62d5cc15257811",
+  "sessions": {
+    "s_adecaf1a4b1cd7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ed4cd-6934-7260-9361-55bd5b4f532b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "zhouli.gavin <zhouli.gavin@bigo.sg>"
+    }
+  }
+}
